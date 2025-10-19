@@ -114,6 +114,7 @@ namespace WpfApp1
                     await cmd.ExecuteNonQueryAsync();
                     da.Fill(dt);
                     contractsDG.ItemsSource = dt.AsDataView();
+                    ShowRecordsCount();
                 }
             }
             catch (Exception exc)
@@ -192,6 +193,17 @@ namespace WpfApp1
         private void contractsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             showContractVerbose.IsEnabled = true;
+        }
+
+        private void ShowRecordsCount()
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from `contract`;", conn);
+                int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
+                recordsCountLabel.Content = recordsCount.ToString();
+            }
         }
     }
 }
