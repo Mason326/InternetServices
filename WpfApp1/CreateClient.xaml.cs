@@ -136,37 +136,54 @@ namespace WpfApp1
 
         private void fioTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
-                return;
-            if (e.Key == Key.Back)
+            try
             {
-                prevBack = true;
-                return;
-            }
-            int fioLength = fioTextBox.Text.Length;
-            if (fioLength > 0)
-            {
-                string[] fioByParts = fioTextBox.Text.Split(' ');
-                for (int i = 0; i < fioByParts.Length; i++)
+                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                    return;
+                if (e.Key == Key.Back)
                 {
-                    string part = fioByParts[i];
-                    if(part.Length > 0)
-                        fioByParts[i] = ToTitle(part);
+                    prevBack = true;
+                    return;
                 }
-                int currentPos = fioTextBox.CaretIndex;
-                fioTextBox.Text = ToTitle(string.Join(" ", fioByParts));
-                if (prevBack)
+                int fioLength = fioTextBox.Text.Length;
+                if (fioLength > 0)
                 {
-                    fioTextBox.CaretIndex = currentPos;
-                    prevBack = false;
-                }
-                else
-                {
-                    if(currentPos != fioTextBox.Text.Length)
+                    string[] fioByParts = fioTextBox.Text.Split(' ');
+                    for (int i = 0; i < fioByParts.Length; i++)
+                    {
+                        string part = fioByParts[i];
+
+                        if (part.Length > 0)
+                            fioByParts[i] = ToTitle(part);
+                        if (part.Contains("-"))
+                        {
+                            string[] arr = fioByParts[i].Split(new char[] { '-' });
+                            if (arr[1].Length > 0)
+                            {
+                                arr[1] = ToTitle(arr[1]);
+                                fioByParts[i] = string.Join("-", arr);
+                            }
+                        }
+                    }
+                    int currentPos = fioTextBox.CaretIndex;
+                    fioTextBox.Text = string.Join(" ", fioByParts);
+                    if (prevBack)
+                    {
                         fioTextBox.CaretIndex = currentPos;
+                        prevBack = false;
+                    }
                     else
-                        fioTextBox.CaretIndex = ++currentPos;
+                    {
+                        if (currentPos != fioTextBox.Text.Length)
+                            fioTextBox.CaretIndex = currentPos;
+                        else
+                            fioTextBox.CaretIndex = ++currentPos;
+                    }
                 }
+            }
+            catch
+            {
+                ;
             }
         }
 
