@@ -1,0 +1,17 @@
+﻿<Window x:Class="WpfApp1.MasterMain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Window25" Height="450" Width="358.4" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+    <Grid>
+        <Label Content="Мастер:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Image HorizontalAlignment="Left" Height="188" Margin="71,65,0,0" VerticalAlignment="Top" Width="221" Source="user.png"/>
+        <Label Name="userName" Content="" HorizontalAlignment="Left" Margin="77,10,0,0" VerticalAlignment="Top" FontSize="16" Height="32" Width="234"/>
+        <Button Content="Заявки" HorizontalAlignment="Left" Margin="62,290,0,0" VerticalAlignment="Top" Width="230" Height="35" Click="Button_Click" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <Button Content="Выйти из учётной записи" HorizontalAlignment="Left" Margin="62,340,0,0" VerticalAlignment="Top" Width="230" Height="42" Click="Button_Click_1" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+
+    </Grid>
+</Window>

@@ -1,0 +1,40 @@
+﻿<Window x:Class="WpfApp1.Contract"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Договор" Height="588.6" Width="865.6" WindowStartupLocation="CenterScreen" WindowStyle="None">
+    <Grid>
+        <GroupBox Header="Заявка" HorizontalAlignment="Left" Height="263" Margin="50,152,0,0" VerticalAlignment="Top" Width="470" FontSize="16">
+            <StackPanel HorizontalAlignment="Left" Height="220" Margin="10,10,0,-35.6" VerticalAlignment="Top" Width="459">
+                <Label Content="Номер заявки: 12345" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="178"/>
+                <Label Content="Дата создания: 13.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="221"/>
+                <Label Content="Дата выполнения: 15.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="234"/>
+                <Label Content="Клиент: Иванов Иван Иванович" HorizontalAlignment="Left" Margin="0,0,-7.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="329"/>
+                <Label Content="Адрес монтирования: ул. Пушкина, д. X, кв. X" HorizontalAlignment="Left" Margin="0,0,-95.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="417"/>
+                <Label Content="Менеджер: Петров Пётр Петрович" HorizontalAlignment="Left" Margin="0,0,-138.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="460"/>
+                <DockPanel>
+                    <Label Content="Статус заявки: Закрыта" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="186"/>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+        <Label Content="Номер договора: 543210" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="40,43,0,0"/>
+        <Label Content="Номер акта выполнненных работ: 543210" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="348" Margin="40,79,0,0"/>
+        <Label Content="Статус договора" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="257" Margin="544,43,0,0"/>
+        <Label Content="Тариф: 300 мбит/c 600 руб. / мес." HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="348" Margin="544,137,-32.8,0"/>
+        <Label Content="Логин учетной записи" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="193" Margin="544,184,0,0"/>
+        <Label Content="Пароль учетной записи" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="273" Margin="544,270,0,0"/>
+        <TextBox HorizontalAlignment="Left" Height="33" Margin="544,216,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="273"/>
+        <TextBox HorizontalAlignment="Left" Height="33" Margin="544,307,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="273"/>
+        <Button Content="Сгенерировать пароль и логин" HorizontalAlignment="Left" Margin="544,372,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+        <Label Content="Номер пакета доп. услуг: xxxxx" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="348" Margin="42,434,0,0"/>
+
+        <Label Content="Дата заключения договора: 15.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="384" Margin="42,115,0,0"/>
+        <Button Content="На главную" HorizontalAlignment="Left" Margin="544,498,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+        <ComboBox HorizontalAlignment="Left" Margin="544,78,0,0" VerticalAlignment="Top" Width="220" Height="44"/>
+        <Button Content="Печать договора" HorizontalAlignment="Left" Margin="544,434,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+
+    </Grid>
+</Window>

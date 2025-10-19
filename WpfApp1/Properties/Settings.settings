@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WpfApp1.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="companyName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ООО "Начало"</Value>
+    </Setting>
+    <Setting Name="companyDescription" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ИНН 0781780400, ОГРН 1130203661830, ОГРНИП 40704903516393, КПП 320142383, Юридический адрес 420342, г. Казань, ул. Центральная, 18, оф. 57</Value>
+    </Setting>
+    <Setting Name="companyDirector" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Иванов Иван Иванович</Value>
+    </Setting>
+    <Setting Name="server" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="database" Type="System.String" Scope="User">
+      <Value Profile="(Default)">course</Value>
+    </Setting>
+    <Setting Name="user" Type="System.String" Scope="User">
+      <Value Profile="(Default)">root</Value>
+    </Setting>
+    <Setting Name="password" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>
