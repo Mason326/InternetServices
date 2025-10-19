@@ -27,8 +27,10 @@ namespace WpfApp1
             {
                 DataRowView selectedContractView = contractsDG.SelectedItem as DataRowView;
                 object[] selectedContractoItemsArray = selectedContractView.Row.ItemArray;
+                this.Hide();
                 var form = new ContractVerbose(selectedContractoItemsArray);
                 form.ShowDialog();
+                this.ShowDialog();
             }
         }
 

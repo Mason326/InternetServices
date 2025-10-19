@@ -36,8 +36,10 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new CreateClient(true);
             win.ShowDialog();
+            this.ShowDialog();
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
@@ -272,8 +274,10 @@ namespace WpfApp1
             {
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                this.Hide();
                 var win = new ClaimVerbose(fieldValuesOfARecord, false);
                 win.ShowDialog();
+                this.ShowDialog();
             }
         }
 

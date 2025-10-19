@@ -34,7 +34,9 @@ namespace WpfApp1
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            MessageBoxResult resDialog = MessageBox.Show("Вы действительно хотите выйти из приложения?", "Выход", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (resDialog == MessageBoxResult.Yes)
+                this.Close();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -83,7 +85,7 @@ namespace WpfApp1
                                 AccountHolder.UserLogin = (string)accountData[2];
                                 AccountHolder.UserPassword = (string)accountData[3];
                                 AccountHolder.UserRole = (string)accountData[4];
-
+                                this.Hide();
                                 switch (AccountHolder.UserRole)
                                 {
                                     case "Менеджер":
@@ -113,6 +115,7 @@ namespace WpfApp1
                 }
                 LoginTextbox.Text = "";
                 PasswordTextBox.Password = "";
+                this.ShowDialog();
             }
 
         }

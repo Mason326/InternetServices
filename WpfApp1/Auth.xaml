@@ -23,5 +23,7 @@
                 <Button x:Name="AuthButton" Content="Авторизоваться" HorizontalAlignment="Left" Margin="5,223,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" Click="Button_Click_1" UseLayoutRounding="False"/>
             </StackPanel>
         </DockPanel>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="431,61,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="445,147,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
     </Grid>
 </Window>

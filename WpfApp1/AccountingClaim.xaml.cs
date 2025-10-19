@@ -42,15 +42,19 @@ namespace WpfApp1
             {
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                this.Hide();
                 var win = new ClaimVerbose(fieldValuesOfARecord, true);
                 win.ShowDialog();
+                this.ShowDialog();
             }
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new Order();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
