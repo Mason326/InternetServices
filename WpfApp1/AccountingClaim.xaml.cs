@@ -38,8 +38,13 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var win = new ClaimVerbose();
-            win.ShowDialog();
+            if (claimsDG.SelectedItem != null)
+            {
+                DataRowView drv = claimsDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                var win = new ClaimVerbose(fieldValuesOfARecord, true);
+                win.ShowDialog();
+            }
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
@@ -82,7 +87,13 @@ namespace WpfApp1
                     DataTable dt = new DataTable();
                     await cmd.ExecuteNonQueryAsync();
                     da.Fill(dt);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        string fio = row.ItemArray[5].ToString();
+                        row.SetField<string>(5, HideClientName(fio));
+                    }
                     claimsDG.ItemsSource = dt.AsDataView();
+                    ShowRecordsCount();
                 }
             }
             catch (Exception exc)
@@ -177,6 +188,28 @@ namespace WpfApp1
             toDate.Text = "";
             allStatuses.IsChecked = true;
             searchByContractNumAndFio.Text = "";
+        }
+
+        private string HideClientName(string fullName)
+        {
+            string[] clientFio = fullName.Split(' ');
+            return $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+        }
+
+        private void claimsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            showClaimButton.IsEnabled = true;
+        }
+
+        private void ShowRecordsCount()
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from `connection_claim`;", conn);
+                int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
+                recordsCountLabel.Content = recordsCount.ToString();
+            }
         }
     }
 }

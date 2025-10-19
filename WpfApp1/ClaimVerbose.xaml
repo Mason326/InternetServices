@@ -5,18 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Заявка подробно" Height="394.8" Width="531.2" WindowStartupLocation="CenterScreen" WindowStyle="None">
+        Title="Заявка подробно" Height="405.265" Width="743.346" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <Label Content="Номер заявки: 12345" HorizontalAlignment="Left" Margin="32,35,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="178"/>
-        <Label Content="Дата создания: 13.09.2025" HorizontalAlignment="Left" Margin="32,71,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="221"/>
-        <Label Content="Дата выполнения: 15.09.2025" HorizontalAlignment="Left" Margin="32,102,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="234"/>
-        <Label Content="Клиент: Иванов Иван Иванович" HorizontalAlignment="Left" Margin="32,138,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="329"/>
-        <Label Content="Адрес монтирования: ул. Пушкина, д. X, кв. X" HorizontalAlignment="Left" Margin="32,169,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="460"/>
-        <Label Content="Менеджер: Петров Пётр Петрович" HorizontalAlignment="Left" Margin="32,200,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="460"/>
-        <Label Content="Статус" HorizontalAlignment="Left" Margin="32,236,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="73"/>
-        <ComboBox HorizontalAlignment="Left" Margin="105,236,0,0" VerticalAlignment="Top" Width="178" Height="31"/>
-        <Button Content="Сохранить изменения" HorizontalAlignment="Left" Margin="305,236,0,0" VerticalAlignment="Top" Width="187" Height="37" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
-        <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="32,292,0,0" VerticalAlignment="Top" Width="460" Height="47" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <GroupBox x:Name="ClaimGroupBox" Header="Заявка" HorizontalAlignment="Left" Height="379" Margin="10,10,0,0" VerticalAlignment="Top" Width="488" FontSize="16">
+            <StackPanel>
+                <DockPanel Margin="0,16,0,0">
+                    <Label Content="Дата выполнения:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="146"/>
+                    <Label x:Name="dateOfExecutionLabel" Content="" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Клиент:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="65"/>
+                    <Label x:Name="clientLabel" Content="" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Адрес монтирования:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="178"/>
+                    <TextBox x:Name="mountAddressTextBox" IsReadOnly="True" HorizontalAlignment="Left" Height="116" Margin="0,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="282" FontSize="16" BorderBrush="White" AcceptsReturn="True"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Менеджер:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="92"/>
+                    <Label x:Name="managerNameLabel" Content="" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Статус" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="73"/>
+                    <ComboBox x:Name="statusComboBox" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="178" Height="31"/>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
+        <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="523,20,0,0" VerticalAlignment="Top" Width="187" Height="48" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="187" Height="47" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
 
     </Grid>
 </Window>

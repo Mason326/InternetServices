@@ -23,6 +23,7 @@ namespace WpfApp1
     public partial class CreateClaim : Window
     {
         Dictionary<int, string> tariffs = new Dictionary<int, string>();
+        const int INCOMING_CLAIM_STATUS_ID = 1;
         public CreateClaim()
         {
             InitializeComponent();
@@ -42,8 +43,6 @@ namespace WpfApp1
                 object[] client = ClientHolder.data;
                 string fioWithHiddenSurname = HideClientName(client[1].ToString());
                 string hiddenPhoneNumber = HideClientPhoneNumber(client[3].ToString());
-                
-
                 clientTextBox.Text = $"{fioWithHiddenSurname}, {hiddenPhoneNumber}";
             }
         }
@@ -71,6 +70,22 @@ namespace WpfApp1
             catch (Exception exc)
             {
                 MessageBox.Show($"Не удалось загрузить тарифы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT `status` FROM claim_status where idclaim_status = {INCOMING_CLAIM_STATUS_ID};", conn);
+                    string statusName = cmd.ExecuteScalar().ToString();
+                    claimStatusComboBox.SelectedItem = statusName;
+                }
+                tariffComboBox.ItemsSource = tariffs.Values;
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось загрузить статус\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             claimStatusComboBox.ItemsSource = new string[] { "Входящая" };
@@ -248,9 +263,23 @@ namespace WpfApp1
                 }
                 sb.Append(phoneNumberByLetters[i]);
             }
-
-            
             return sb.ToString();
+        }
+
+        private void ShowClaimVerbose(object sender, RoutedEventArgs e)
+        {
+            if (claimsDG.SelectedItem != null)
+            {
+                DataRowView drv = claimsDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                var win = new ClaimVerbose(fieldValuesOfARecord, false);
+                win.ShowDialog();
+            }
+        }
+
+        private void claimsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            showClaimButton.IsEnabled = true;
         }
     }
 }
