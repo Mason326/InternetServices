@@ -11,7 +11,7 @@
         <Label Content="Статус" HorizontalAlignment="Left" Margin="255,35,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
         <Button Content="Создать заявку" HorizontalAlignment="Left" Height="36" Margin="727,35,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
         <Button Content="На главную" HorizontalAlignment="Left" Height="36" Margin="255,310,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148"/>
-        <DataGrid x:Name="claimsDG" Margin="10,279,9.8,3.4" AutoGenerateColumns="False">
+        <DataGrid x:Name="claimsDG" Margin="10,279,9.8,3.4" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№ Заявки" Binding="{Binding id_claim}" Width="70" />
                 <DataGridTextColumn Header="Дата создания" Binding="{Binding connection_creationDate, StringFormat=\{0:dd.MM.yy\}}" Width="100" />
@@ -48,7 +48,7 @@
         </DataGrid>
         <Button Content="Редактировать заявку" HorizontalAlignment="Left" Height="36" Margin="727,83,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         <Button Content="На главную" HorizontalAlignment="Left" Height="36" Margin="727,220,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <DatePicker x:Name="dateOfExecution" HorizontalAlignment="Left" Margin="464,64,0,0" VerticalAlignment="Top" Height="36" Width="135" FontSize="16" SelectedDateChanged="dateOfExecution_SelectedDateChanged"/>
+        <DatePicker x:Name="dateOfExecution" HorizontalAlignment="Left" Margin="464,64,0,0" VerticalAlignment="Top" Height="36" Width="135" FontSize="16" SelectedDateChanged="dateOfExecution_SelectedDateChanged" PreviewTextInput="dateOfExecution_PreviewTextInput"/>
         <ComboBox IsEnabled="False" x:Name="claimStatusComboBox" HorizontalAlignment="Left" Margin="255,64,0,0" VerticalAlignment="Top" Width="184" Height="38" FontSize="16"/>
         <Label Content="Дата создания:" HorizontalAlignment="Left" Margin="25,69,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="120"/>
         <Label Content="Номер заявки:" HorizontalAlignment="Left" Margin="29,25,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="117"/>
@@ -57,7 +57,7 @@
         <TextBox x:Name="clientTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,223,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310"/>
         <Label Name="claimNumber" Content="" HorizontalAlignment="Left" Margin="142,28,0,0" VerticalAlignment="Top" FontSize="16"/>
         <Label Name="creationDate" Content="" HorizontalAlignment="Left" Margin="142,71,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <TextBox Name="mountAddressTextBox" HorizontalAlignment="Left" Height="32" Margin="30,146,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="409" PreviewTextInput="TextBox_PreviewTextInput"/>
+        <TextBox Name="mountAddressTextBox" HorizontalAlignment="Left" Height="44" Margin="30,146,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="409" PreviewTextInput="TextBox_PreviewTextInput" MaxLength="150"/>
         <Label Content="Адрес монтирования" HorizontalAlignment="Left" Margin="25,115,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="165"/>
         <ComboBox x:Name="timeOfExecution" HorizontalAlignment="Left" Margin="599,64,0,0" VerticalAlignment="Top" Width="82" Height="36" FontSize="16">
             <ComboBox.Background>

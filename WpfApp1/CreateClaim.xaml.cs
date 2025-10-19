@@ -40,26 +40,11 @@ namespace WpfApp1
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
-                string[] clientFio = client[1].ToString().Split(' ');
-                string fioWithHiddenSurname = $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
-                string[] hiddenPhoneNumber = client[3].ToString().Split();
-                int cntr = 0;
-                for (int i = 1; i < 8; i++)
-                {
-                    if (i < 4)
-                    {
-                        string middlePart = hiddenPhoneNumber[1];
-                        hiddenPhoneNumber[1] = middlePart.Replace(middlePart[i], '#');
-                    }
-                    if (i > 4)
-                    {
-                        string lastPart = hiddenPhoneNumber[2];
-                        hiddenPhoneNumber[2] = lastPart.Replace(lastPart[cntr], '#');
-                        cntr++;
-                    }
-                }
+                string fioWithHiddenSurname = HideClientName(client[1].ToString());
+                string hiddenPhoneNumber = HideClientPhoneNumber(client[3].ToString());
+                
 
-                clientTextBox.Text = $"{fioWithHiddenSurname}, {string.Join(" ", hiddenPhoneNumber)}";
+                clientTextBox.Text = $"{fioWithHiddenSurname}, {hiddenPhoneNumber}";
             }
         }
 
@@ -79,6 +64,7 @@ namespace WpfApp1
                     {
                         tariffs.Add(Convert.ToInt32(dr.GetValue(0)), dr.GetValue(1).ToString());
                     }
+                    dr.Close();
                 }
                 tariffComboBox.ItemsSource = tariffs.Values;
             }
@@ -150,7 +136,6 @@ namespace WpfApp1
                 catch (Exception exc)
                 {
                     MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-
                 }
             }
             else
@@ -174,9 +159,16 @@ namespace WpfApp1
                                                         inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
                                                         inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id;", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
+                    DataTable dt =  new DataTable();
                     da.Fill(dt);
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        string fio = row.ItemArray[5].ToString();
+                        row.SetField<string>(5, HideClientName(fio));
+                    }
+
                     claimsDG.ItemsSource = dt.AsDataView();
                     timeOfExecution.ItemsSource = timePeriodArr;
                 }
@@ -224,6 +216,41 @@ namespace WpfApp1
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             ClearSelected();
+        }
+
+        private void dateOfExecution_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex(@"[\b\s]");
+            if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                e.Handled = false;
+            else
+                e.Handled = true;
+        }
+
+        private string HideClientName(string fullName)
+        {
+            string[] clientFio = fullName.Split(' ');
+            return $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+        }
+
+        private string HideClientPhoneNumber(string phoneNumber)
+        {
+            char[] phoneNumberByLetters = phoneNumber.ToCharArray().Where(c => c != ' ').ToArray();
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < phoneNumberByLetters.Length; i++)
+            {
+                if(i == 2 || i == 7)
+                    sb.Append(' ');
+                if (i >= 3 && i <= 5 || i >= 7 && i <= 9)
+                {
+                    sb.Append('#');
+                    continue;
+                }
+                sb.Append(phoneNumberByLetters[i]);
+            }
+
+            
+            return sb.ToString();
         }
     }
 }
