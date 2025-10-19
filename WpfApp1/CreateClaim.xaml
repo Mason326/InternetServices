@@ -80,6 +80,7 @@
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="508,119,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Button Content="Очистить поля" HorizontalAlignment="Left" Margin="546,217,0,0" VerticalAlignment="Top" Width="135" Height="39" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_3"/>
         <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="727,88,0,0" VerticalAlignment="Top" Width="226" Height="37" Background="#FF4F6DD3" Foreground="White" FontSize="16" FontFamily="Arial" FontWeight="Bold" Click="ShowClaimVerbose"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="304,35,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" RenderTransformOrigin="-16.708,0.598"/>
 
     </Grid>
 </Window>

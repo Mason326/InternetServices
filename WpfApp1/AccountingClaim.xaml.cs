@@ -64,6 +64,20 @@ namespace WpfApp1
             fromDate.DisplayDateStart = DateTime.Today.AddYears(-10);
             fromDate.DisplayDateEnd = DateTime.Today.AddDays(-1);
             toDate.DisplayDateEnd = DateTime.Today;
+
+            switch (AccountHolder.UserRole)
+            {
+                case "Менеджер":
+                    printClaimButton.Visibility = Visibility.Collapsed;
+                    orderButton.Visibility = Visibility.Collapsed;
+                    break;
+                case "Мастер":
+                    printClaimButton.Visibility = Visibility.Collapsed;
+                    break;
+                case "Директор":
+                    orderButton.Visibility = Visibility.Collapsed;
+                    break;
+            }
         }
 
         private async void RefreshDatagrid()

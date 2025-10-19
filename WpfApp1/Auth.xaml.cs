@@ -101,6 +101,9 @@ namespace WpfApp1
                                         new DirectorMain().ShowDialog();
                                         break;
                                 }
+                                LoginTextbox.Text = "";
+                                PasswordTextBox.Password = "";
+                                this.ShowDialog();
                             }
                             else
                             {
@@ -115,7 +118,6 @@ namespace WpfApp1
                 }
                 LoginTextbox.Text = "";
                 PasswordTextBox.Password = "";
-                this.ShowDialog();
             }
 
         }

@@ -22,7 +22,7 @@ namespace WpfApp1
     /// </summary>
     public partial class CreateClient : Window
     {
-
+        bool prevBack = false;
         public CreateClient(bool isSelectClient)
         {
             InitializeComponent();
@@ -55,6 +55,7 @@ namespace WpfApp1
                     da.Fill(dt);
                     clientsDG.ItemsSource = dt.AsDataView();
                 }
+                LoadClientStatuses();
             }
             catch (Exception exc)
             {
@@ -64,17 +65,13 @@ namespace WpfApp1
 
         private void fioTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex(@"[А-Яа-я-\b\s]");
+            Regex regex = new Regex(@"[А-Яа-я- \b\s]");
             try
             {
                 if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
                     e.Handled = false;
                 else
                     e.Handled = true;
-                string[] arr = fioTextBox.Text.Split(' ');
-                if (arr.Length > 0)
-                    fioTextBox.Text = string.Join(" ", arr.Select(s => $"{s[0].ToString().ToUpper()}{s.Substring(1)}"));
-                fioTextBox.CaretIndex = fioTextBox.Text.Length;
             }
             catch
             {
@@ -95,6 +92,87 @@ namespace WpfApp1
                 ClientHolder.data = drv.Row.ItemArray;
                 this.Close();
             }
+        }
+
+        private void LoadClientStatuses()
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(@"Select `status_name` from client_status;", conn);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    cmd.ExecuteNonQuery();
+                    da.Fill(dt);
+                    try
+                    { 
+                        List<string> statuses = new List<string>();
+                        foreach (DataRow record in dt.Rows)
+                        {
+                           statuses.Add(record.ItemArray[0].ToString());
+                        }
+                        clientStatusCombobox.ItemsSource = statuses;
+                        clientStatusCombobox.SelectedIndex = 0;
+                    }
+                    catch (Exception exc)
+                    {
+                        MessageBox.Show($"Не удалось загрузить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void fioTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+           
+        }
+
+        private void fioTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                return;
+            if (e.Key == Key.Back)
+            {
+                prevBack = true;
+                return;
+            }
+            int fioLength = fioTextBox.Text.Length;
+            if (fioLength > 0)
+            {
+                string[] fioByParts = fioTextBox.Text.Split(' ');
+                for (int i = 0; i < fioByParts.Length; i++)
+                {
+                    string part = fioByParts[i];
+                    if(part.Length > 0)
+                        fioByParts[i] = ToTitle(part);
+                }
+                int currentPos = fioTextBox.CaretIndex;
+                fioTextBox.Text = ToTitle(string.Join(" ", fioByParts));
+                if (prevBack)
+                {
+                    fioTextBox.CaretIndex = currentPos;
+                    prevBack = false;
+                }
+                else
+                {
+                    if(currentPos != fioTextBox.Text.Length)
+                        fioTextBox.CaretIndex = currentPos;
+                    else
+                        fioTextBox.CaretIndex = ++currentPos;
+                }
+            }
+        }
+
+        private string ToTitle(string text)
+        {
+            return $"{text[0].ToString().ToUpper()}{text.Substring(1, text.Length - 1)}";
         }
     }
 }
