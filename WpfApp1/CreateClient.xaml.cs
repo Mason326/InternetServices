@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -23,6 +24,12 @@ namespace WpfApp1
     public partial class CreateClient : Window
     {
         bool prevBack = false;
+        Regex regexForEmail = new Regex("^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
+        Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
+        Regex regexForPassportSeries = new Regex(@"^[0-9]{4}$");
+        Regex regexForPassportNumber = new Regex(@"^[0-9]{6}$");
+        Regex regexForDepartmentCode = new Regex(@"^\d{3}-\d{3}$");
+
         public CreateClient(bool isSelectClient)
         {
             InitializeComponent();
@@ -57,6 +64,9 @@ namespace WpfApp1
                 }
                 LoadClientStatuses();
                 phoneTextBox.Text = "+7 (___) ___-__-__";
+                dateOfBirthDatePicker.DisplayDateEnd = DateTime.Now;
+                issueDate.DisplayDateEnd = DateTime.Now;
+                departmentCodeTextBox.Text = "___-___";
             }
             catch (Exception exc)
             {
@@ -286,6 +296,163 @@ namespace WpfApp1
                     e.Handled = false;
                 else
                     e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void emailTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var emailTextBox = sender as TextBox;
+            string email = emailTextBox.Text;
+            if (e.Key == Key.D2)
+            {
+                if (emailTextBox.Text.Length > 0)
+                {
+                    if (LimitOneLetterInput(emailTextBox, '@'))
+                        e.Handled = true;
+                    else
+                        e.Handled = false;
+                }
+            }
+        }
+
+        private bool LimitOneLetterInput(TextBox textBox, char letter)
+        {
+            return textBox.Text.Count(c => c == letter) > 0;
+        }
+
+        private void placeOfResidenceTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            try
+            {
+                Regex regex = new Regex(@"[0-9А-Яа-я-/.,\b\s]");
+                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                    e.Handled = false;
+                else
+                    e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            char[] targetCharsLogin = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
+            char[] mixedCharsLogin = CredentialsGenerator.MixChars(targetCharsLogin);
+            string generateLogin = CredentialsGenerator.GenerateCredential(mixedCharsLogin, false);
+            
+            char[] targetCharsPassword = "#$!&&)(!-_+=<>qwe*rtyuiopasdfghjk56789lzxcvb%nmQWERTYU%IOPASDFGHJKLZXCVBNM0123456789#$!&&)(!-_+=<>".ToCharArray();
+            char[] mixedCharsPassword = CredentialsGenerator.MixChars(targetCharsPassword);
+            string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword, true);
+
+            abonentLoginTextBox.Text = generateLogin;
+            abonentPasswordTextBox.Text = generatePassword;
+        }
+
+        
+        private void seriesAndNumberTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            try
+            {
+                Regex regex = new Regex(@"[0-9\b\s]");
+                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                    e.Handled = false;
+                else
+                    e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void issuedByTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            try
+            {
+                Regex regex = new Regex(@"[0-9А-Яа-я-/.,\b\s]");
+                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                    e.Handled = false;
+                else
+                    e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void departmentCodeTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            try
+            {
+                Regex regex = new Regex(@"[0-9\b\s]");
+                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                    e.Handled = false;
+                else
+                    e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void Date_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex(@"[\b\s]");
+            if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                e.Handled = false;
+            else
+                e.Handled = true;
+        }
+
+        private void departmentCodeTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            var departmentCodeTextBox = sender as TextBox;
+            try
+            {
+                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                    return;
+                if (e.Key == Key.Back)
+                {
+                    departmentCodeTextBox.Text = "___-___";
+                    departmentCodeTextBox.CaretIndex = 0;
+                    return;
+                }
+                int caretIndex = departmentCodeTextBox.CaretIndex;
+                int departmentCodeLength = departmentCodeTextBox.Text.Length;
+                if (departmentCodeLength > 0)
+                {
+                    string[] departmentCodeByParts = departmentCodeTextBox.Text.Split('-');
+                    for (int i = 0; i < departmentCodeByParts.Length; i++)
+                    {
+                        string part = departmentCodeByParts[i];
+                        string fpart;
+                        string spart;
+                        switch (i)
+                        {
+                            case 0:
+                                fpart = part.Substring(0, 3);
+                                departmentCodeByParts[i] = fpart;
+                                break;
+                            case 1:
+                                spart = part.Substring(0, 3);
+                                departmentCodeByParts[i] = spart;
+                                break;
+                        }
+                    }
+                    departmentCodeTextBox.Text = string.Join("-", departmentCodeByParts);
+                    if(caretIndex == 3)
+                        departmentCodeTextBox.CaretIndex = ++caretIndex;
+                    else
+                        departmentCodeTextBox.CaretIndex = caretIndex;
+                }
             }
             catch
             {

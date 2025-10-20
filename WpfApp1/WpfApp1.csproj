@@ -86,6 +86,7 @@
     <Compile Include="ContractVerbose.xaml.cs">
       <DependentUpon>ContractVerbose.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CredentialsGenerator.cs" />
     <Compile Include="FullNameSplitter.cs" />
     <Compile Include="Services.xaml.cs">
       <DependentUpon>Services.xaml</DependentUpon>
