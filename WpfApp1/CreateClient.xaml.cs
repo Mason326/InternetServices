@@ -218,30 +218,15 @@ namespace WpfApp1
                             string fpart;
                             string spart;
                             string tpart;
-                            if (currentPos > 16)
-                            {
-                                fpart = part.Substring(0, 3);
-                                spart = part.Substring(4, 2);
-                                tpart = part.Substring(7, 2);
-                            }
-                            else if (currentPos > 13)
-                            {
-                                fpart = part.Substring(0, 3);
-                                spart = part.Substring(4, 2);
+                            fpart = part.Substring(0, 3);
+                            spart = part.Substring(4, 2);
+                            tpart = part.Substring(7, 2);
+                            if (currentPos > 13 && currentPos <= 16)
                                 tpart = part.Substring(8, 2);
-                            }
-                            else if (currentPos > 9)
+                            else if (currentPos > 9 && currentPos <= 13)
                             {
-                                fpart = part.Substring(0, 3);
                                 spart = part.Substring(5, 2);
                                 tpart = part.Substring(8, 2);
-                            }
-                            else
-                            {
-                                fpart = part.Substring(0, 3);
-                                spart = part.Substring(4, 2);
-                                tpart = part.Substring(7, 2);
-
                             }
                             phoneByParts[i] = $"{fpart}-{spart}-{tpart}";
                             break;
@@ -266,18 +251,6 @@ namespace WpfApp1
                 else
                     phoneTextBox.CaretIndex = currentPos;
                 }
-                //if (prevBack)
-                //{
-                //    fioTextBox.CaretIndex = currentPos;
-                //    prevBack = false;
-                //}
-                //else
-                //{
-                //    if (currentPos != fioTextBox.Text.Length)
-                //        fioTextBox.CaretIndex = currentPos;
-                //    else
-                //        fioTextBox.CaretIndex = ++currentPos;
-                //}
         }
 
         private void phoneTextBox_GotFocus(object sender, RoutedEventArgs e)
@@ -290,6 +263,22 @@ namespace WpfApp1
         {
             var phoneTextBox = sender as TextBox;
             phoneTextBox.CaretIndex = 4;
+        }
+
+        private void phoneTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex(@"[0-9\b\s]");
+            try
+            {
+                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                    e.Handled = false;
+                else
+                    e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
         }
     }
 }
