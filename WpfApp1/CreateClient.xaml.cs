@@ -459,5 +459,53 @@ namespace WpfApp1
                 ;
             }
         }
+
+        private void createClientButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (fioTextBox.Text.Split(' ').Length == 3 
+                && regexForPhoneNumber.IsMatch(phoneTextBox.Text) 
+                && dateOfBirthDatePicker.SelectedDate != null 
+                && placeOfResidenceTextBox.Text.Length > 0 
+                && abonentLoginTextBox.Text.Length > 0 
+                && regexForPassportSeries.IsMatch(passportSeriesTextBox.Text) 
+                && regexForPassportNumber.IsMatch(passportNumberTextBox.Text) 
+                && issuedByTextBox.Text.Length > 0 
+                && issueDate.SelectedDate != null 
+                && regexForDepartmentCode.IsMatch(departmentCodeTextBox.Text))
+            {
+                string emailFieldName = "";
+                if (regexForEmail.IsMatch(emailTextBox.Text))
+                {
+                    emailFieldName = " email,";
+                }
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($@"Insert into `client`(full_name,{emailFieldName}phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, client_status_id) 
+                                                        value(
+                                                            '{fioTextBox.Text}',
+                                                            '{phoneTextBox.Text}',
+                                                            '{placeOfResidenceTextBox.Text}',
+                                                            '{((DateTime)dateOfBirthDatePicker.SelectedDate).ToString("yyyy-MM-dd")}',
+                                                            '{abonentLoginTextBox.Text}',
+                                                            '{abonentPasswordTextBox.Text}',
+                                                             {passportSeriesTextBox.Text},
+                                                             {passportNumberTextBox.Text},
+                                                            '{issuedByTextBox.Text}',
+                                                            '{((DateTime)issueDate.SelectedDate).ToString("yyyy-MM-dd")}',
+                                                            '{departmentCodeTextBox.Text}',
+                                                             (SELECT `idclient_status` FROM `client_status` where `status_name` = '{clientStatusCombobox.SelectedItem.ToString()}')
+                                                        );", conn);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Клиент создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                }
+            }
+            else
+                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        
     }
 }
