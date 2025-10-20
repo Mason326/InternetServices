@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
         <TextBox x:Name="fioTextBox" HorizontalAlignment="Left" Margin="33,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="394" Height="29" PreviewTextInput="fioTextBox_PreviewTextInput" PreviewKeyUp="fioTextBox_PreviewKeyUp"/>
         <Label Content="ФИО" HorizontalAlignment="Left" Margin="28,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="46"/>
-        <TextBox x:Name="phoneTextBox" HorizontalAlignment="Left" Margin="33,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28"/>
+        <TextBox x:Name="phoneTextBox" HorizontalAlignment="Left" Margin="33,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28" PreviewKeyUp="phoneTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture"/>
         <Label Content="Телефон" HorizontalAlignment="Left" Margin="28,60,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="73"/>
         <Button x:Name="createClientButton" Content="Создать клиента" HorizontalAlignment="Left" Height="36" Margin="11,30,0,0" VerticalAlignment="Top" Width="325" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1"/>
         <Button x:Name="inClaimButton" Content="В заявку" HorizontalAlignment="Left" Height="36" Margin="11,143,0,0" VerticalAlignment="Top" Width="325" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="inClaimButton_Click" Grid.Column="1"/>

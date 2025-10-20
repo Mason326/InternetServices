@@ -56,6 +56,7 @@ namespace WpfApp1
                     clientsDG.ItemsSource = dt.AsDataView();
                 }
                 LoadClientStatuses();
+                phoneTextBox.Text = "+7 (___) ___-__-__";
             }
             catch (Exception exc)
             {
@@ -129,11 +130,6 @@ namespace WpfApp1
             }
         }
 
-        private void fioTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-           
-        }
-
         private void fioTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             try
@@ -190,6 +186,110 @@ namespace WpfApp1
         private string ToTitle(string text)
         {
             return $"{text[0].ToString().ToUpper()}{text.Substring(1, text.Length - 1)}";
+        }
+
+        private void phoneTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            var phoneTextBox = sender as TextBox;
+            if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                return;
+            if (e.Key == Key.Back)
+            {
+                prevBack = true;
+                return;
+            }
+            int fioLength = phoneTextBox.Text.Length;
+            if (fioLength > 0)
+            {
+                string[] phoneByParts = phoneTextBox.Text.Split(' ');
+                int currentPos = phoneTextBox.CaretIndex;
+                for (int i = 0; i < phoneByParts.Length; i++)
+                {
+                    string part = phoneByParts[i];
+                    switch (i)
+                    {
+                        case 0:
+                            phoneByParts[i] = "+7";
+                            break;
+                        case 1:
+                            phoneByParts[i] = $"({part.Substring(1, 3)})";
+                            break;
+                        case 2:
+                            string fpart;
+                            string spart;
+                            string tpart;
+                            if (currentPos > 16)
+                            {
+                                fpart = part.Substring(0, 3);
+                                spart = part.Substring(4, 2);
+                                tpart = part.Substring(7, 2);
+                            }
+                            else if (currentPos > 13)
+                            {
+                                fpart = part.Substring(0, 3);
+                                spart = part.Substring(4, 2);
+                                tpart = part.Substring(8, 2);
+                            }
+                            else if (currentPos > 9)
+                            {
+                                fpart = part.Substring(0, 3);
+                                spart = part.Substring(5, 2);
+                                tpart = part.Substring(8, 2);
+                            }
+                            else
+                            {
+                                fpart = part.Substring(0, 3);
+                                spart = part.Substring(4, 2);
+                                tpart = part.Substring(7, 2);
+
+                            }
+                            phoneByParts[i] = $"{fpart}-{spart}-{tpart}";
+                            break;
+                    }
+                }
+                string[] lastNumsOfThirdPart = phoneByParts[2].Split('-');
+                phoneTextBox.Text = string.Join(" ", phoneByParts);
+                if (!phoneByParts[1].Contains("_") && currentPos < 9)
+                    phoneTextBox.CaretIndex = currentPos + 2;
+                else if (!lastNumsOfThirdPart[0].Contains("_") && currentPos < 13)
+                {
+                    phoneTextBox.CaretIndex = currentPos + 1;
+                }
+                else if (!lastNumsOfThirdPart[1].Contains("_") && currentPos < 17)
+                {
+                    phoneTextBox.CaretIndex = currentPos + 1;
+                }
+                else if (!lastNumsOfThirdPart[2].Contains("_") && currentPos < 21)
+                {
+                    phoneTextBox.CaretIndex = currentPos + 1;
+                }
+                else
+                    phoneTextBox.CaretIndex = currentPos;
+                }
+                //if (prevBack)
+                //{
+                //    fioTextBox.CaretIndex = currentPos;
+                //    prevBack = false;
+                //}
+                //else
+                //{
+                //    if (currentPos != fioTextBox.Text.Length)
+                //        fioTextBox.CaretIndex = currentPos;
+                //    else
+                //        fioTextBox.CaretIndex = ++currentPos;
+                //}
+        }
+
+        private void phoneTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var phoneTextBox = sender as TextBox;
+            phoneTextBox.CaretIndex = 4;
+        }
+
+        private void phoneTextBox_GotMouseCapture(object sender, MouseEventArgs e)
+        {
+            var phoneTextBox = sender as TextBox;
+            phoneTextBox.CaretIndex = 4;
         }
     }
 }
