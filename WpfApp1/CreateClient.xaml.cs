@@ -58,6 +58,7 @@ namespace WpfApp1
                 passportSeriesTextBox.Text = "____";
                 passportNumberTextBox.Text = "______";
                 inClaimButton.IsEnabled = false;
+                showClient.IsEnabled = false;
             }
             catch (Exception exc)
             {
@@ -84,6 +85,7 @@ namespace WpfApp1
         private void clientsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             inClaimButton.IsEnabled = true;
+            showClient.IsEnabled = true;
         }
 
         private void inClaimButton_Click(object sender, RoutedEventArgs e)
@@ -658,6 +660,19 @@ namespace WpfApp1
             else
                 filterOption = "";
             RefreshDataGrid();
+        }
+
+        private void showClient_Click(object sender, RoutedEventArgs e)
+        {
+            if (clientsDG.SelectedItem != null)
+            {
+                DataRowView drv = clientsDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                this.Hide();
+                var win = new ClientVerbose(fieldValuesOfARecord);
+                win.ShowDialog();
+                this.ShowDialog();
+            }
         }
     }
 }

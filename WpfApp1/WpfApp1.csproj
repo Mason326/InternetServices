@@ -79,6 +79,9 @@
       <DependentUpon>AdditionalServices.xaml</DependentUpon>
     </Compile>
     <Compile Include="ClientHolder.cs" />
+    <Compile Include="ClientVerbose.xaml.cs">
+      <DependentUpon>ClientVerbose.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Company.xaml.cs">
       <DependentUpon>Company.xaml</DependentUpon>
     </Compile>
@@ -136,6 +139,10 @@
     <Compile Include="Auth.xaml.cs">
       <DependentUpon>Auth.xaml</DependentUpon>
     </Compile>
+    <Page Include="ClientVerbose.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Company.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
