@@ -108,7 +108,14 @@ namespace WpfApp1
                     foreach (DataRow row in dt.Rows)
                     {
                         string fio = row.ItemArray[5].ToString();
-                        row.SetField<string>(5, HideClientName(fio));
+                        try
+                        {
+                            row.SetField<string>(5, HideClientName(fio));
+                        }
+                        catch
+                        {
+                            ;
+                        }
                     }
                     claimsDG.ItemsSource = dt.AsDataView();
                     ShowRecordsCount();
@@ -211,7 +218,8 @@ namespace WpfApp1
         private string HideClientName(string fullName)
         {
             string[] clientFio = fullName.Split(' ');
-            return $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+            string hiddenName = $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+            return hiddenName;
         }
 
         private void claimsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)

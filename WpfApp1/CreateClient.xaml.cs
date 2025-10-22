@@ -29,6 +29,7 @@ namespace WpfApp1
         Regex regexForPassportSeries = new Regex(@"^[0-9]{4}$");
         Regex regexForPassportNumber = new Regex(@"^[0-9]{6}$");
         Regex regexForDepartmentCode = new Regex(@"^\d{3}-\d{3}$");
+        string filterOption = "";
 
         public CreateClient(bool isSelectClient)
         {
@@ -628,13 +629,26 @@ namespace WpfApp1
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand(@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status order by idclient desc;", conn);
+                MySqlCommand cmd = new MySqlCommand($@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status  {filterOption} order by idclient desc;", conn);
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 cmd.ExecuteNonQuery();
                 da.Fill(dt);
                 clientsDG.ItemsSource = dt.AsDataView();
             }
+        }
+
+        private void searchByPassportSeriesAndNumber_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int passportNum;
+            string target = searchByPassportSeriesAndNumber.Text;
+            if (target.Length >= 3 || int.TryParse(target, out passportNum) && target.Length > 0)
+            {
+                filterOption = $"where full_name like '%{target}%' or passport_series = '{target}' or passport_number = '{target}'";
+            }
+            else
+                filterOption = "";
+            RefreshDataGrid();
         }
     }
 }
