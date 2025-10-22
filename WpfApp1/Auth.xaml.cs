@@ -41,6 +41,19 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            SendAuthАttempt();
+        }
+
+        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SendAuthАttempt();
+            }
+        }
+
+        private void SendAuthАttempt()
+        {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
@@ -71,7 +84,7 @@ namespace WpfApp1
                                 Sb.Append(b.ToString("x2"));
                         }
                         string hashedPassword = Sb.ToString();
-                        
+
                         MySqlCommand cmd = new MySqlCommand($"Select `idemployees`, `full_name`, `login`, `password`, `roles`.role_name from `employees` INNER JOIN `roles` on `employees`.roles_Id = `roles`.idroles WHERE `login` = '{userLogin}' AND `password` = '{hashedPassword}'", conn);
                         using (MySqlDataReader rdr = cmd.ExecuteReader())
                         {
@@ -108,10 +121,10 @@ namespace WpfApp1
                             else
                             {
                                 MessageBox.Show("Неверные данные пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                           }
+                            }
                         }
                     }
-                    catch(Exception exc)
+                    catch (Exception exc)
                     {
                         MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
@@ -119,8 +132,6 @@ namespace WpfApp1
                 LoginTextbox.Text = "";
                 PasswordTextBox.Password = "";
             }
-
         }
-
     }
 }

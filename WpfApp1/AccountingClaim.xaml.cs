@@ -110,7 +110,7 @@ namespace WpfApp1
                         string fio = row.ItemArray[5].ToString();
                         try
                         {
-                            row.SetField<string>(5, HideClientName(fio));
+                            row.SetField<string>(5, FullNameSplitter.HideClientName(fio));
                         }
                         catch
                         {
@@ -213,13 +213,6 @@ namespace WpfApp1
             toDate.Text = "";
             allStatuses.IsChecked = true;
             searchByContractNumAndFio.Text = "";
-        }
-
-        private string HideClientName(string fullName)
-        {
-            string[] clientFio = fullName.Split(' ');
-            string hiddenName = $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
-            return hiddenName;
         }
 
         private void claimsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)

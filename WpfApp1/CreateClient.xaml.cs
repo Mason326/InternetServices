@@ -34,13 +34,9 @@ namespace WpfApp1
         public CreateClient(bool isSelectClient)
         {
             InitializeComponent();
-            if (isSelectClient)
+            if (!isSelectClient)
             {
-                inClaimButton.IsEnabled = false;
-            }
-            else
-            {
-                inClaimButton.IsEnabled = false;
+                inClaimButton.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -61,6 +57,7 @@ namespace WpfApp1
                 departmentCodeTextBox.Text = "___-___";
                 passportSeriesTextBox.Text = "____";
                 passportNumberTextBox.Text = "______";
+                inClaimButton.IsEnabled = false;
             }
             catch (Exception exc)
             {
@@ -634,6 +631,18 @@ namespace WpfApp1
                 DataTable dt = new DataTable();
                 cmd.ExecuteNonQuery();
                 da.Fill(dt);
+                foreach (DataRow row in dt.Rows)
+                {
+                    string fio = row.ItemArray[1].ToString();
+                    try
+                    {
+                        row.SetField<string>(1, FullNameSplitter.HideClientName(fio));
+                    }
+                    catch
+                    {
+                        ;
+                    }
+                }
                 clientsDG.ItemsSource = dt.AsDataView();
             }
         }

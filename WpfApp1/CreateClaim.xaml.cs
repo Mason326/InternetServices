@@ -36,10 +36,10 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            this.Hide();
+            //this.Hide();
             var win = new CreateClient(true);
             win.ShowDialog();
-            this.ShowDialog();
+            //this.ShowDialog();
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
