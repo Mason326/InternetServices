@@ -24,6 +24,8 @@ namespace WpfApp1
     /// </summary>
     public partial class CreateUser : Window
     {
+        bool prevBack = false;
+        Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
         public CreateUser()
         {
             InitializeComponent();
@@ -36,26 +38,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(@"SELECT idemployees, full_name, login, password, photo, roles.role_name, phoneNumber
-                                                        FROM employees
-                                                        inner join `roles` on employees.roles_id = roles.idroles;", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
-                    userDG.ItemsSource = dt.AsDataView();
-                }
-                phoneTextBox.Text = "+7(___)-___-__-__";
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            RefreshDataGrid();
 
             try
             {
@@ -76,14 +59,10 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Ошибка загрузки ролей\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
+            deleteUserButton.IsEnabled = false;
         }
 
 
-        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
@@ -107,95 +86,360 @@ namespace WpfApp1
 
         private void phoneTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            phoneTextBox.CaretIndex = phoneTextBox.Text.IndexOf('_') == -1 ? phoneTextBox.Text.Length : phoneTextBox.Text.IndexOf('_');
+            var phoneTextBox = sender as TextBox;
+            int targetIndex = phoneTextBox.Text.IndexOf("_");
+            if (targetIndex != -1)
+                phoneTextBox.CaretIndex = targetIndex;
         }
 
         private void phoneTextBox_GotMouseCapture(object sender, MouseEventArgs e)
         {
-            phoneTextBox.CaretIndex = phoneTextBox.Text.IndexOf('_') == -1 ? phoneTextBox.Text.Length : phoneTextBox.Text.IndexOf('_');
-        }
-
-        private void phoneTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            Key[] keys = new Key[] { Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, Key.D9, Key.D0, Key.Back };
-            if (keys.Contains(e.Key))
-            {
-                e.Handled = false;
-            }
-            else
-                e.Handled = true;
+            var phoneTextBox = sender as TextBox;
+            int targetIndex = phoneTextBox.Text.IndexOf("_");
+            if (targetIndex != -1)
+                phoneTextBox.CaretIndex = targetIndex;
         }
 
         private void phoneTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            Key[] keys = new Key[] { Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, Key.D9, Key.D0 };
-            if (keys.Contains(e.Key))
+            var phoneTextBox = sender as TextBox;
+            int currentPos = phoneTextBox.CaretIndex;
+            try
             {
-                phoneTextBox.Text = phoneTextBox.Text.Remove(phoneTextBox.Text.IndexOf('_'), 1);
-                phoneTextBox.CaretIndex = phoneTextBox.Text.IndexOf('_') == -1 ? phoneTextBox.Text.Length : phoneTextBox.Text.IndexOf('_');
+                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                    return;
+                if (e.Key == Key.Back)
+                {
+                    phoneTextBox.Text = "+7 (___) ___-__-__";
+                    phoneTextBox.CaretIndex = 4;
+                    return;
+                }
+                int fioLength = phoneTextBox.Text.Length;
+                if (fioLength > 0)
+                {
+                    string[] phoneByParts = phoneTextBox.Text.Split(' ');
+                    for (int i = 0; i < phoneByParts.Length; i++)
+                    {
+                        string part = phoneByParts[i];
+                        switch (i)
+                        {
+                            case 0:
+                                phoneByParts[i] = "+7";
+                                break;
+                            case 1:
+                                phoneByParts[i] = $"({part.Substring(1, 3)})";
+                                break;
+                            case 2:
+                                string fpart;
+                                string spart;
+                                string tpart;
+                                fpart = part.Substring(0, 3);
+                                spart = part.Substring(4, 2);
+                                tpart = part.Substring(7, 2);
+                                if (currentPos > 13 && currentPos <= 16)
+                                    tpart = part.Substring(8, 2);
+                                else if (currentPos > 9 && currentPos <= 13)
+                                {
+                                    spart = part.Substring(5, 2);
+                                    tpart = part.Substring(8, 2);
+                                }
+                                phoneByParts[i] = $"{fpart}-{spart}-{tpart}";
+                                break;
+                        }
+                    }
+                    string[] lastNumsOfThirdPart = phoneByParts[2].Split('-');
+                    phoneTextBox.Text = string.Join(" ", phoneByParts);
+                    if (!phoneByParts[1].Contains("_") && currentPos < 9)
+                        phoneTextBox.CaretIndex = currentPos + 2;
+                    else if (!lastNumsOfThirdPart[0].Contains("_") && currentPos < 13)
+                    {
+                        phoneTextBox.CaretIndex = currentPos + 1;
+                    }
+                    else if (!lastNumsOfThirdPart[1].Contains("_") && currentPos < 17)
+                    {
+                        phoneTextBox.CaretIndex = currentPos + 1;
+                    }
+                    else if (!lastNumsOfThirdPart[2].Contains("_") && currentPos < 21)
+                    {
+                        phoneTextBox.CaretIndex = currentPos + 1;
+                    }
+                    else
+                        phoneTextBox.CaretIndex = currentPos;
+                }
             }
-            if (e.Key == Key.Back)
+            catch
             {
-                phoneTextBox.Text = "+7(___)-___-__-__";
-                phoneTextBox.CaretIndex = phoneTextBox.Text.IndexOf('_');
+                ;
             }
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            long idEmpl;
+            char[] targetCharsLogin = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
+            char[] mixedCharsLogin = CredentialsGenerator.MixChars(targetCharsLogin);
+            string generateLogin = CredentialsGenerator.GenerateCredential(mixedCharsLogin, false);
+
+            char[] targetCharsPassword = "#$!&&)(!-_+=<>qwe*rtyuiopasdfghjk56789lzxcvb%nmQWERTYU%IOPASDFGHJKLZXCVBNM0123456789#$!&&)(!-_+=<>".ToCharArray();
+            char[] mixedCharsPassword = CredentialsGenerator.MixChars(targetCharsPassword);
+            string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword, true);
+
+            loginTextBox.Text = generateLogin;
+            passwordTextBox.Text = generatePassword;
+        }
+
+        private void phoneTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex(@"[0-9\b\s]");
+            try
+            {
+                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                    e.Handled = false;
+                else
+                    e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void fioTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                    return;
+                if (e.Key == Key.Back)
+                {
+                    prevBack = true;
+                    return;
+                }
+                int fioLength = fioTextBox.Text.Length;
+                if (fioLength > 0)
+                {
+                    string[] fioByParts = fioTextBox.Text.Split(' ');
+                    for (int i = 0; i < fioByParts.Length; i++)
+                    {
+                        string part = fioByParts[i];
+
+                        if (part.Length > 0)
+                            fioByParts[i] = ToTitle(part);
+                        if (part.Contains("-"))
+                        {
+                            string[] arr = fioByParts[i].Split(new char[] { '-' });
+                            if (arr[1].Length > 0)
+                            {
+                                arr[1] = ToTitle(arr[1]);
+                                fioByParts[i] = string.Join("-", arr);
+                            }
+                        }
+                    }
+                    int currentPos = fioTextBox.CaretIndex;
+                    fioTextBox.Text = string.Join(" ", fioByParts);
+                    if (prevBack)
+                    {
+                        fioTextBox.CaretIndex = currentPos;
+                        prevBack = false;
+                    }
+                    else
+                    {
+                        if (currentPos != fioTextBox.Text.Length)
+                            fioTextBox.CaretIndex = currentPos;
+                        else
+                            fioTextBox.CaretIndex = ++currentPos;
+                    }
+                }
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void fioTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex(@"[А-Яа-я- \b\s]");
+            try
+            {
+                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                    e.Handled = false;
+                else
+                    e.Handled = true;
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private string ToTitle(string text)
+        {
+            return $"{text[0].ToString().ToUpper()}{text.Substring(1, text.Length - 1)}";
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled;
+            try
+            {
+
+                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 3
+                   && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
+                   && rolesComboBox.SelectedItem != null
+                   && loginTextBox.Text.Length > 0
+                   && passwordTextBox.Text.Length > 0;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректно заполнены обязательные поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+
+            if (requiredFieldsIsFilled)
+            {
+                if (HasDirectorAccount() && rolesComboBox.SelectedItem.ToString() == "Директор")
+                { 
+                    MessageBox.Show("В системе уже существует учетная запись директора", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand($@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id) 
+                                                            value(
+                                                                '{fioTextBox.Text}',
+                                                                '{loginTextBox.Text}',
+                                                                '{CreateChecksum(passwordTextBox.Text)}',
+                                                                '{phoneTextBox.Text}',
+                                                                 (Select idroles from `roles` where `role_name` = '{rolesComboBox.SelectedItem}')
+                                                            );", conn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Пользователь создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ClearInputData();
+                    }
+
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось создать нового пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                RefreshDataGrid();
+            }
+            else
+                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private void ClearInputData()
+        {
+            fioTextBox.Text = "";
+            phoneTextBox.Text = "+7 (___) ___-__-__";
+            rolesComboBox.SelectedItem = null;
+            loginTextBox.Text = "";
+            passwordTextBox.Text = "";
+        }
+
+        private void RefreshDataGrid()
+        {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    try
-                    {
-                        MySqlCommand cmd = new MySqlCommand("SELECT max(`idemployees`) FROM employees;", conn);
-                        idEmpl = long.Parse(cmd.ExecuteScalar().ToString());
-                    }
-                    catch
-                    {
-                        idEmpl = 1;
-                    }
-
+                    MySqlCommand cmd = new MySqlCommand(@"SELECT idemployees, full_name, login, password, photo, roles.role_name, phoneNumber
+                                                        FROM employees
+                                                        inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;", conn);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    cmd.ExecuteNonQuery();
+                    da.Fill(dt);
+                    userDG.ItemsSource = dt.AsDataView();
                 }
-                string loginGenerated = ComputeSha256Hash($"login{DateTime.Now}{idEmpl}{new Random().Next(0, 100000)}").Substring(6, 14);
-                string passwordGenerated = ComputeSha256Hash($"password{DateTime.Now}{idEmpl}{new Random().Next(0, 100000)}").Substring(6, 14);
-                //string targetEng = "qwertyuiopasdfghjklzxcvbnm";
-                //int[] indexes = loginGenerated.Where(c => targetEng.Contains(c)).Select(c => loginGenerated.ToString().IndexOf(c)).ToArray();
-                //for (int i = 0; i < 3; i++)
-                //{
-                //    int idx = new Random().Next(0, indexes.Length - 1);
-                //    loginGenerated[idx] = Convert.ToChar(loginGenerated[idx].ToString().ToUpper());
-                //}
-                //Random rand = new Random();
-                loginTextBox.Text = loginGenerated;
-                passwordTextBox.Text = passwordGenerated;
+                phoneTextBox.Text = "+7 (___) ___-__-__";
             }
             catch (Exception exc)
             {
-                MessageBox.Show($"Ошибка генерации логина и пароля\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        
-        private static string ComputeSha256Hash(string rawData)
+
+        public string CreateChecksum(string password)
         {
-            // Create a SHA256 hash algorithm instance.
-            using (SHA256 sha256Hash = SHA256.Create())
+            StringBuilder Sb = new StringBuilder();
+            using (SHA256 hash = SHA256Managed.Create())
             {
-                // Compute the hash from the input string (converted to bytes).
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-
-                // Convert the byte array to a hexadecimal string.
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2")); // "x2" formats as two lowercase hexadecimal digits
-                }
-                return builder.ToString();
+                Encoding enc = Encoding.UTF8;
+                Byte[] result = hash.ComputeHash(enc.GetBytes(password));
+                foreach (Byte b in result)
+                    Sb.Append(b.ToString("x2"));
             }
+            string hashedPassword = Sb.ToString();
+            return hashedPassword;
         }
 
+        private void deleteUserButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (userDG.SelectedItem == null)
+                return;
+
+            DataRowView recordView = userDG.SelectedItem as DataRowView;
+            object[] recordValues = recordView.Row.ItemArray;
+
+            MessageBoxResult result = MessageBox.Show($"Вы действительно хотите удалить пользователя '{recordValues[1]}'?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.No || result == MessageBoxResult.Cancel)
+                return;
+
+            int currentUserId = AccountHolder.userId;
+            if (currentUserId == Convert.ToInt32(recordValues[0]))
+            {
+                MessageBox.Show($"Пользователь не может быть удален так как является текущей учетной записью", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($@"Delete from `employees` where `idemployees` = {recordValues[0]};", conn);
+                    cmd.ExecuteNonQuery();
+                }
+                MessageBox.Show("Пользователь удален", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                ClearInputData();
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось удалить пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            RefreshDataGrid();
+        }
+
+        private void userDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            deleteUserButton.IsEnabled = true;
+        }
+
+        private bool HasDirectorAccount()
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($@"Select idemployees from `employees` where `roles_id` = (Select idroles from `roles` where role_name = 'Директор');", conn);
+                    object res = cmd.ExecuteScalar();
+                    if (res != null)
+                        return true;
+                    return false;
+                }
+            }
+            catch
+            { 
+                return false;
+            }
+        }
     }
 }
