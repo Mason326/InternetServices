@@ -34,23 +34,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `tariff`", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
-                    tariffDG.ItemsSource = dt.AsDataView();
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -107,14 +91,78 @@ namespace WpfApp1
                 e.Handled = true;
             if (e.Key == Key.OemComma)
             {
-                if (monthFee.Text.Length > 0)
+                if (monthFeeTextBox.Text.Length > 0)
                 {
-                    if (monthFee.Text.Count(c => c == ',') > 0)
+                    if (monthFeeTextBox.Text.Count(c => c == ',') > 0)
                         e.Handled = true;
                     else
                         e.Handled = false;
                 }
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled = tariffNameTextBox.Text.Length > 0 && tariffDescriptionTextBox.Text.Length > 0 && monthFeeTextBox.Text.Length > 0;
+
+
+            if (requiredFieldsIsFilled)
+            {
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand($@"Insert into `tariff`(tariff_name, tariff_details, monthly_fee) 
+                                                            value(
+                                                                '{tariffNameTextBox.Text}',
+                                                                '{tariffDescriptionTextBox.Text}',
+                                                                 {monthFeeTextBox.Text.Replace(',', '.')}
+                                                            );", conn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Тариф создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ClearInputData();
+                    }
+
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось создать тариф\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                RefreshDataGrid();
+            }
+            else
+                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+        }
+
+        private void RefreshDataGrid()
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("Select * from `tariff` order by idtariff desc", conn);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    cmd.ExecuteNonQuery();
+                    da.Fill(dt);
+                    tariffDG.ItemsSource = dt.AsDataView();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ClearInputData()
+        {
+            tariffNameTextBox.Text = "";
+            tariffDescriptionTextBox.Text = "";
+            monthFeeTextBox.Text = "";
         }
     }
 }

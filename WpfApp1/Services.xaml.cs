@@ -34,23 +34,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `services`", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
-                    servicesDG.ItemsSource = dt.AsDataView();
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            RefreshDataGrid();
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -91,9 +75,9 @@ namespace WpfApp1
                 e.Handled = true;
             if (e.Key == Key.OemComma)
             {
-                if (cost.Text.Length > 0)
+                if (costTextBox.Text.Length > 0)
                 {
-                    if (cost.Text.Count(c => c == ',') > 0)
+                    if (costTextBox.Text.Count(c => c == ',') > 0)
                         e.Handled = true;
                     else
                         e.Handled = false;
@@ -115,6 +99,69 @@ namespace WpfApp1
             {
                 ;
             }
+        }
+
+        private void RefreshDataGrid()
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("Select * from `services` order by idservice desc", conn);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    cmd.ExecuteNonQuery();
+                    da.Fill(dt);
+                    servicesDG.ItemsSource = dt.AsDataView();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ClearInputData()
+        {
+            serviceTextBox.Text = "";
+            costTextBox.Text = "";
+            unitsTextBox.Text = "";
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled = serviceTextBox.Text.Length > 0 && costTextBox.Text.Length > 0 && unitsTextBox.Text.Length > 0;
+
+
+            if (requiredFieldsIsFilled)
+            {
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand($@"Insert into `services`(service_name, units, service_cost) 
+                                                            value(
+                                                                '{serviceTextBox.Text}',
+                                                                '{unitsTextBox.Text}',
+                                                                 {costTextBox.Text.Replace(',', '.')}
+                                                            );", conn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Услуга создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ClearInputData();
+                    }
+
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось создать услугу\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                RefreshDataGrid();
+            }
+            else
+                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }
