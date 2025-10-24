@@ -34,7 +34,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            
+            RefreshDataGrid();
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -120,14 +120,14 @@ namespace WpfApp1
                                                                  {monthFeeTextBox.Text.Replace(',', '.')}
                                                             );", conn);
                         cmd.ExecuteNonQuery();
-                        MessageBox.Show("Тариф создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Тариф добавлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         ClearInputData();
                     }
 
                 }
                 catch (Exception exc)
                 {
-                    MessageBox.Show($"Не удалось создать тариф\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось добавить тариф\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 RefreshDataGrid();
