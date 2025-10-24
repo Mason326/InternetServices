@@ -34,23 +34,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `materials`", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
-                    materialsDG.ItemsSource = dt.AsDataView();
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            RefreshDataGrid();
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -107,14 +91,78 @@ namespace WpfApp1
                 e.Handled = true;
             if (e.Key == Key.OemComma)
             {
-                if (cost.Text.Length > 0)
+                if (materialCostTextBox.Text.Length > 0)
                 {
-                    if (cost.Text.Count(c => c == ',') > 0)
+                    if (materialCostTextBox.Text.Count(c => c == ',') > 0)
                         e.Handled = true;
                     else
                         e.Handled = false;
                 }
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled = materialNameTextBox.Text.Length > 0 && materialUnitTextBox.Text.Length > 0 && materialCostTextBox.Text.Length > 0;
+
+
+            if (requiredFieldsIsFilled)
+            {
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand($@"Insert into `materials`(material_name, units, cost) 
+                                                            value(
+                                                                '{materialNameTextBox.Text}',
+                                                                '{materialUnitTextBox.Text}',
+                                                                 {materialCostTextBox.Text.Replace(',', '.')}
+                                                            );", conn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Материал добавлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ClearInputData();
+                    }
+
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось добавить Материал\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                RefreshDataGrid();
+            }
+            else
+                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+        }
+
+        private void RefreshDataGrid()
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("Select * from `materials` order by idmaterials desc", conn);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    cmd.ExecuteNonQuery();
+                    da.Fill(dt);
+                    materialsDG.ItemsSource = dt.AsDataView();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ClearInputData()
+        {
+            materialNameTextBox.Text = "";
+            materialUnitTextBox.Text = "";
+            materialCostTextBox.Text = "";
         }
     }
 }
