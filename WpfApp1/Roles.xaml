@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Window8" Height="382.4" Width="518.4" WindowStartupLocation="CenterScreen" WindowStyle="None">
     <Grid>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="283,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
+        <TextBox x:Name="roleNameTextBox" HorizontalAlignment="Left" Height="30" Margin="283,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
         <Label Content="Роль" HorizontalAlignment="Left" Margin="283,14,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273"/>
         <DataGrid x:Name="rolesDG" AutoGenerateColumns="False" HorizontalAlignment="Left" Height="307" Margin="13,17,0,0" VerticalAlignment="Top" Width="248" Loaded="rolesDG_Loaded">
             <DataGrid.Columns>
@@ -15,11 +15,10 @@
             </DataGrid.Columns>
         </DataGrid>
         <Button Content="Добавить роль" HorizontalAlignment="Left" Margin="283,113,0,0" VerticalAlignment="Top" Width="210" Height="31" FontSize="16" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White"/>
-
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="283,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput"/>
         <Button Content="На главную" HorizontalAlignment="Left" Margin="283,295,0,0" VerticalAlignment="Top" Width="210" Height="31" Click="Button_Click" FontSize="16" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White"/>
         <Button Content="Редактировать роль" HorizontalAlignment="Left" Margin="283,159,0,0" VerticalAlignment="Top" Width="210" Height="31" FontSize="16" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White"/>
         <Button Content="Удалить роль" HorizontalAlignment="Left" Margin="283,205,0,0" VerticalAlignment="Top" Width="210" Height="31" FontSize="16" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="310,13,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
 
     </Grid>
 </Window>

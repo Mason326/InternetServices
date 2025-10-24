@@ -34,23 +34,8 @@ namespace WpfApp1
 
         private void rolesDG_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `roles`", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
-                    rolesDG.ItemsSource = dt.AsDataView();
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            RefreshDataGrid();
+
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -67,6 +52,66 @@ namespace WpfApp1
             {
                 ;
             }
+        }
+
+        private void ClearInputData()
+        {
+            roleNameTextBox.Text = "";
+        }
+
+        private void RefreshDataGrid()
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand("Select * from `roles` order by idroles desc", conn);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    cmd.ExecuteNonQuery();
+                    da.Fill(dt);
+                    rolesDG.ItemsSource = dt.AsDataView();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled = roleNameTextBox.Text.Length > 0;
+
+
+            if (requiredFieldsIsFilled)
+            {
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand($@"Insert into `roles`(role_name) 
+                                                            value(
+                                                                '{roleNameTextBox.Text}'
+                                                            );", conn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Роль добавлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ClearInputData();
+                    }
+
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось добавить роль\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                RefreshDataGrid();
+            }
+            else
+                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+
         }
     }
 }
