@@ -164,5 +164,13 @@ namespace WpfApp1
             materialUnitTextBox.Text = "";
             materialCostTextBox.Text = "";
         }
+
+        private void TextBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command == ApplicationCommands.Paste)
+            {
+                e.Handled = true;
+            }
+        }
     }
 }

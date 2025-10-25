@@ -40,7 +40,7 @@
             <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
             <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
             <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <TextBox TabIndex="3" x:Name="materialCostTextBox" HorizontalAlignment="Left" Height="30" Margin="486,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput_2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="12"/>
+            <TextBox CommandManager.PreviewExecuted="TextBox_PreviewExecuted" TabIndex="3" x:Name="materialCostTextBox" HorizontalAlignment="Left" Height="30" Margin="486,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput_2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="12"/>
             <Button Content="Добавить материал" HorizontalAlignment="Left" Margin="486,215,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
             <TextBox TabIndex="1" x:Name="materialNameTextBox" HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput"/>
             <TextBox TabIndex="2" x:Name="materialUnitTextBox" HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput_1"/>

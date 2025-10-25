@@ -16,7 +16,7 @@
                 <DataGridTextColumn Header="Ежемесячные выплаты" Binding="{Binding monthly_fee}" Width="150" />
             </DataGrid.Columns>
         </DataGrid>
-        <TextBox TabIndex="2" x:Name="monthFee" HorizontalAlignment="Left" Height="30" Margin="488,170,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="12"/>
+        <TextBox CommandManager.PreviewExecuted="TextBox_PreviewExecuted" TabIndex="2" x:Name="monthFee" HorizontalAlignment="Left" Height="30" Margin="488,170,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="12"/>
         <Button Content="Добавить услугу" HorizontalAlignment="Left" Margin="488,275,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="Button_Click_1"/>
         <Button Content="На главную" HorizontalAlignment="Left" Margin="488,481,0,0" VerticalAlignment="Top" Width="210" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
         <Button Content="Редактировать услугу" HorizontalAlignment="Left" Margin="488,329,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
