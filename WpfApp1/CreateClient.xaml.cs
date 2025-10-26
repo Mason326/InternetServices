@@ -478,6 +478,26 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("client", "passport_series", passportSeriesTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат серии паспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if (!CheckDuplicateUtil.HasNoDuplicate("client", "passport_number", passportNumberTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат номера паспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if (!CheckDuplicateUtil.HasNoDuplicate("client", "phone_number", phoneTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if (!CheckDuplicateUtil.HasNoDuplicate("client", "subscriber_login", abonentLoginTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина абонента", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
                 string emailFieldName = "";
                 string emailFieldValue = "";
                 string singleQuote = "";
