@@ -335,16 +335,16 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            char[] targetCharsLogin = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
-            char[] mixedCharsLogin = CredentialsGenerator.MixChars(targetCharsLogin);
-            string generateLogin = CredentialsGenerator.GenerateCredential(mixedCharsLogin, false);
-            
-            char[] targetCharsPassword = "#$!&&)(!-_+=<>qwe*rtyuiopasdfghjk56789lzxcvb%nmQWERTYU%IOPASDFGHJKLZXCVBNM0123456789#$!&&)(!-_+=<>".ToCharArray();
+            char[] targetCharsPassword = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
             char[] mixedCharsPassword = CredentialsGenerator.MixChars(targetCharsPassword);
-            string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword, true);
+            string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword);
 
-            abonentLoginTextBox.Text = generateLogin;
             abonentPasswordTextBox.Text = generatePassword;
+            string[] loginPart = new string[] { "apple","bridge","cloud", "dream","eagle","forest", "garden","horizon","island","jungle","kite","lion","mountain","night","ocean","pencil","queen","river","sunshine","tree","umbrella","violet","window","xylophone","yellow","zebra","adventure","butterfly","castle","desert","elephant","flower","guitar","honey","iceberg","jewel","kangaroo","lake","meadow","nectar","orchid","penguin","quartz","rainbow","star","tiger","universe","valley","whisper","yacht","zeppelin"};
+            StringBuilder sb = new StringBuilder();
+            sb.Append(loginPart[new Random().Next(0, loginPart.Length - 1)]);
+            sb.Append(new Random().Next(10000, 999999));
+            abonentLoginTextBox.Text = sb.ToString();
         }
 
         
@@ -458,8 +458,7 @@ namespace WpfApp1
             bool requiredFieldsIsFilled;
             try
             {
-
-                 requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 3
+                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 3
                     && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
                     && dateOfBirthDatePicker.SelectedDate != null
                     && placeOfResidenceTextBox.Text.Length > 0

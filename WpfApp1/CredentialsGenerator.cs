@@ -20,12 +20,10 @@ namespace WpfApp1
             return targetChars;
         }
 
-        public static string GenerateCredential(char[] mixedChars, bool isPassword)
+        public static string GenerateCredential(char[] mixedChars)
         {
             Random random = new Random();
-            int lettersCount = 12;
-            if (isPassword)
-                lettersCount = 16;
+            int lettersCount = 8;
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < lettersCount; i++)
             {
