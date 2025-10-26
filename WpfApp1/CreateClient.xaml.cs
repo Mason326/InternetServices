@@ -458,7 +458,7 @@ namespace WpfApp1
             bool requiredFieldsIsFilled;
             try
             {
-                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 3
+                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 1
                     && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
                     && dateOfBirthDatePicker.SelectedDate != null
                     && placeOfResidenceTextBox.Text.Length > 0

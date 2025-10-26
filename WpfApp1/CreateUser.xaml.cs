@@ -278,7 +278,7 @@ namespace WpfApp1
             try
             {
 
-                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 3
+                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 1
                    && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
                    && rolesComboBox.SelectedItem != null
                    && loginTextBox.Text.Length > 0
