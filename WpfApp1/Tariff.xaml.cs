@@ -108,6 +108,11 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("tariff", "tariff_name", tariffNameTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить тариф. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))

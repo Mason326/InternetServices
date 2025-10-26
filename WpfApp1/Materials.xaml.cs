@@ -108,6 +108,12 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("materials", "material_name", materialNameTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить материал. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))

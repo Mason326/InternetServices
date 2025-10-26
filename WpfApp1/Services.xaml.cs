@@ -136,6 +136,11 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("services", "service_name", serviceTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить услугу. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))

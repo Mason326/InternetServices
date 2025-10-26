@@ -298,6 +298,17 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("employees", "login", loginTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина пользователя", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if (!CheckDuplicateUtil.HasNoDuplicate("employees", "phoneNumber", phoneTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 if (HasDirectorAccount() && rolesComboBox.SelectedItem.ToString() == "Директор")
                 { 
                     MessageBox.Show("В системе уже существует учетная запись директора", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
