@@ -60,9 +60,9 @@ namespace WpfApp1
                 {
                     conn.Open();
                 }
-                catch
+                catch(Exception exc)
                 {
-                    MessageBox.Show($"Не удалось установить соединение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось установить соединение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 string userLogin = LoginTextbox.Text;
                 string userPassword = PasswordTextBox.Password;

@@ -92,6 +92,12 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("additional_services", "additional_service_name", serviceTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить услугу. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -145,5 +151,14 @@ namespace WpfApp1
                 MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void TextBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command == ApplicationCommands.Paste)
+            {
+                e.Handled = true;
+            }
+        }
+
     }
 }

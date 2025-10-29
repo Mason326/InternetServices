@@ -136,6 +136,11 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("services", "service_name", serviceTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить услугу. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -162,6 +167,14 @@ namespace WpfApp1
             }
             else
                 MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private void TextBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command == ApplicationCommands.Paste)
+            {
+                e.Handled = true;
+            }
         }
     }
 }

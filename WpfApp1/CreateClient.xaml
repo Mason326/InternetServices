@@ -34,7 +34,22 @@
                 <DataGridTextColumn Header="Кем выдан" Binding="{Binding issued_by}" Width="100" />
                 <DataGridTextColumn Header="Дата выдачи" Binding="{Binding issue_date, StringFormat=\{0:dd.MM.yy\}}" Width="80" />
                 <DataGridTextColumn Header="Код подразделения" Binding="{Binding department_code}" Width="120" />
-                <DataGridTextColumn Header="Статус клиента" Binding="{Binding client_status}" Width="90" />
+                <DataGridTextColumn Header="Статус клиента" Binding="{Binding client_status}" Width="90">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="Активный">
+                                    <Setter Property="Background" Value="ForestGreen" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                                <Trigger Property="Text"  Value="Не активный">
+                                    <Setter Property="Background" Value="DarkRed" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
         <TextBox TabIndex="3"  MaxLength="100" x:Name="emailTextBox" HorizontalAlignment="Left" Margin="208,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="215" Height="28" PreviewKeyDown="emailTextBox_PreviewKeyDown"/>

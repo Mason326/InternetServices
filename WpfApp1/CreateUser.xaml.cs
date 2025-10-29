@@ -175,15 +175,10 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            char[] targetCharsLogin = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
-            char[] mixedCharsLogin = CredentialsGenerator.MixChars(targetCharsLogin);
-            string generateLogin = CredentialsGenerator.GenerateCredential(mixedCharsLogin, false);
-
-            char[] targetCharsPassword = "#$!&&)(!-_+=<>qwe*rtyuiopasdfghjk56789lzxcvb%nmQWERTYU%IOPASDFGHJKLZXCVBNM0123456789#$!&&)(!-_+=<>".ToCharArray();
+            char[] targetCharsPassword = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
             char[] mixedCharsPassword = CredentialsGenerator.MixChars(targetCharsPassword);
-            string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword, true);
+            string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword);
 
-            loginTextBox.Text = generateLogin;
             passwordTextBox.Text = generatePassword;
         }
 
@@ -283,11 +278,22 @@ namespace WpfApp1
             try
             {
 
-                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 3
+                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 1
                    && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
                    && rolesComboBox.SelectedItem != null
                    && loginTextBox.Text.Length > 0
                    && passwordTextBox.Text.Length > 0;
+
+                if (loginTextBox.Text.Length < 6)
+                {
+                    MessageBox.Show("Необходимо создать более сложный логин", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                if (passwordTextBox.Text.Length < 8)
+                {
+                    MessageBox.Show("Необходимо создать более сложный пароль", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
             }
             catch
             {
@@ -298,6 +304,17 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("employees", "login", loginTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина пользователя", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if (!CheckDuplicateUtil.HasNoDuplicate("employees", "phoneNumber", phoneTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 if (HasDirectorAccount() && rolesComboBox.SelectedItem.ToString() == "Директор")
                 { 
                     MessageBox.Show("В системе уже существует учетная запись директора", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);

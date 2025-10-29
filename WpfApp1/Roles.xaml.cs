@@ -80,13 +80,19 @@ namespace WpfApp1
             }
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             bool requiredFieldsIsFilled = roleNameTextBox.Text.Length > 0;
 
 
             if (requiredFieldsIsFilled)
             {
+                if (!CheckDuplicateUtil.HasNoDuplicate("roles", "role_name", roleNameTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить роль. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))

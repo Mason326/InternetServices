@@ -1,0 +1,21 @@
+﻿<Window x:Class="WpfApp1.EmployeesViewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="EmployeesViewWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+    <Grid>
+        <Button Content="В заявку" HorizontalAlignment="Left" Margin="523,24,0,0" VerticalAlignment="Top" Width="240" Height="36"/>
+        <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="240" Height="36" Click="Button_Click"/>
+        <DataGrid x:Name="employeesDG" HorizontalAlignment="Left" IsReadOnly="True" AutoGenerateColumns="False" Height="422" Margin="10,10,0,0" VerticalAlignment="Top" Width="486">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ФИО" Binding="{Binding full_name}" Width="200" />
+                <DataGridTextColumn Header="Номер Телефона" Binding="{Binding phone_number}" Width="150"/>
+                <DataGridTextColumn Header="Фото" Binding="{Binding photo}" Width="150"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>
