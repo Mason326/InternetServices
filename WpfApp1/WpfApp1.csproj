@@ -91,6 +91,9 @@
       <DependentUpon>ContractVerbose.xaml</DependentUpon>
     </Compile>
     <Compile Include="CredentialsGenerator.cs" />
+    <Compile Include="EmployeesViewWindow.xaml.cs">
+      <DependentUpon>EmployeesViewWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FullNameSplitter.cs" />
     <Compile Include="Services.xaml.cs">
       <DependentUpon>Services.xaml</DependentUpon>
@@ -165,6 +168,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="AdditionalServices.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EmployeesViewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
