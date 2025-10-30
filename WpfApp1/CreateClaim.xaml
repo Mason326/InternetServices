@@ -57,7 +57,7 @@
         <Label Content="Дата создания:" HorizontalAlignment="Left" Margin="25,69,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="120"/>
         <Label Content="Номер заявки:" HorizontalAlignment="Left" Margin="29,25,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="117"/>
         <Label Content="Клиент" HorizontalAlignment="Left" Margin="28,189,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <Button Content="Выбрать клиента" HorizontalAlignment="Left" Margin="361,217,0,0" VerticalAlignment="Top" Width="151" Height="38" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+        <Button Content="Выбрать клиента" HorizontalAlignment="Left" Margin="361,220,0,0" VerticalAlignment="Top" Width="151" Height="38" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         <TextBox x:Name="clientTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,223,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310"/>
         <Label Name="claimNumber" Content="" HorizontalAlignment="Left" Margin="142,28,0,0" VerticalAlignment="Top" FontSize="16"/>
         <Label Name="creationDate" Content="" HorizontalAlignment="Left" Margin="142,71,0,0" VerticalAlignment="Top" FontSize="16"/>
@@ -81,7 +81,7 @@
         <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="727,88,0,0" VerticalAlignment="Top" Width="226" Height="37" Background="#FF4F6DD3" Foreground="White" FontSize="16" FontFamily="Arial" FontWeight="Bold" Click="ShowClaimVerbose"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="304,35,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" RenderTransformOrigin="-16.708,0.598"/>
         <Label Content="Мастер" HorizontalAlignment="Left" Margin="28,263,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <Button Content="Выбрать мастера" HorizontalAlignment="Left" Margin="361,288,0,0" VerticalAlignment="Top" Width="151" Height="38" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_4"/>
+        <Button Content="Выбрать мастера" HorizontalAlignment="Left" Margin="361,291,0,0" VerticalAlignment="Top" Width="151" Height="38" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_4"/>
         <TextBox x:Name="masterTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,294,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310" TextChanged="masterTextBox_TextChanged"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="85,264,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Label Content="(доступны после выбора мастера)" HorizontalAlignment="Left" Margin="463,35,0,0" VerticalAlignment="Top" FontSize="13" Height="31" Width="231"/>
