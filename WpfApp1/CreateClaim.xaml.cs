@@ -24,6 +24,7 @@ namespace WpfApp1
     {
         Dictionary<int, string> tariffs = new Dictionary<int, string>();
         const int INCOMING_CLAIM_STATUS_ID = 1;
+        int recordsCount = 0;
         public CreateClaim()
         {
             InitializeComponent();
@@ -31,6 +32,7 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            ClearSelected();
             this.Close();
         }
 
@@ -43,8 +45,8 @@ namespace WpfApp1
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
-                string fioWithHiddenSurname = HideClientName(client[1].ToString());
-                string hiddenPhoneNumber = HideClientPhoneNumber(client[3].ToString());
+                string fioWithHiddenSurname = HideName(client[1].ToString());
+                string hiddenPhoneNumber = HidePhoneNumber(client[3].ToString());
                 clientTextBox.Text = $"{fioWithHiddenSurname}, {hiddenPhoneNumber}";
             }
         }
@@ -52,6 +54,8 @@ namespace WpfApp1
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshData();
+            dateOfExecution.IsEnabled = false;
+            timeOfExecution.IsEnabled = false;
 
             try
             {
@@ -97,7 +101,39 @@ namespace WpfApp1
 
         private void dateOfExecution_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if (dateOfExecution.SelectedDate == null || MasterHolder.data == null)
+            {
+                timeOfExecution.IsEnabled = false;
+                return;
+            }
+            timeOfExecution.IsEnabled = true;
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"SELECT mount_date FROM connection_claim where mount_date like '%{((DateTime)dateOfExecution.SelectedDate).ToString("yyyy-MM-dd")}%' and masterId = {MasterHolder.data[0]};", conn);
+                    List<string> armoredTime = new List<string>();
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            armoredTime.Add(DateTime.Parse(dr.GetValue(0).ToString()).ToString("HH:mm"));
+                            recordsCount++;
+                        }
+                        
+                    }
+                    List<string> timePeriodArr = new List<string>() { "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00" };
+                    if (armoredTime.Count > 0)
+                        timeOfExecution.ItemsSource = timePeriodArr.Where(el => !armoredTime.Contains(el));
+                    else
+                        timeOfExecution.ItemsSource = timePeriodArr;
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -118,16 +154,21 @@ namespace WpfApp1
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null)
+            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
+                    if (recordsCount > 6)
+                    {
+                        MessageBox.Show($"Не удалось добавить заявку. Указанный мастер превысил количество взятых заявок в сутки", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
                         try
                         {
-                            MySqlCommand cmd = new MySqlCommand($@"Insert into connection_claim(id_claim, connection_address, mount_date, employees_id, client_id, claim_status_id, connection_creationDate, tariff_id)
+                            MySqlCommand cmd = new MySqlCommand($@"Insert into connection_claim(id_claim, connection_address, mount_date, employees_id, client_id, claim_status_id, connection_creationDate, tariff_id, masterId)
                                                                value (
                                                                 {claimNumber.Content},
                                                                 '{mountAddressTextBox.Text}',
@@ -136,7 +177,8 @@ namespace WpfApp1
                                                                 {ClientHolder.data[0]},
                                                                 (Select `idclaim_status` from claim_status where `status` = '{claimStatusComboBox.SelectedItem}'),
                                                                 '{DateTime.Parse(creationDate.Content.ToString()).ToString("yyyy-MM-dd")}',
-                                                                {tariffs.Where(pair => pair.Value == tariffComboBox.SelectedItem.ToString()).Select(pair => pair.Key).Single()}
+                                                                {tariffs.Where(pair => pair.Value == tariffComboBox.SelectedItem.ToString()).Select(pair => pair.Key).Single()},
+                                                                {MasterHolder.data[0]}
                                                                  );", conn);
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Заявка успешно создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -163,7 +205,6 @@ namespace WpfApp1
 
         private void RefreshData()
         {
-            string[] timePeriodArr = new string[] { "9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00" };
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -183,11 +224,10 @@ namespace WpfApp1
                     foreach (DataRow row in dt.Rows)
                     {
                         string fio = row.ItemArray[5].ToString();
-                        row.SetField<string>(5, HideClientName(fio));
+                        row.SetField<string>(5, HideName(fio));
                     }
 
                     claimsDG.ItemsSource = dt.AsDataView();
-                    timeOfExecution.ItemsSource = timePeriodArr;
                 }
             }
             catch (Exception exc)
@@ -227,7 +267,10 @@ namespace WpfApp1
             tariffComboBox.SelectedItem = null;
             clientTextBox.Clear();
             ClientHolder.data = null;
+            MasterHolder.data = null;
+            masterTextBox.Clear();
             timeOfExecution.SelectedItem = null;
+            recordsCount = 0;
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
@@ -244,13 +287,21 @@ namespace WpfApp1
                 e.Handled = true;
         }
 
-        private string HideClientName(string fullName)
+        private string HideName(string fullName)
         {
-            string[] clientFio = fullName.Split(' ');
-            return $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+            try
+            {
+                string[] clientFio = fullName.Split(' ');
+                string hidden_name = $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+                return hidden_name;
+            }
+            catch
+            {
+                return fullName;
+            }
         }
 
-        private string HideClientPhoneNumber(string phoneNumber)
+        private string HidePhoneNumber(string phoneNumber)
         {
             char[] phoneNumberByLetters = phoneNumber.ToCharArray().Where(c => c != ' ').ToArray();
             StringBuilder sb = new StringBuilder();
@@ -290,6 +341,22 @@ namespace WpfApp1
         {
             var win = new EmployeesViewWindow();
             win.ShowDialog();
+
+            if (MasterHolder.data != null)
+            {
+                object[] master = MasterHolder.data;
+                string fioWithHiddenSurname = HideName(master[1].ToString());
+                string hiddenPhoneNumber = HidePhoneNumber(master[5].ToString());
+                masterTextBox.Text = $"{fioWithHiddenSurname}, {hiddenPhoneNumber}";
+            }
+        }
+
+        private void masterTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (masterTextBox.Text.Length > 0)
+                dateOfExecution.IsEnabled = true;
+            else
+                dateOfExecution.IsEnabled = false;
         }
     }
 }

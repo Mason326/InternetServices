@@ -95,6 +95,7 @@
       <DependentUpon>EmployeesViewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="FullNameSplitter.cs" />
+    <Compile Include="MasterHolder.cs" />
     <Compile Include="Services.xaml.cs">
       <DependentUpon>Services.xaml</DependentUpon>
     </Compile>
