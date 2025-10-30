@@ -43,13 +43,29 @@ namespace WpfApp1
             }
             catch (Exception exc)
             {
-                MessageBox.Show($"Не удалось загрузить тарифы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Не удалось загрузить сотрудников\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            inClaimButton.IsEnabled = false;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (employeesDG.SelectedItem != null)
+            {
+                DataRowView drv = employeesDG.SelectedItem as DataRowView;
+                MasterHolder.data = drv.Row.ItemArray;
+                this.Close();
+            }
+        }
+
+        private void employeesDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            inClaimButton.IsEnabled = true;
         }
     }
 }

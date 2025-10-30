@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Создание заявки" Height="741.55" Width="987.2" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <Label Content="Дата и время выполнения" HorizontalAlignment="Left" Margin="460,33,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="209"/>
+        <Label Content="Дата и время выполнения" HorizontalAlignment="Left" Margin="463,15,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="209"/>
         <Label Content="Статус" HorizontalAlignment="Left" Margin="255,35,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
         <Button Content="Создать заявку" HorizontalAlignment="Left" Height="36" Margin="727,35,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
         <DataGrid x:Name="claimsDG" Margin="10,351,10,3" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="claimsDG_SelectionChanged">
@@ -73,17 +73,18 @@
         </ComboBox>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="81,190,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="182,116,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="655,34,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="658,16,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <ComboBox x:Name="tariffComboBox" HorizontalAlignment="Left" Margin="464,146,0,0" VerticalAlignment="Top" Width="217" Height="32"/>
         <Label Content="Тариф" HorizontalAlignment="Left" Margin="461,117,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="508,119,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Button Content="Очистить поля" HorizontalAlignment="Left" Margin="546,288,0,0" VerticalAlignment="Top" Width="135" Height="39" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_3"/>
         <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="727,88,0,0" VerticalAlignment="Top" Width="226" Height="37" Background="#FF4F6DD3" Foreground="White" FontSize="16" FontFamily="Arial" FontWeight="Bold" Click="ShowClaimVerbose"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="304,35,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" RenderTransformOrigin="-16.708,0.598"/>
-        <Label Content="Мастер" HorizontalAlignment="Left" Margin="28,260,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
+        <Label Content="Мастер" HorizontalAlignment="Left" Margin="28,263,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
         <Button Content="Выбрать мастера" HorizontalAlignment="Left" Margin="361,288,0,0" VerticalAlignment="Top" Width="151" Height="38" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_4"/>
-        <TextBox x:Name="masterTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,294,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="85,261,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+        <TextBox x:Name="masterTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,294,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310" TextChanged="masterTextBox_TextChanged"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="85,264,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+        <Label Content="(доступны после выбора мастера)" HorizontalAlignment="Left" Margin="463,35,0,0" VerticalAlignment="Top" FontSize="13" Height="31" Width="231"/>
 
     </Grid>
 </Window>

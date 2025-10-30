@@ -7,12 +7,12 @@
         mc:Ignorable="d"
         Title="EmployeesViewWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <Button Content="В заявку" HorizontalAlignment="Left" Margin="523,24,0,0" VerticalAlignment="Top" Width="240" Height="36"/>
-        <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="240" Height="36" Click="Button_Click"/>
-        <DataGrid x:Name="employeesDG" HorizontalAlignment="Left" IsReadOnly="True" AutoGenerateColumns="False" Height="422" Margin="10,10,0,0" VerticalAlignment="Top" Width="486">
+        <Button x:Name="inClaimButton" Content="В заявку" HorizontalAlignment="Left" Margin="523,24,0,0" VerticalAlignment="Top" Width="248" Height="36" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="Button_Click_1"/>
+        <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="248" Height="36" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <DataGrid x:Name="employeesDG" HorizontalAlignment="Left" IsReadOnly="True" AutoGenerateColumns="False" Height="422" Margin="10,10,0,0" VerticalAlignment="Top" Width="486" SelectionChanged="employeesDG_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ФИО" Binding="{Binding full_name}" Width="200" />
-                <DataGridTextColumn Header="Номер Телефона" Binding="{Binding phone_number}" Width="150"/>
+                <DataGridTextColumn Header="Номер Телефона" Binding="{Binding phoneNumber}" Width="150"/>
                 <DataGridTextColumn Header="Фото" Binding="{Binding photo}" Width="150"/>
             </DataGrid.Columns>
         </DataGrid>

@@ -31,6 +31,7 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            ClearSelected();
             this.Close();
         }
 
@@ -43,8 +44,8 @@ namespace WpfApp1
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
-                string fioWithHiddenSurname = HideClientName(client[1].ToString());
-                string hiddenPhoneNumber = HideClientPhoneNumber(client[3].ToString());
+                string fioWithHiddenSurname = HideName(client[1].ToString());
+                string hiddenPhoneNumber = HidePhoneNumber(client[3].ToString());
                 clientTextBox.Text = $"{fioWithHiddenSurname}, {hiddenPhoneNumber}";
             }
         }
@@ -52,6 +53,8 @@ namespace WpfApp1
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshData();
+            dateOfExecution.IsEnabled = false;
+            timeOfExecution.IsEnabled = false;
 
             try
             {
@@ -118,7 +121,7 @@ namespace WpfApp1
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null)
+            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
@@ -127,7 +130,7 @@ namespace WpfApp1
                         conn.Open();
                         try
                         {
-                            MySqlCommand cmd = new MySqlCommand($@"Insert into connection_claim(id_claim, connection_address, mount_date, employees_id, client_id, claim_status_id, connection_creationDate, tariff_id)
+                            MySqlCommand cmd = new MySqlCommand($@"Insert into connection_claim(id_claim, connection_address, mount_date, employees_id, client_id, claim_status_id, connection_creationDate, tariff_id, masterId)
                                                                value (
                                                                 {claimNumber.Content},
                                                                 '{mountAddressTextBox.Text}',
@@ -136,7 +139,8 @@ namespace WpfApp1
                                                                 {ClientHolder.data[0]},
                                                                 (Select `idclaim_status` from claim_status where `status` = '{claimStatusComboBox.SelectedItem}'),
                                                                 '{DateTime.Parse(creationDate.Content.ToString()).ToString("yyyy-MM-dd")}',
-                                                                {tariffs.Where(pair => pair.Value == tariffComboBox.SelectedItem.ToString()).Select(pair => pair.Key).Single()}
+                                                                {tariffs.Where(pair => pair.Value == tariffComboBox.SelectedItem.ToString()).Select(pair => pair.Key).Single()},
+                                                                {MasterHolder.data[0]}
                                                                  );", conn);
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Заявка успешно создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -183,7 +187,7 @@ namespace WpfApp1
                     foreach (DataRow row in dt.Rows)
                     {
                         string fio = row.ItemArray[5].ToString();
-                        row.SetField<string>(5, HideClientName(fio));
+                        row.SetField<string>(5, HideName(fio));
                     }
 
                     claimsDG.ItemsSource = dt.AsDataView();
@@ -227,6 +231,8 @@ namespace WpfApp1
             tariffComboBox.SelectedItem = null;
             clientTextBox.Clear();
             ClientHolder.data = null;
+            MasterHolder.data = null;
+            masterTextBox.Clear();
             timeOfExecution.SelectedItem = null;
         }
 
@@ -244,13 +250,13 @@ namespace WpfApp1
                 e.Handled = true;
         }
 
-        private string HideClientName(string fullName)
+        private string HideName(string fullName)
         {
             string[] clientFio = fullName.Split(' ');
             return $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
         }
 
-        private string HideClientPhoneNumber(string phoneNumber)
+        private string HidePhoneNumber(string phoneNumber)
         {
             char[] phoneNumberByLetters = phoneNumber.ToCharArray().Where(c => c != ' ').ToArray();
             StringBuilder sb = new StringBuilder();
@@ -290,6 +296,28 @@ namespace WpfApp1
         {
             var win = new EmployeesViewWindow();
             win.ShowDialog();
+
+            if (MasterHolder.data != null)
+            {
+                object[] master = MasterHolder.data;
+                string fioWithHiddenSurname = HideName(master[1].ToString());
+                string hiddenPhoneNumber = HidePhoneNumber(master[5].ToString());
+                masterTextBox.Text = $"{fioWithHiddenSurname}, {hiddenPhoneNumber}";
+            }
+        }
+
+        private void masterTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (masterTextBox.Text.Length > 0)
+            {
+                dateOfExecution.IsEnabled = true;
+                timeOfExecution.IsEnabled = true;
+            }
+            else
+            {
+                dateOfExecution.IsEnabled = false;
+                timeOfExecution.IsEnabled = false;
+            }
         }
     }
 }
