@@ -50,7 +50,7 @@ namespace WpfApp1
                 try
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT `status` FROM claim_status;", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
