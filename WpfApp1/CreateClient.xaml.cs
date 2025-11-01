@@ -58,7 +58,7 @@ namespace WpfApp1
                 passportSeriesTextBox.Text = "____";
                 passportNumberTextBox.Text = "______";
                 inClaimButton.IsEnabled = false;
-                showClient.IsEnabled = false;
+                showClientButton.IsEnabled = false;
             }
             catch (Exception exc)
             {
@@ -85,7 +85,7 @@ namespace WpfApp1
         private void clientsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             inClaimButton.IsEnabled = true;
-            showClient.IsEnabled = true;
+            showClientButton.IsEnabled = true;
         }
 
         private void inClaimButton_Click(object sender, RoutedEventArgs e)
@@ -691,6 +691,49 @@ namespace WpfApp1
                 var win = new ClientVerbose(fieldValuesOfARecord);
                 win.ShowDialog();
                 this.ShowDialog();
+            }
+        }
+
+        private void editClientButton_Click(object sender, RoutedEventArgs e)
+        {
+            PrepareToEdit();
+        }
+
+        private void PrepareToEdit()
+        {
+            if (clientsDG.SelectedItem != null)
+            {
+                DataRowView drv = clientsDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+
+                createClientButton.Visibility = Visibility.Collapsed;
+                inClaimButton.Visibility = Visibility.Collapsed;
+                editClientButton.Visibility = Visibility.Collapsed;
+                showClientButton.Visibility = Visibility.Collapsed;
+                toMenuButton.Visibility = Visibility.Collapsed;
+                //claimNumber.Content = fieldValuesOfARecord[0];
+                //creationDate.Content = ((DateTime)fieldValuesOfARecord[1]).ToString("dd.MM.yyyy");
+                //dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
+
+                //FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
+                //chooseAClientButton.IsEnabled = false;
+                //claimStatusComboBox.IsEnabled = true;
+                //claimsDG.IsEnabled = false;
+                //string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
+                //List<string> times = ShowAvailableTime();
+                //times.Add(time);
+                //timeOfExecution.IsEnabled = true;
+                //timeOfExecution.ItemsSource = times;
+                //timeOfExecution.SelectedItem = time;
+                //mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
+                //FillComboBoxStatusesManager();
+                //claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
+                //tariffComboBox.SelectedItem = fieldValuesOfARecord[4];
+                //clientTextBox.Text = fieldValuesOfARecord[5].ToString();
+                //masterTextBox.Text = MasterHolder.data[1].ToString();
+
+                endEditingButton.Visibility = Visibility.Visible;
+                cancelChangesButton.Visibility = Visibility.Visible;
             }
         }
     }

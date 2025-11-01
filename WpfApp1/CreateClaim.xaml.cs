@@ -368,6 +368,7 @@ namespace WpfApp1
                 FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
                 chooseAClientButton.IsEnabled = false;
                 claimStatusComboBox.IsEnabled = true;
+                mountAddressTextBox.IsEnabled = false;
                 claimsDG.IsEnabled = false;
                 string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
                 List<string> times = ShowAvailableTime();
@@ -408,6 +409,7 @@ namespace WpfApp1
             ClearSelected();
 
             claimsDG.SelectedItem = null;
+            mountAddressTextBox.IsEnabled = true;
             chooseAClientButton.IsEnabled = true;
             claimsDG.IsEnabled = true;
             timeOfExecution.IsEnabled = false;
