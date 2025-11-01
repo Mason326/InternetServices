@@ -8,7 +8,7 @@
         Title="Учет договоров" Height="512.001" Width="987.2" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
         <Button x:Name="showContractVerbose" Content="Просмотр договора" HorizontalAlignment="Left" Height="36" Margin="727,32,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
-        <DataGrid IsReadOnly="True" x:Name="contractsDG" Margin="10,195,9.8,66.6" AutoGenerateColumns="False" CanUserAddRows="False" SelectionChanged="contractsDG_SelectionChanged">
+        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="contractsDG" Margin="10,195,9.8,66.6" AutoGenerateColumns="False" CanUserAddRows="False" SelectionChanged="contractsDG_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№ Договора" Binding="{Binding idcontract}" Width="100" />
                 <DataGridTextColumn Header="№ Заявки" Binding="{Binding connection_claim_id}" Width="100" />

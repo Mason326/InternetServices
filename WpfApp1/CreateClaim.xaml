@@ -9,11 +9,11 @@
     <Grid>
         <Label Content="Дата и время выполнения" HorizontalAlignment="Left" Margin="463,15,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="209"/>
         <Label Content="Статус" HorizontalAlignment="Left" Margin="255,35,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <Button Content="Создать заявку" HorizontalAlignment="Left" Height="36" Margin="727,35,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
-        <DataGrid x:Name="claimsDG" Margin="10,351,10,3" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="claimsDG_SelectionChanged">
+        <DataGrid x:Name="claimsDG" SelectionMode="Single" Margin="10,351,10,3" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="claimsDG_SelectionChanged">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="ShowClaimVerbose" />
+                    <MenuItem Header="Редактировать" Click="PrepareToEditClaim"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
@@ -24,6 +24,7 @@
                 <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="75" />
                 <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}" Width="90" />
                 <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="120" />
+                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="120" />
                 <DataGridTextColumn Header="Статус" Binding="{Binding claim_status}" Width="70">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="{x:Type TextBlock}">
@@ -50,14 +51,12 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Content="Редактировать заявку" HorizontalAlignment="Left" Height="36" Margin="727,146,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Button Content="На главную" HorizontalAlignment="Left" Height="36" Margin="727,220,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         <DatePicker x:Name="dateOfExecution" HorizontalAlignment="Left" Margin="464,64,0,0" VerticalAlignment="Top" Height="36" Width="135" FontSize="16" SelectedDateChanged="dateOfExecution_SelectedDateChanged" PreviewTextInput="dateOfExecution_PreviewTextInput"/>
         <ComboBox IsEnabled="False" x:Name="claimStatusComboBox" HorizontalAlignment="Left" Margin="255,64,0,0" VerticalAlignment="Top" Width="184" Height="38" FontSize="16"/>
         <Label Content="Дата создания:" HorizontalAlignment="Left" Margin="25,69,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="120"/>
         <Label Content="Номер заявки:" HorizontalAlignment="Left" Margin="29,25,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="117"/>
         <Label Content="Клиент" HorizontalAlignment="Left" Margin="28,189,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <Button Content="Выбрать клиента" HorizontalAlignment="Left" Margin="361,220,0,0" VerticalAlignment="Top" Width="151" Height="38" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+        <Button x:Name="chooseAClientButton" Content="Выбрать клиента" HorizontalAlignment="Left" Margin="361,220,0,0" VerticalAlignment="Top" Width="151" Height="38" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         <TextBox x:Name="clientTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,223,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310"/>
         <Label Name="claimNumber" Content="" HorizontalAlignment="Left" Margin="142,28,0,0" VerticalAlignment="Top" FontSize="16"/>
         <Label Name="creationDate" Content="" HorizontalAlignment="Left" Margin="142,71,0,0" VerticalAlignment="Top" FontSize="16"/>
@@ -78,13 +77,19 @@
         <Label Content="Тариф" HorizontalAlignment="Left" Margin="461,117,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="508,119,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Button Content="Очистить поля" HorizontalAlignment="Left" Margin="546,288,0,0" VerticalAlignment="Top" Width="135" Height="39" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_3"/>
-        <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="727,88,0,0" VerticalAlignment="Top" Width="226" Height="37" Background="#FF4F6DD3" Foreground="White" FontSize="16" FontFamily="Arial" FontWeight="Bold" Click="ShowClaimVerbose"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="304,35,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" RenderTransformOrigin="-16.708,0.598"/>
         <Label Content="Мастер" HorizontalAlignment="Left" Margin="28,263,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
         <Button Content="Выбрать мастера" HorizontalAlignment="Left" Margin="361,291,0,0" VerticalAlignment="Top" Width="151" Height="38" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_4"/>
         <TextBox x:Name="masterTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,294,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310" TextChanged="masterTextBox_TextChanged"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="85,264,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Label Content="(доступны после выбора мастера)" HorizontalAlignment="Left" Margin="463,35,0,0" VerticalAlignment="Top" FontSize="13" Height="31" Width="231"/>
-
+        <StackPanel HorizontalAlignment="Left" Height="229" Margin="694,29,0,0"  VerticalAlignment="Top" Width="263">
+            <Button x:Name="createClaimButton" Content="Создать заявку" HorizontalAlignment="Left" Height="36" Margin="20,30,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
+            <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" Height="37" Background="#FF4F6DD3" Foreground="White" FontSize="16" FontFamily="Arial" FontWeight="Bold" Click="ShowClaimVerbose"/>
+            <Button x:Name="editButton" Content="Редактировать заявку" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="PrepareToEditClaim"/>
+            <Button x:Name="toMainButton" Content="На главную" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+            <Button x:Name="endEditingButton" Visibility="Collapsed" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="20,30,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="EditClaim" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+            <Button x:Name="cancelChangesButton" Visibility="Collapsed" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="CancelEdit" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+        </StackPanel>
     </Grid>
 </Window>

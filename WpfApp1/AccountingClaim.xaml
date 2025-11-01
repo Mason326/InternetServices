@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Учет заявок" Height="588.2" Width="996.8" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <DataGrid IsReadOnly="True" x:Name="claimsDG" Margin="13,268,10.4,52.6" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged">
+        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,268,10.4,52.6" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="Button_Click_1" />
