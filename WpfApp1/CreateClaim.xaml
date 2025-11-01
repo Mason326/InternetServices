@@ -24,6 +24,7 @@
                 <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="75" />
                 <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}" Width="90" />
                 <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="120" />
+                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="120" />
                 <DataGridTextColumn Header="Статус" Binding="{Binding claim_status}" Width="70">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="{x:Type TextBlock}">
@@ -87,7 +88,7 @@
             <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" Height="37" Background="#FF4F6DD3" Foreground="White" FontSize="16" FontFamily="Arial" FontWeight="Bold" Click="ShowClaimVerbose"/>
             <Button x:Name="editButton" Content="Редактировать заявку" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="PrepareToEditClaim"/>
             <Button x:Name="toMainButton" Content="На главную" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-            <Button x:Name="endEditingButton" Visibility="Collapsed" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="20,30,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+            <Button x:Name="endEditingButton" Visibility="Collapsed" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="20,30,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="EditClaim" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
             <Button x:Name="cancelChangesButton" Visibility="Collapsed" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="CancelEdit" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         </StackPanel>
     </Grid>
