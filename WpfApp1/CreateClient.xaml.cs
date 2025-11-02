@@ -30,7 +30,6 @@ namespace WpfApp1
         Regex regexForPassportNumber = new Regex(@"^[0-9]{6}$");
         Regex regexForDepartmentCode = new Regex(@"^\d{3}-\d{3}$");
         string filterOption = "";
-
         public CreateClient(bool isSelectClient)
         {
             InitializeComponent();
@@ -59,6 +58,8 @@ namespace WpfApp1
                 passportNumberTextBox.Text = "______";
                 inClaimButton.IsEnabled = false;
                 showClientButton.IsEnabled = false;
+                endEditingButton.Visibility = Visibility.Collapsed;
+                cancelChangesButton.Visibility = Visibility.Collapsed;
             }
             catch (Exception exc)
             {
@@ -711,6 +712,27 @@ namespace WpfApp1
                 editClientButton.Visibility = Visibility.Collapsed;
                 showClientButton.Visibility = Visibility.Collapsed;
                 toMenuButton.Visibility = Visibility.Collapsed;
+
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($@"Select full_name from `client` where idclient = {fieldValuesOfARecord[0]};", conn);
+                    fioTextBox.Text = cmd.ExecuteScalar().ToString();
+                }
+                emailTextBox.Text = fieldValuesOfARecord[2].ToString();
+                phoneTextBox.Text = fieldValuesOfARecord[3].ToString();
+                placeOfResidenceTextBox.Text = fieldValuesOfARecord[4].ToString();
+                dateOfBirthDatePicker.SelectedDate = DateTime.Parse(((DateTime)fieldValuesOfARecord[5]).ToString("dd.MM.yyyy"));
+                passportSeriesTextBox.Text = fieldValuesOfARecord[8].ToString();
+                passportNumberTextBox.Text = fieldValuesOfARecord[9].ToString();
+                issuedByTextBox.Text = fieldValuesOfARecord[10].ToString();
+                issueDate.SelectedDate = DateTime.Parse(((DateTime)fieldValuesOfARecord[11]).ToString("dd.MM.yyyy"));
+                departmentCodeTextBox.Text = fieldValuesOfARecord[12].ToString();
+                clientStatusCombobox.Text = fieldValuesOfARecord[13].ToString();
+
+                searchByPassportSeriesAndNumber.IsEnabled = false;
+                clientStatusCombobox.IsEnabled = true;
+                clientsDG.IsEnabled = false;
                 //claimNumber.Content = fieldValuesOfARecord[0];
                 //creationDate.Content = ((DateTime)fieldValuesOfARecord[1]).ToString("dd.MM.yyyy");
                 //dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
