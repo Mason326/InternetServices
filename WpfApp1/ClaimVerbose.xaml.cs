@@ -23,8 +23,9 @@ namespace WpfApp1
     {
         string currStatus;
         int claimId;
+        Action Refresh;
         bool isEdit;
-        public ClaimVerbose(object[] selectedItems, bool isEditStatus)
+        public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action RefreshDG)
         {
             InitializeComponent();
             ClaimGroupBox.Header += $" {selectedItems[0]} от {((DateTime)selectedItems[1]).ToString("dd.MM.yyyy")}";
@@ -35,6 +36,7 @@ namespace WpfApp1
             mountAddressTextBox.Text = address;
             currStatus = selectedItems[7].ToString();
             isEdit = isEditStatus;
+            Refresh = RefreshDG;
             claimId = Convert.ToInt32(selectedItems[0]);
         }
 
@@ -49,8 +51,25 @@ namespace WpfApp1
             {
                 try
                 {
+                    string statusQuery = "SELECT `status` FROM claim_status;";
+                    if (AccountHolder.UserRole == "Менеджер")
+                    {
+                        statusQuery = "SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';";
+                        if (currStatus == "В работе" || currStatus == "Закрыта")
+                        {
+                            statusComboBox.ItemsSource = new string[] { currStatus };
+                            statusComboBox.SelectedItem = currStatus;
+                            statusComboBox.IsEnabled = false;
+                            saveChangesButton.IsEnabled =  false;
+                            return;
+                        }
+                    }
+                    else if (AccountHolder.UserRole == "Мастер")
+                    {
+                        statusQuery = "SELECT `status` FROM claim_status where `status` != 'Входящая';";
+                    }
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';", conn);
+                    MySqlCommand cmd = new MySqlCommand(statusQuery, conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
@@ -62,6 +81,11 @@ namespace WpfApp1
                 {
                     MessageBox.Show($"Не удалось загрузить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+
+                if (!isEdit)
+                    saveChangesButton.IsEnabled = false;
+                else
+                    saveChangesButton.IsEnabled = true;
             }
 
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -80,11 +104,25 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось загрузить клиента\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+        }
 
-            if (!isEdit)
+        private void saveChangesButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
-                statusComboBox.IsEnabled = false;
-                saveChangesButton.IsEnabled = false;
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"Update `connection_claim` SET `claim_status_id` = (SELECT idclaim_status from claim_status where `status` = '{statusComboBox.SelectedItem}') where id_claim = {claimId}", conn);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Refresh();
+                    this.Close();
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось обновить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
     }

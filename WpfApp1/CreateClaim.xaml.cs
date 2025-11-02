@@ -19,6 +19,7 @@ namespace WpfApp1
         Dictionary<int, string> tariffs = new Dictionary<int, string>();
         const int INCOMING_CLAIM_STATUS_ID = 1;
         int recordsCount = 0;
+        bool isEditing = false;
         public CreateClaim()
         {
             InitializeComponent();
@@ -275,15 +276,18 @@ namespace WpfApp1
 
         private void ClearSelected()
         {
-            mountAddressTextBox.Clear();
             dateOfExecution.SelectedDate = null;
             tariffComboBox.SelectedItem = null;
-            clientTextBox.Clear();
             ClientHolder.data = null;
-            MasterHolder.data = null;
-            masterTextBox.Clear();
             timeOfExecution.SelectedItem = null;
             recordsCount = 0;
+            masterTextBox.Clear();
+            MasterHolder.data = null;
+            if (!isEditing)
+            {
+                clientTextBox.Clear();
+                mountAddressTextBox.Clear();
+            }
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
@@ -339,7 +343,7 @@ namespace WpfApp1
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
                 this.Hide();
-                var win = new ClaimVerbose(fieldValuesOfARecord, false);
+                var win = new ClaimVerbose(fieldValuesOfARecord, true, RefreshData);
                 win.ShowDialog();
                 this.ShowDialog();
             }
@@ -368,6 +372,7 @@ namespace WpfApp1
                 FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
                 chooseAClientButton.IsEnabled = false;
                 claimStatusComboBox.IsEnabled = true;
+                mountAddressTextBox.IsEnabled = false;
                 claimsDG.IsEnabled = false;
                 string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
                 List<string> times = ShowAvailableTime();
@@ -381,6 +386,7 @@ namespace WpfApp1
                 tariffComboBox.SelectedItem = fieldValuesOfARecord[4];
                 clientTextBox.Text = fieldValuesOfARecord[5].ToString();
                 masterTextBox.Text = MasterHolder.data[1].ToString();
+                isEditing = true;
 
                 endEditingButton.Visibility = Visibility.Visible;
                 cancelChangesButton.Visibility = Visibility.Visible;
@@ -402,12 +408,14 @@ namespace WpfApp1
             endEditingButton.Visibility = Visibility.Collapsed;
             cancelChangesButton.Visibility = Visibility.Collapsed;
             creationDate.Content = DateTime.Now.ToString("dd.MM.yyyy");
+            isEditing = false;
 
             UseNewClaimNumber();
             UseStatusAsIncoming();
             ClearSelected();
 
             claimsDG.SelectedItem = null;
+            mountAddressTextBox.IsEnabled = true;
             chooseAClientButton.IsEnabled = true;
             claimsDG.IsEnabled = true;
             timeOfExecution.IsEnabled = false;
@@ -530,7 +538,15 @@ namespace WpfApp1
         private void masterTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (masterTextBox.Text.Length > 0)
+            {
                 dateOfExecution.IsEnabled = true;
+                if(isEditing)
+                {
+                    dateOfExecution.SelectedDate = null;
+                    timeOfExecution.IsEnabled = false;
+                    timeOfExecution.SelectedItem = null;
+                }
+            }
             else
                 dateOfExecution.IsEnabled = false;
         }
