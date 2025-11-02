@@ -43,7 +43,7 @@ namespace WpfApp1
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
                 this.Hide();
-                var win = new ClaimVerbose(fieldValuesOfARecord, true);
+                var win = new ClaimVerbose(fieldValuesOfARecord, true, RefreshDatagrid);
                 win.ShowDialog();
                 this.ShowDialog();
             }
