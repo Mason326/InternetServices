@@ -19,6 +19,7 @@ namespace WpfApp1
         Dictionary<int, string> tariffs = new Dictionary<int, string>();
         const int INCOMING_CLAIM_STATUS_ID = 1;
         int recordsCount = 0;
+        string filterOption = "";
         bool isEditing = false;
         public CreateClaim()
         {
@@ -220,12 +221,12 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio'
+                    MySqlCommand cmd = new MySqlCommand($@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio'
                                                         from `connection_claim`
                                                         inner join `client` on client.idclient = connection_claim.client_id
                                                         inner join `employees` on employees.idemployees = connection_claim.employees_id
                                                         inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
-                                                        inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id;", conn);
+                                                        inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterOption};", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     cmd.ExecuteNonQuery();
                     DataTable dt = new DataTable();
@@ -283,6 +284,7 @@ namespace WpfApp1
             recordsCount = 0;
             masterTextBox.Clear();
             MasterHolder.data = null;
+            searchByClaimNumAndFio.Clear();
             if (!isEditing)
             {
                 clientTextBox.Clear();
@@ -550,5 +552,19 @@ namespace WpfApp1
             else
                 dateOfExecution.IsEnabled = false;
         }
+
+        private void searchByClaimNumAndFio_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int claimNum;
+            string target = searchByClaimNumAndFio.Text;
+            if (target.Length >= 3 || int.TryParse(target, out claimNum) && target.Length > 0)
+            {
+                filterOption = $"where `client`.full_name like '%{target}%' or id_claim = '{target}'";
+            }
+            else
+                filterOption = "";
+            RefreshData();
+        }
+
     }
 }
