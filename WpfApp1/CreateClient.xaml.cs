@@ -25,6 +25,8 @@ namespace WpfApp1
     {
         bool prevBack = false;
         int clientId;
+        bool isEdit = false;
+        bool isGenerateNewCredentials;
         Regex regexForEmail = new Regex("^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$");
         Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
         Regex regexForPassportSeries = new Regex(@"^[0-9]{4}$");
@@ -110,6 +112,7 @@ namespace WpfApp1
             editClientButton.IsEnabled = false;
             clientStatusCombobox.SelectedItem = "Активный";
             clientsDG.IsEnabled = true;
+            isEdit = false;
         }
 
         private void clientsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -301,6 +304,8 @@ namespace WpfApp1
             int targetIndex = phoneTextBox.Text.IndexOf("_");
             if (targetIndex != -1)
                 phoneTextBox.CaretIndex = targetIndex;
+            else
+                phoneTextBox.CaretIndex = phoneTextBox.Text.Length;
         }
 
         private void phoneTextBox_GotMouseCapture(object sender, MouseEventArgs e)
@@ -309,6 +314,8 @@ namespace WpfApp1
             int targetIndex = phoneTextBox.Text.IndexOf("_");
             if (targetIndex != -1)
                 phoneTextBox.CaretIndex = targetIndex;
+            else
+                phoneTextBox.CaretIndex = phoneTextBox.Text.Length;
         }
 
         private void phoneTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -366,6 +373,14 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            if (isEdit)
+            {
+                MessageBoxResult res = MessageBox.Show("Вы уверены, что хотите изменить пароль и логин абонента?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                if (res != MessageBoxResult.Yes)
+                    return;
+                else
+                    isGenerateNewCredentials = true;
+            }
             char[] targetCharsPassword = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
             char[] mixedCharsPassword = CredentialsGenerator.MixChars(targetCharsPassword);
             string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword);
@@ -513,12 +528,12 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат серии и номера паспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                else if (!CheckDuplicateUtil.HasNoDuplicate("client", "phone_number", phoneTextBox.Text))
+                else if (!CheckDuplicateUtil.HasNoDuplicate("client", "`phone_number`", phoneTextBox.Text))
                 {
                     MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                else if (!CheckDuplicateUtil.HasNoDuplicate("client", "subscriber_login", abonentLoginTextBox.Text))
+                else if (!CheckDuplicateUtil.HasNoDuplicate("client", "`subscriber_login`", abonentLoginTextBox.Text))
                 {
                     MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина абонента", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
@@ -744,6 +759,9 @@ namespace WpfApp1
                     MySqlCommand cmd = new MySqlCommand($@"Select full_name from `client` where idclient = {fieldValuesOfARecord[0]};", conn);
                     fioTextBox.Text = cmd.ExecuteScalar().ToString().Trim();
                 }
+                abonentLoginTextBox.Clear();
+                abonentPasswordTextBox.Clear();
+
                 emailTextBox.Text = fieldValuesOfARecord[2].ToString().Trim();
                 phoneTextBox.Text = fieldValuesOfARecord[3].ToString().Trim();
                 placeOfResidenceTextBox.Text = fieldValuesOfARecord[4].ToString().Trim();
@@ -758,6 +776,8 @@ namespace WpfApp1
                 searchByPassportSeriesAndNumber.IsEnabled = false;
                 clientStatusCombobox.IsEnabled = true;
                 clientsDG.IsEnabled = false;
+                isGenerateNewCredentials = false;
+                isEdit = true;
 
                 endEditingButton.Visibility = Visibility.Visible;
                 cancelChangesButton.Visibility = Visibility.Visible;
@@ -787,7 +807,6 @@ namespace WpfApp1
                     && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
                     && dateOfBirthDatePicker.SelectedDate != null
                     && placeOfResidenceTextBox.Text.Length > 0
-                    && abonentLoginTextBox.Text.Length > 0
                     && regexForPassportSeries.IsMatch(passportSeriesTextBox.Text)
                     && regexForPassportNumber.IsMatch(passportNumberTextBox.Text)
                     && issuedByTextBox.Text.Length > 0
@@ -804,6 +823,7 @@ namespace WpfApp1
             {
                 int duplicatePassportClientId = CheckDuplicateUtil.HasNoDuplicate("client", "concat_ws(' ', passport_series, passport_number)", $"{passportSeriesTextBox.Text} {passportNumberTextBox.Text}", true);
                 int duplicatePhoneClientId = CheckDuplicateUtil.HasNoDuplicate("client", "phone_number", phoneTextBox.Text, false);
+                int duplicateLoginClientId = CheckDuplicateUtil.HasNoDuplicate("client", "subscriber_login", abonentLoginTextBox.Text, false);
 
                 if (duplicatePassportClientId != clientId && duplicatePassportClientId != -1)
                 {
@@ -815,11 +835,11 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                //else if (CheckDuplicateUtil.HasNoDuplicate("client", "subscriber_login", abonentLoginTextBox.Text, false) != clientId)
-                //{
-                //    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина абонента", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                //    return;
-                //}
+                else if (duplicateLoginClientId != clientId && duplicateLoginClientId != -1 && isGenerateNewCredentials)
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина абонента", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -827,21 +847,24 @@ namespace WpfApp1
                         conn.Open();
                         try
                         {
-                            MySqlCommand cmd2 = new MySqlCommand($@"Update `client` 
-                                                                   set full_name = '{fioTextBox.Text}',
-                                                                   `email` = '{emailTextBox.Text}',
-                                                                   phone_number = '{phoneTextBox.Text}',
-                                                                   place_of_residence = '{placeOfResidenceTextBox.Text}',
-                                                                   birthdate = '{((DateTime)dateOfBirthDatePicker.SelectedDate).ToString("yyyy-MM-dd")}',
-                                                                   subscriber_login = '{abonentLoginTextBox.Text}',
-                                                                   subscriber_password = '{abonentPasswordTextBox.Text}',
-                                                                   passport_series = {passportSeriesTextBox.Text},
-                                                                   passport_number = {passportNumberTextBox.Text},
-                                                                   issued_by = '{issuedByTextBox.Text}',
-                                                                   issue_date = '{((DateTime)issueDate.SelectedDate).ToString("yyyy-MM-dd")}',
-                                                                   department_code = '{departmentCodeTextBox.Text}',
-                                                                   client_status_id = (SELECT idclient_status FROM client_status where `status_name` = '{clientStatusCombobox.SelectedItem}')
-                                                                   where idclient = {clientId};", conn);
+                            string mainQuery = $@"Update `client` 
+                                                set full_name = '{fioTextBox.Text}',
+                                                `email` = '{emailTextBox.Text}',
+                                                phone_number = '{phoneTextBox.Text}',
+                                                place_of_residence = '{placeOfResidenceTextBox.Text}',
+                                                birthdate = '{((DateTime)dateOfBirthDatePicker.SelectedDate).ToString("yyyy-MM-dd")}',
+                                                passport_series = { passportSeriesTextBox.Text},
+                                                passport_number = { passportNumberTextBox.Text},
+                                                issued_by = '{issuedByTextBox.Text}',
+                                                issue_date = '{((DateTime)issueDate.SelectedDate).ToString("yyyy-MM-dd")}',
+                                                department_code = '{departmentCodeTextBox.Text}',
+                                                client_status_id = (SELECT idclient_status FROM client_status where `status_name` = '{clientStatusCombobox.SelectedItem}')";
+                            if (isGenerateNewCredentials)
+                            {
+                                mainQuery += $@", subscriber_login = '{abonentLoginTextBox.Text}',
+                                                  subscriber_password = '{abonentPasswordTextBox.Text}'";
+                            }
+                            MySqlCommand cmd2 = new MySqlCommand($@"{mainQuery} where idclient = {clientId};", conn);
                             cmd2.ExecuteNonQuery();
                             MessageBox.Show($"Данные клента успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();

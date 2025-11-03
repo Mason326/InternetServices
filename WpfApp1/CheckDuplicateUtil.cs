@@ -19,7 +19,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($"Select * from `{tableName}` where trim(`{fieldName}`) = '{trimmedInputValue}'", conn);
+                    MySqlCommand cmd = new MySqlCommand($"Select * from `{tableName}` where trim({fieldName}) = '{trimmedInputValue}'", conn);
                     object duplicateId = cmd.ExecuteScalar();
                     if (duplicateId != null)
                         return false;
