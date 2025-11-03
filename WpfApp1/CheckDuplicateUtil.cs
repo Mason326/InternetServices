@@ -19,7 +19,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($"Select * from `{tableName}` where trim(`{fieldName}`) = '{trimmedInputValue}'", conn);
+                    MySqlCommand cmd = new MySqlCommand($"Select * from `{tableName}` where trim({fieldName}) = '{trimmedInputValue}'", conn);
                     object duplicateId = cmd.ExecuteScalar();
                     if (duplicateId != null)
                         return false;
@@ -29,6 +29,32 @@ namespace WpfApp1
             catch
             {
                 return false;
+            }
+        }
+
+        public static int HasNoDuplicate(string tableName, string fieldName, string inputValue, bool fieldNameIsAnExpression)
+        {
+            try
+            {
+                string[] removedMultipleSpacesArray = inputValue.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string removedMultipleSpaces = string.Join(" ", removedMultipleSpacesArray);
+                string trimmedInputValue = removedMultipleSpaces.Trim();
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    string query = $"Select idclient from `{tableName}` where trim(`{fieldName}`) = '{trimmedInputValue}'";
+                    if (fieldNameIsAnExpression)
+                        query = query.Replace("`", "");
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    object clientId = cmd.ExecuteScalar();
+                    if (clientId == null)
+                        return -1;
+                    return Convert.ToInt32(clientId);
+                }
+            }
+            catch
+            {
+                return -1;
             }
         }
     }

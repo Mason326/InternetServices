@@ -107,8 +107,8 @@
             <Button x:Name="editClientButton" Content="Редактировать клиента" HorizontalAlignment="Right" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="editClientButton_Click"/>
             <Button x:Name="showClientButton" Content="Просмотреть клиента" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="showClient_Click"/>
             <Button x:Name="toMenuButton" Content="В меню" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1"/>
-            <Button x:Name="endEditingButton" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" />
-            <Button x:Name="cancelChangesButton" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" />
+            <Button x:Name="endEditingButton" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="EditClaim"/>
+            <Button x:Name="cancelChangesButton" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="CancelEdit" />
         </StackPanel>
     </Grid>
 </Window>
