@@ -729,7 +729,7 @@ namespace WpfApp1
                 DataRowView drv = clientsDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
                 this.Hide();
-                var win = new ClientVerbose(fieldValuesOfARecord);
+                var win = new ClientVerbose(fieldValuesOfARecord, RefreshDataGrid);
                 win.ShowDialog();
                 this.ShowDialog();
             }

@@ -23,7 +23,8 @@ namespace WpfApp1
     {
         int clientId;
         string currStatus;
-        public ClientVerbose(object[] selectedItems)
+        Action RefreshDG;
+        public ClientVerbose(object[] selectedItems, Action refresh)
         {
             InitializeComponent();
             clientId = Convert.ToInt32(selectedItems[0]);
@@ -40,6 +41,7 @@ namespace WpfApp1
             issueDateLabel.Content = selectedItems[11].ToString();
             departmentCodeLabel.Content = selectedItems[12].ToString();
             currStatus = selectedItems[13].ToString();
+            RefreshDG += refresh;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -81,6 +83,26 @@ namespace WpfApp1
                 catch (Exception exc)
                 {
                     MessageBox.Show($"Не удалось загрузить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void saveChangesButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"Update `client` set `client_status_id` = (select idclient_status from client_status where status_name = '{statusComboBox.SelectedItem}') where idclient = {clientId};", conn);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    RefreshDG();
+                    this.Close();
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось обновить статус\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
