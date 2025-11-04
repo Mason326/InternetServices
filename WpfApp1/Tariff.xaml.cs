@@ -22,6 +22,7 @@ namespace WpfApp1
     /// </summary>
     public partial class Tariff : Window
     {
+        int tariffId = -1;
         public Tariff()
         {
             InitializeComponent();
@@ -35,6 +36,8 @@ namespace WpfApp1
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshDataGrid();
+            editTariffButton.IsEnabled = false;
+            deleteTariffButton.IsEnabled = false;
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -176,6 +179,125 @@ namespace WpfApp1
             {
                 e.Handled = true;
             }
+        }
+
+        private void PrepareToEdit()
+        {
+            if (tariffDG.SelectedItem != null)
+            {
+                DataRowView drv = tariffDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+
+                addTariffButton.Visibility = Visibility.Collapsed;
+                editTariffButton.Visibility = Visibility.Collapsed;
+                deleteTariffButton.Visibility = Visibility.Collapsed;
+                toMainButton.Visibility = Visibility.Collapsed;
+
+                tariffId = Convert.ToInt32(fieldValuesOfARecord[0]);
+                tariffNameTextBox.Text = fieldValuesOfARecord[2].ToString().Trim();
+                tariffDescriptionTextBox.Text = fieldValuesOfARecord[3].ToString().Trim();
+                monthFeeTextBox.Text = fieldValuesOfARecord[1].ToString().Trim();
+
+                tariffDG.IsEnabled = false;
+
+                endEditButton.Visibility = Visibility.Visible;
+                cancelEditButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CloseEdition()
+        {
+            addTariffButton.Visibility = Visibility.Visible;
+            editTariffButton.Visibility = Visibility.Visible;
+            deleteTariffButton.Visibility = Visibility.Visible;
+            toMainButton.Visibility = Visibility.Visible;
+
+            endEditButton.Visibility = Visibility.Collapsed;
+            cancelEditButton.Visibility = Visibility.Collapsed;
+
+            ClearInputData();
+
+            tariffDG.SelectedItem = null;
+            tariffId = -1;
+            editTariffButton.IsEnabled = false;
+            deleteTariffButton.IsEnabled = false;
+            tariffDG.IsEnabled = true;
+        }
+
+        private void endEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled;
+            try
+            {
+                requiredFieldsIsFilled = tariffNameTextBox.Text.Length > 0
+                    && tariffDescriptionTextBox.Text.Length > 0
+                    && monthFeeTextBox.Text.Length > 0;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректно заполнены обязательные поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (requiredFieldsIsFilled)
+            {
+                int duplicateNameService = CheckDuplicateUtil.HasNoDuplicate("tariff", "tariff_name", tariffNameTextBox.Text, false);
+
+                if (duplicateNameService != tariffId && duplicateNameService != -1)
+                {
+                    MessageBox.Show($"Не удалось обновить данные тарифа. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string query = $@"Update `tariff` 
+                                                set tariff_name = '{tariffNameTextBox.Text.Trim()}',
+                                                monthly_fee = {monthFeeTextBox.Text.Trim()},
+                                                tariff_details = '{tariffDescriptionTextBox.Text.Trim()}'
+                                                where idtariff = {tariffId}";
+                            MySqlCommand cmd = new MySqlCommand(query, conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Данные тарифа успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            CloseEdition();
+                            RefreshDataGrid();
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось обновить данные тарифа\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void cancelEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            CloseEdition();
+        }
+
+        private void editTariffButton_Click(object sender, RoutedEventArgs e)
+        {
+            PrepareToEdit();
+        }
+
+        private void tariffDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            editTariffButton.IsEnabled = true;
+            deleteTariffButton.IsEnabled = true;
         }
     }
 }
