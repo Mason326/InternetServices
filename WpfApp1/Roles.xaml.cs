@@ -38,27 +38,6 @@ namespace WpfApp1
 
         }
 
-        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex(@"[А-Яа-я\b\s]");
-            try
-            {
-                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
-                    e.Handled = false;
-                else
-                    e.Handled = true;
-            }
-            catch
-            {
-                ;
-            }
-        }
-
-        private void ClearInputData()
-        {
-            roleNameTextBox.Text = "";
-        }
-
         private void RefreshDataGrid()
         {
             try
@@ -78,46 +57,6 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            bool requiredFieldsIsFilled = roleNameTextBox.Text.Length > 0;
-
-
-            if (requiredFieldsIsFilled)
-            {
-                if (!CheckDuplicateUtil.HasNoDuplicate("roles", "role_name", roleNameTextBox.Text))
-                {
-                    MessageBox.Show($"Не удалось добавить роль. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                try
-                {
-                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                    {
-                        conn.Open();
-                        MySqlCommand cmd = new MySqlCommand($@"Insert into `roles`(role_name) 
-                                                            value(
-                                                                '{roleNameTextBox.Text}'
-                                                            );", conn);
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Роль добавлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        ClearInputData();
-                    }
-
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show($"Не удалось добавить роль\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-                RefreshDataGrid();
-            }
-            else
-                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-
         }
     }
 }
