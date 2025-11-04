@@ -42,7 +42,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    string query = $"Select idclient from `{tableName}` where trim(`{fieldName}`) = '{trimmedInputValue}'";
+                    string query = $"Select * from `{tableName}` where trim(`{fieldName}`) = '{trimmedInputValue}'";
                     if (fieldNameIsAnExpression)
                         query = query.Replace("`", "");
                     MySqlCommand cmd = new MySqlCommand(query, conn);

@@ -827,17 +827,17 @@ namespace WpfApp1
 
                 if (duplicatePassportClientId != clientId && duplicatePassportClientId != -1)
                 {
-                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат серии и номера паспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Не удалось редактировать клиента. Обнаружен дубликат серии и номера паспорта", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 else if (duplicatePhoneClientId != clientId && duplicatePhoneClientId != -1)
                 {
-                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Не удалось редактировать клиента. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 else if (duplicateLoginClientId != clientId && duplicateLoginClientId != -1 && isGenerateNewCredentials)
                 {
-                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина абонента", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Не удалось редактировать клиента. Обнаружен дубликат логина абонента", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 try

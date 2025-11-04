@@ -25,6 +25,9 @@ namespace WpfApp1
     public partial class CreateUser : Window
     {
         bool prevBack = false;
+        bool isEdit = false;
+        bool isGenerateNewCredentials;
+        int userId = -1;
         Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
         public CreateUser()
         {
@@ -39,7 +42,7 @@ namespace WpfApp1
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshDataGrid();
-
+            editUserButton.IsEnabled = false;
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -175,6 +178,14 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            if (isEdit)
+            {
+                MessageBoxResult res = MessageBox.Show("Вы уверены, что хотите изменить пароль пользователя?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                if (res != MessageBoxResult.Yes)
+                    return;
+                else
+                    isGenerateNewCredentials = true;
+            }
             char[] targetCharsPassword = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
             char[] mixedCharsPassword = CredentialsGenerator.MixChars(targetCharsPassword);
             string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword);
@@ -437,6 +448,7 @@ namespace WpfApp1
         private void userDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             deleteUserButton.IsEnabled = true;
+            editUserButton.IsEnabled = true;
         }
 
         private bool HasDirectorAccount()
@@ -457,6 +469,142 @@ namespace WpfApp1
             { 
                 return false;
             }
+        }
+
+        private void editUserButton_Click(object sender, RoutedEventArgs e)
+        {
+            PrepareToEdit();
+        }
+
+        private void PrepareToEdit()
+        {
+            if (userDG.SelectedItem != null)
+            {
+                DataRowView drv = userDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+
+                createUserButton.Visibility = Visibility.Collapsed;
+                editUserButton.Visibility = Visibility.Collapsed;
+                deleteUserButton.Visibility = Visibility.Collapsed;
+                toMainButton.Visibility = Visibility.Collapsed;
+
+                passwordTextBox.Clear();
+
+                userId = Convert.ToInt32(fieldValuesOfARecord[0]);
+                fioTextBox.Text = fieldValuesOfARecord[1].ToString().Trim();
+                loginTextBox.Text = fieldValuesOfARecord[2].ToString().Trim();
+                phoneTextBox.Text = fieldValuesOfARecord[6].ToString().Trim();
+                rolesComboBox.SelectedItem = fieldValuesOfARecord[5].ToString();
+
+                userDG.IsEnabled = false;
+                isGenerateNewCredentials = false;
+                isEdit = true;
+
+                endEditingButton.Visibility = Visibility.Visible;
+                cancelChangesButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CloseEdition()
+        {
+            createUserButton.Visibility = Visibility.Visible;
+            editUserButton.Visibility = Visibility.Visible;
+            deleteUserButton.Visibility = Visibility.Visible;
+            toMainButton.Visibility = Visibility.Visible;
+
+            endEditingButton.Visibility = Visibility.Collapsed;
+            cancelChangesButton.Visibility = Visibility.Collapsed;
+
+            ClearInputData();
+
+            userDG.SelectedItem = null;
+            userId = -1;
+            //searchByPassportSeriesAndNumber.IsEnabled = true;
+            editUserButton.IsEnabled = false;
+            deleteUserButton.IsEnabled = false;
+            userDG.IsEnabled = true;
+            isEdit = false;
+        }
+
+        private void cancelChangesButton_Click(object sender, RoutedEventArgs e)
+        {
+            CloseEdition();
+        }
+
+        private void endEditingButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled;
+            try
+            {
+                requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 1
+                    && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
+                    && rolesComboBox.SelectedItem != null
+                    && loginTextBox.Text.Length > 0;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректно заполнены обязательные поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (requiredFieldsIsFilled)
+            {
+                int duplicatePhoneUserId = CheckDuplicateUtil.HasNoDuplicate("employees", "phoneNumber", phoneTextBox.Text, false);
+                int duplicateLoginUserId = CheckDuplicateUtil.HasNoDuplicate("employees", "login", loginTextBox.Text, true);
+
+                if (duplicatePhoneUserId != userId && duplicatePhoneUserId != -1)
+                {
+                    MessageBox.Show($"Не удалось обновить пользователя. Обнаружен дубликат номера телефона", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else if (duplicateLoginUserId != userId && duplicateLoginUserId != -1)
+                {
+                    MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина пользователя", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string mainQuery = $@"Update `employees` 
+                                                set full_name = '{fioTextBox.Text}',
+                                                `login` = '{loginTextBox.Text}',
+                                                phoneNumber = '{phoneTextBox.Text}',
+                                                roles_id = (SELECT idroles FROM `roles` where `role_name` = '{rolesComboBox.SelectedItem}')";
+                            if (isGenerateNewCredentials && passwordTextBox.Text.Length > 0)
+                            {
+                                mainQuery += $@", `password` = '{CreateChecksum(passwordTextBox.Text)}'";
+                            }
+                            MySqlCommand cmd = new MySqlCommand($@"{mainQuery} where idemployees = {userId};", conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Данные пользователя успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            CloseEdition();
+                            RefreshDataGrid();
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось обновить данные пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void passwordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            isGenerateNewCredentials = true;
         }
     }
 }

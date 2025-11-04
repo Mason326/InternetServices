@@ -133,5 +133,10 @@ namespace WpfApp1
                 PasswordTextBox.Password = "";
             }
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoginTextbox.Focus();
+        }
     }
 }
