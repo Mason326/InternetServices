@@ -22,10 +22,13 @@ namespace WpfApp1
     public partial class ContractVerbose : Window
     {
         string currentStatus;
-        public ContractVerbose(object[] selectedItems)
+        int contactId;
+        Action RefreshDG;
+        public ContractVerbose(object[] selectedItems, Action refresh)
         {
             InitializeComponent();
             ContractGroupBox.Header += $"{selectedItems[0]} от {((DateTime)selectedItems[1]).ToString("dd.MM.yyyy")}";
+            contactId = Convert.ToInt32(selectedItems[0]);
             ClientLabel.Content += selectedItems[2].ToString();
             ClaimNumberLabel.Content += selectedItems[3].ToString();
             TariffNameLabel.Content += selectedItems[6].ToString();
@@ -34,6 +37,7 @@ namespace WpfApp1
             address = address.Replace(",,", ",");
             AddressTextBox.Text += address;
             currentStatus = selectedItems[5].ToString();
+            RefreshDG += refresh;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -59,6 +63,26 @@ namespace WpfApp1
                 catch (Exception exc)
                 {
                     MessageBox.Show($"Не удалось загрузить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"Update contract Set contract_status_id = (Select idcontract_status from contract_status where `status` = '{StatusComboBox.SelectedItem}') where idcontract = {contactId};", conn);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    RefreshDG();
+                    this.Close();
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось обновить статус\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
