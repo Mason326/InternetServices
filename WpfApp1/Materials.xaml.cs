@@ -22,6 +22,7 @@ namespace WpfApp1
     /// </summary>
     public partial class Materials : Window
     {
+        int materialId = -1;
         public Materials()
         {
             InitializeComponent();
@@ -35,6 +36,8 @@ namespace WpfApp1
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshDataGrid();
+            editMaterialButton.IsEnabled = false;
+            deleteMaterialButton.IsEnabled = false;
         }
 
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -177,6 +180,125 @@ namespace WpfApp1
             {
                 e.Handled = true;
             }
+        }
+
+        private void PrepareToEdit()
+        {
+            if (materialsDG.SelectedItem != null)
+            {
+                DataRowView drv = materialsDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+
+                addMaterialButton.Visibility = Visibility.Collapsed;
+                editMaterialButton.Visibility = Visibility.Collapsed;
+                deleteMaterialButton.Visibility = Visibility.Collapsed;
+                toMainButton.Visibility = Visibility.Collapsed;
+
+                materialId = Convert.ToInt32(fieldValuesOfARecord[0]);
+                materialNameTextBox.Text = fieldValuesOfARecord[1].ToString().Trim();
+                materialUnitTextBox.Text = fieldValuesOfARecord[2].ToString().Trim();
+                materialCostTextBox.Text = fieldValuesOfARecord[3].ToString().Trim();
+
+                materialsDG.IsEnabled = false;
+
+                endEditButton.Visibility = Visibility.Visible;
+                cancelEditButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CloseEdition()
+        {
+            addMaterialButton.Visibility = Visibility.Visible;
+            editMaterialButton.Visibility = Visibility.Visible;
+            deleteMaterialButton.Visibility = Visibility.Visible;
+            toMainButton.Visibility = Visibility.Visible;
+
+            endEditButton.Visibility = Visibility.Collapsed;
+            cancelEditButton.Visibility = Visibility.Collapsed;
+
+            ClearInputData();
+
+            materialsDG.SelectedItem = null;
+            materialId = -1;
+            editMaterialButton.IsEnabled = false;
+            deleteMaterialButton.IsEnabled = false;
+            materialsDG.IsEnabled = true;
+        }
+
+        private void endEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled;
+            try
+            {
+                requiredFieldsIsFilled = materialNameTextBox.Text.Length > 0
+                    && materialUnitTextBox.Text.Length > 0
+                    && materialCostTextBox.Text.Length > 0;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректно заполнены обязательные поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (requiredFieldsIsFilled)
+            {
+                int duplicateMaterialName = CheckDuplicateUtil.HasNoDuplicate("materials", "material_name", materialNameTextBox.Text, false);
+
+                if (duplicateMaterialName != materialId && duplicateMaterialName != -1)
+                {
+                    MessageBox.Show($"Не удалось обновить данные материала. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string query = $@"Update `materials` 
+                                                set material_name = '{materialNameTextBox.Text.Trim()}',
+                                                cost = '{materialCostTextBox.Text.Trim()}',
+                                                units = '{materialUnitTextBox.Text.Trim()}'
+                                                where idmaterials = {materialId}";
+                            MySqlCommand cmd = new MySqlCommand(query, conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Данные материала успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            CloseEdition();
+                            RefreshDataGrid();
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось обновить данные материала\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void cancelEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            CloseEdition();
+        }
+
+        private void editMaterialButton_Click(object sender, RoutedEventArgs e)
+        {
+            PrepareToEdit();
+        }
+
+        private void materialsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            editMaterialButton.IsEnabled = true;
+            deleteMaterialButton.IsEnabled = true;
         }
     }
 }
