@@ -41,7 +41,7 @@ namespace WpfApp1
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
-                string fioWithHiddenSurname = HideName(client[1].ToString());
+                string fioWithHiddenSurname = client[1].ToString();
                 string hiddenPhoneNumber = HidePhoneNumber(client[3].ToString());
                 clientTextBox.Text = $"{fioWithHiddenSurname}, {hiddenPhoneNumber}";
             }
