@@ -369,19 +369,23 @@ namespace WpfApp1
                 toMainButton.Visibility = Visibility.Collapsed;
                 claimNumber.Content = fieldValuesOfARecord[0];
                 creationDate.Content = ((DateTime)fieldValuesOfARecord[1]).ToString("dd.MM.yyyy");
-                dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
-
                 FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
+                
+                if (!(DateTime.Parse(dateByParts[0]) < DateTime.Now))
+                { 
+                    dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
+                    string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
+                    List<string> times = ShowAvailableTime();
+                    times.Add(time);
+                    timeOfExecution.IsEnabled = true;
+                    timeOfExecution.ItemsSource = times;
+                    timeOfExecution.SelectedItem = time;
+                }
+
                 chooseAClientButton.IsEnabled = false;
                 claimStatusComboBox.IsEnabled = true;
                 mountAddressTextBox.IsEnabled = false;
                 claimsDG.IsEnabled = false;
-                string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
-                List<string> times = ShowAvailableTime();
-                times.Add(time);
-                timeOfExecution.IsEnabled = true;
-                timeOfExecution.ItemsSource = times;
-                timeOfExecution.SelectedItem = time;
                 mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 FillComboBoxStatusesManager();
                 claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
