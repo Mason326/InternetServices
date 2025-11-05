@@ -299,5 +299,46 @@ namespace WpfApp1
             editTariffButton.IsEnabled = true;
             deleteTariffButton.IsEnabled = true;
         }
+
+        private void deleteTariffButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult res = MessageBox.Show($"Вы уверены, что хотите удалить тариф?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes)
+                return;
+
+            if (tariffDG.SelectedItem != null)
+            {
+                DataRowView drv = tariffDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string query = $@"Delete from `tariff`
+                                                where idtariff = {fieldValuesOfARecord[0]}";
+                            MySqlCommand cmd = new MySqlCommand(query, conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Тариф успешно удален", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            RefreshDataGrid();
+                            tariffDG.SelectedItem = null;
+                            editTariffButton.IsEnabled = false;
+                            deleteTariffButton.IsEnabled = false;
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось удалить тариф\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
     }
 }
