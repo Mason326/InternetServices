@@ -491,6 +491,11 @@ namespace WpfApp1
                 passwordTextBox.Clear();
 
                 userId = Convert.ToInt32(fieldValuesOfARecord[0]);
+                int currentUserId = AccountHolder.userId;
+                if (currentUserId == userId)
+                    rolesComboBox.IsEnabled = false;
+                else
+                    rolesComboBox.IsEnabled = true;
                 fioTextBox.Text = fieldValuesOfARecord[1].ToString().Trim();
                 loginTextBox.Text = fieldValuesOfARecord[2].ToString().Trim();
                 phoneTextBox.Text = fieldValuesOfARecord[6].ToString().Trim();
