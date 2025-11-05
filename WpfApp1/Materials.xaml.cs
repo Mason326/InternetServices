@@ -300,5 +300,46 @@ namespace WpfApp1
             editMaterialButton.IsEnabled = true;
             deleteMaterialButton.IsEnabled = true;
         }
+
+        private void deleteMaterialButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult res = MessageBox.Show($"Вы уверены, что хотите удалить материал?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes)
+                return;
+
+            if (materialsDG.SelectedItem != null)
+            {
+                DataRowView drv = materialsDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string query = $@"Delete from `materials`
+                                                where idmaterials = {fieldValuesOfARecord[0]}";
+                            MySqlCommand cmd = new MySqlCommand(query, conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Материал успешно удален", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            RefreshDataGrid();
+                            materialsDG.SelectedItem = null;
+                            editMaterialButton.IsEnabled = false;
+                            deleteMaterialButton.IsEnabled = false;
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось удалить материал\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
     }
 }
