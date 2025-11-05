@@ -298,5 +298,46 @@ namespace WpfApp1
             editServiceButton.IsEnabled = true;
             deleteServiceButton.IsEnabled = true;
         }
+
+        private void deleteServiceButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult res = MessageBox.Show($"Вы уверены, что хотите удалить эту услугу?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes)
+                return;
+
+            if (servicesDG.SelectedItem != null)
+            {
+                DataRowView drv = servicesDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string query = $@"Delete from `services`
+                                                where idservice = {fieldValuesOfARecord[0]}";
+                            MySqlCommand cmd = new MySqlCommand(query, conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Данные услуги успешно удалены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            RefreshDataGrid();
+                            servicesDG.SelectedItem = null;
+                            editServiceButton.IsEnabled = false;
+                            deleteServiceButton.IsEnabled = false;
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось удалить услугу\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
     }
 }
