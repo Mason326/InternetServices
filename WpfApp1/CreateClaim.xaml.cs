@@ -362,6 +362,38 @@ namespace WpfApp1
                     MessageBox.Show($"Заявки с такими статусами недоступны для редактирования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+                else if (fieldValuesOfARecord[7].ToString() == "Отменена")
+                {
+                    MessageBoxResult res = MessageBox.Show($"Заявка отменена и не подлежит изменению. Хотите перевыпустить заявку?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        ClearSelected();
+                        try
+                        {
+                            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                            {
+                                conn.Open();
+                                MySqlCommand cmd = new MySqlCommand($@"SELECT `client`.* FROM connection_claim inner join `client` on `client`.idclient = connection_claim.client_id where id_claim = {fieldValuesOfARecord[0]};", conn);
+                                using (MySqlDataReader dr = cmd.ExecuteReader())
+                                {
+                                    object[] clientData = new object[dr.FieldCount];
+                                    while (dr.Read())
+                                    {
+                                        dr.GetValues(clientData);
+                                    }
+                                    ClientHolder.data = clientData;
+                                    clientTextBox.Text = HideName(clientData[1].ToString());
+                                }
+                                mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries)); ;
+                            }
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    return;
+                }
                 string[] dateByParts = fieldValuesOfARecord[2].ToString().Split(' ');
                 createClaimButton.Visibility = Visibility.Collapsed;
                 showClaimButton.Visibility = Visibility.Collapsed;
