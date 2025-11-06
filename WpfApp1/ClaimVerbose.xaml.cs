@@ -55,7 +55,7 @@ namespace WpfApp1
                     if (AccountHolder.UserRole == "Менеджер")
                     {
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';";
-                        if (currStatus == "В работе" || currStatus == "Закрыта")
+                        if (currStatus == "В работе" || currStatus == "Закрыта" || currStatus == "Отменена")
                         {
                             statusComboBox.ItemsSource = new string[] { currStatus };
                             statusComboBox.SelectedItem = currStatus;

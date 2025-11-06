@@ -469,7 +469,7 @@ namespace WpfApp1
                 try
                 {
                     ShowAvailableTime();
-                    if (recordsCount > 6)
+                    if (recordsCount > 6 && claimStatusComboBox.SelectedItem.ToString() != "Отменена")
                     {
                         MessageBox.Show($"Не удалось обновить заявку. Указанный мастер превысил количество взятых заявок в сутки", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
@@ -602,5 +602,9 @@ namespace WpfApp1
             RefreshData();
         }
 
+        private void claimsDG_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }
