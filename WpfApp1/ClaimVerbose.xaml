@@ -33,6 +33,7 @@
         </GroupBox>
         <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="523,20,0,0" VerticalAlignment="Top" Width="187" Height="48" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="saveChangesButton_Click"/>
         <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="187" Height="47" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
+        <Button x:Name="rereleaseClaimButton" Content="Перевыпустить заявку" HorizontalAlignment="Left" Margin="523,164,0,0" VerticalAlignment="Top" Width="187" Height="46" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
 
     </Grid>
 </Window>

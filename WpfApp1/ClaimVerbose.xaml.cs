@@ -24,6 +24,9 @@ namespace WpfApp1
         string currStatus;
         int claimId;
         Action Refresh;
+        Action<object[]> ReReleaseClaim;
+        object[] fieldValuesOfARecord;
+        bool isAccounting = true;
         bool isEdit;
         public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action RefreshDG)
         {
@@ -35,9 +38,28 @@ namespace WpfApp1
             address = address.Replace(",,", ",");
             mountAddressTextBox.Text = address;
             currStatus = selectedItems[7].ToString();
+            isAccounting = true;
             isEdit = isEditStatus;
             Refresh = RefreshDG;
             claimId = Convert.ToInt32(selectedItems[0]);
+        }
+
+        public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action RefreshDG, Action<object[]> RereleaseClaim)
+        {
+            InitializeComponent();
+            ClaimGroupBox.Header += $" {selectedItems[0]} от {((DateTime)selectedItems[1]).ToString("dd.MM.yyyy")}";
+            dateOfExecutionLabel.Content = selectedItems[2].ToString();
+            managerNameLabel.Content = selectedItems[6].ToString();
+            string address = string.Join(", ", selectedItems[3].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+            address = address.Replace(",,", ",");
+            mountAddressTextBox.Text = address;
+            currStatus = selectedItems[7].ToString();
+            isEdit = isEditStatus;
+            Refresh = RefreshDG;
+            isAccounting = false;
+            ReReleaseClaim = RereleaseClaim;
+            claimId = Convert.ToInt32(selectedItems[0]);
+            fieldValuesOfARecord = selectedItems;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -47,6 +69,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            rereleaseClaimButton.Visibility = Visibility.Collapsed;
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
@@ -55,31 +78,38 @@ namespace WpfApp1
                     if (AccountHolder.UserRole == "Менеджер")
                     {
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';";
-                        if (currStatus == "В работе" || currStatus == "Закрыта" || currStatus == "Отменена")
+                        if (currStatus != "Входящая")
                         {
+                            if(currStatus == "Отменена" && !isAccounting)
+                                rereleaseClaimButton.Visibility = Visibility.Visible;
+                            else
+                                rereleaseClaimButton.Visibility = Visibility.Collapsed;
                             statusComboBox.ItemsSource = new string[] { currStatus };
                             statusComboBox.SelectedItem = currStatus;
                             statusComboBox.IsEnabled = false;
                             saveChangesButton.IsEnabled =  false;
-                            return;
                         }
                     }
                     else if (AccountHolder.UserRole == "Мастер")
                     {
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'Входящая';";
                     }
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(statusQuery, conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
-                    statusComboBox.ItemsSource = dt.AsEnumerable().Select(dr => dr.ItemArray[0]);
-                    statusComboBox.SelectedItem = currStatus;
+                    if (!(currStatus == "В работе" || currStatus == "Закрыта"))
+                    { 
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand(statusQuery, conn);
+                        MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                        DataTable dt = new DataTable();
+                        cmd.ExecuteNonQuery();
+                        da.Fill(dt);
+                        statusComboBox.ItemsSource = dt.AsEnumerable().Select(dr => dr.ItemArray[0]);
+                        statusComboBox.SelectedItem = currStatus;
+                    }
                 }
                 catch (Exception exc)
                 {
                     MessageBox.Show($"Не удалось загрузить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
 
                 if (!isEdit)
@@ -124,6 +154,12 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось обновить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            ReReleaseClaim(fieldValuesOfARecord);
+            this.Close();
         }
     }
 }
