@@ -127,7 +127,13 @@ namespace WpfApp1
             if (clientsDG.SelectedItem != null)
             {
                 DataRowView drv = clientsDG.SelectedItem as DataRowView;
-                ClientHolder.data = drv.Row.ItemArray;
+                object[] clientData = drv.Row.ItemArray;
+                if (clientData[clientData.Length - 1].ToString() != "Активный")
+                {
+                    MessageBox.Show($"Не удалось добавить клиента в заявку, статус клиента не активный", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                ClientHolder.data = clientData;
                 this.Close();
             }
         }
