@@ -227,10 +227,25 @@ namespace WpfApp1
                                                         inner join `employees` on employees.idemployees = connection_claim.employees_id
                                                         inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
                                                         inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterOption};", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    cmd.ExecuteNonQuery();
                     DataTable dt = new DataTable();
-                    da.Fill(dt);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        DataColumn[] columns = new DataColumn[dr.FieldCount];
+                        for (int i = 0; i < columns.Length; i++)
+                        {
+                            columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
+                        }
+                        //var cols = dr.;
+                        //.CopyTo(columns, 0);
+                        dt.Columns.AddRange(columns);
+                        object[] record = new object[dr.FieldCount];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(record);
+                            dt.LoadDataRow(record, true);
+                        }
+                    }
+                   
 
                     foreach (DataRow row in dt.Rows)
                     {
