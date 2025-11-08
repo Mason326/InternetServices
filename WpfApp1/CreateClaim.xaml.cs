@@ -165,7 +165,7 @@ namespace WpfApp1
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
+            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
@@ -625,6 +625,19 @@ namespace WpfApp1
         private void claimsDG_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
 
+        }
+
+        private void claimStatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (claimStatusComboBox.SelectedItem.ToString() == "Отменена" && dateOfExecution.SelectedDate == null)
+            {
+                dateOfExecution.IsEnabled = false;
+                timeOfExecution.IsEnabled = false;
+            }
+            else
+            {
+                claimStatusComboBox.IsEnabled = false;
+            }
         }
     }
 }

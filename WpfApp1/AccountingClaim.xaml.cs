@@ -136,7 +136,7 @@ namespace WpfApp1
                     additionalFilterParams = "";
                     break;
                 case "incoming":
-                    additionalFilterParams = "`status` = 'Входящие'";
+                    additionalFilterParams = "`status` = 'Входящая'";
                     break;
                 case "inProgress":
                     additionalFilterParams = "`status` = 'В работе'";

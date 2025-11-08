@@ -52,7 +52,7 @@
         <GroupBox Header="Фильтр по статусу" HorizontalAlignment="Left" Height="155" Margin="28,95,0,0" VerticalAlignment="Top" Width="162" FontSize="16">
             <StackPanel HorizontalAlignment="Left" Height="134" Margin="0,0,-2.2,-7.6" VerticalAlignment="Top" Width="147">
                 <RadioButton x:Name="allStatuses" Content="Все" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,10,0.0,0" Checked="FilterByStatus_Checked"/>
-                <RadioButton x:Name="incoming" Content="Входящие" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
+                <RadioButton x:Name="incoming" Content="Входящая" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
                 <RadioButton x:Name="inProgress" Content="В работе" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
                 <RadioButton x:Name="closed" Content="Закрыта" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
                 <RadioButton x:Name="canceled" Content="Отменена" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
