@@ -220,6 +220,7 @@ namespace WpfApp1
         {
             try
             {
+                string cmdUpdateExpired = "";
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
@@ -245,14 +246,25 @@ namespace WpfApp1
                         {
                             dr.GetValues(record);
                             DateTime executionDate = (DateTime)record[2];
-                            if ((executionDate < DateTime.Now && record[7].ToString() == "Входящая") || (executionDate < DateTime.Today.AddDays(1) && record[7].ToString() == "В работе"))
+                            if (executionDate < DateTime.Now && record[7].ToString() == "Входящая")
                                 record[record.Length - 1] = true;
+                            else if (executionDate < DateTime.Today.AddDays(1) && record[7].ToString() == "В работе")
+                            {
+                                //record[record.Length - 1] = true;
+                                record[7] = "Отменена";
+                                cmdUpdateExpired += $"Update `connection_claim` set claim_status_id = (select idclaim_status from claim_status where `status` = 'Отменена') where id_claim = {record[0]};";
+                            }
                             else
                                 record[record.Length - 1] = false;
                             dt.LoadDataRow(record, true);
                         }
                     }
 
+                    if (cmdUpdateExpired != string.Empty)
+                    { 
+                        MySqlCommand cmd2 = new MySqlCommand(cmdUpdateExpired, conn);
+                        cmd2.ExecuteNonQuery();
+                    }
 
                     foreach (DataRow row in dt.Rows)
                     {
