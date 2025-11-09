@@ -235,13 +235,18 @@ namespace WpfApp1
                         {
                             columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
                         }
-                        //var cols = dr.;
-                        //.CopyTo(columns, 0);
+
                         dt.Columns.AddRange(columns);
-                        object[] record = new object[dr.FieldCount];
+                        dt.Columns.Add("isExpired", Type.GetType("System.Boolean"));
+                        object[] record = new object[dr.FieldCount + 1];
                         while (dr.Read())
                         {
                             dr.GetValues(record);
+                            DateTime executionDate = (DateTime)record[2];
+                            if ((executionDate < DateTime.Now && record[7].ToString() == "Входящая") || (executionDate < DateTime.Today.AddDays(1) && record[7].ToString() == "В работе"))
+                                record[record.Length - 1] = true;
+                            else
+                                record[record.Length - 1] = false;
                             dt.LoadDataRow(record, true);
                         }
                     }
@@ -627,17 +632,5 @@ namespace WpfApp1
 
         }
 
-        private void claimStatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (claimStatusComboBox.SelectedItem.ToString() == "Отменена" && dateOfExecution.SelectedDate == null)
-            {
-                dateOfExecution.IsEnabled = false;
-                timeOfExecution.IsEnabled = false;
-            }
-            else
-            {
-                claimStatusComboBox.IsEnabled = false;
-            }
-        }
     }
 }
