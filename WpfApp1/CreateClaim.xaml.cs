@@ -252,7 +252,7 @@ namespace WpfApp1
                             dt.LoadDataRow(record, true);
                         }
                     }
-                   
+
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -375,6 +375,11 @@ namespace WpfApp1
 
         private void PrepareToEditClaim(object sender, RoutedEventArgs e)
         {
+            PrepateToEditClaimMethod(false);
+        }
+
+        private void PrepateToEditClaimMethod(bool isCanceled)
+        {
             if (claimsDG.SelectedItem != null)
             {
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
@@ -401,9 +406,9 @@ namespace WpfApp1
                 claimNumber.Content = fieldValuesOfARecord[0];
                 creationDate.Content = ((DateTime)fieldValuesOfARecord[1]).ToString("dd.MM.yyyy");
                 FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
-                
+
                 if (!((DateTime)fieldValuesOfARecord[2] < DateTime.Now))
-                { 
+                {
                     dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
                     string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
                     List<string> times = ShowAvailableTime();
@@ -421,7 +426,10 @@ namespace WpfApp1
                 isExpired = Convert.ToBoolean(fieldValuesOfARecord[fieldValuesOfARecord.Length - 1]);
                 mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 FillComboBoxStatusesManager();
-                claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
+                if(isCanceled)
+                    claimStatusComboBox.SelectedItem = "Отменена";
+                else
+                    claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
                 tariffComboBox.SelectedItem = fieldValuesOfARecord[4];
                 clientTextBox.Text = fieldValuesOfARecord[5].ToString();
                 masterTextBox.Text = MasterHolder.data[1].ToString();
@@ -430,6 +438,7 @@ namespace WpfApp1
                 endEditingButton.Visibility = Visibility.Visible;
                 cancelChangesButton.Visibility = Visibility.Visible;
             }
+
         }
 
         private void CancelEdit(object sender, RoutedEventArgs e)
@@ -642,17 +651,25 @@ namespace WpfApp1
         {
             if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Отменена")
             {
+                PrepateToEditClaimMethod(true);
                 dateOfExecution.SelectedDate = DateTime.Parse(currEditClaimDate[0]);
                 timeOfExecution.ItemsSource = new string[] { DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm") };
                 timeOfExecution.SelectedItem = DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm");
+
                 dateOfExecution.IsEnabled = false;
                 timeOfExecution.IsEnabled = false;
+                chooseAMasterButton.IsEnabled = false;
+                tariffComboBox.IsEnabled = false;
+                clearFieldsButton.IsEnabled = false;
             }
             else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && isExpired)
             {
                 dateOfExecution.SelectedDate = null;
                 timeOfExecution.SelectedItem = null;
                 dateOfExecution.IsEnabled = true;
+                chooseAMasterButton.IsEnabled = true;
+                tariffComboBox.IsEnabled = true;
+                clearFieldsButton.IsEnabled = true;
             }
             else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && !isExpired)
             {
@@ -663,9 +680,17 @@ namespace WpfApp1
                 times.Add(currTime);
                 timeOfExecution.ItemsSource = times;
                 timeOfExecution.SelectedItem = currTime;
+                chooseAMasterButton.IsEnabled = true;
+                tariffComboBox.IsEnabled = true;
+                clearFieldsButton.IsEnabled = true;
             }
             else
+            { 
                 dateOfExecution.IsEnabled = true;
+                chooseAMasterButton.IsEnabled = true;
+                tariffComboBox.IsEnabled = true;
+                clearFieldsButton.IsEnabled = true;
+            }
         }
     }
 }
