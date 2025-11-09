@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace WpfApp1
 {
@@ -22,15 +23,30 @@ namespace WpfApp1
         string[] currEditClaimDate;
         string filterOption = "";
         bool isEditing = false;
+        DispatcherTimer timerRef;
         bool isExpired = false;
         public CreateClaim()
         {
             InitializeComponent();
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(300);
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
+            timerRef = timer;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if(!isEditing)
+                RefreshData();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ClearSelected();
+            timerRef.Stop();
+            timerRef.Tick -= Timer_Tick;
             this.Close();
         }
 
