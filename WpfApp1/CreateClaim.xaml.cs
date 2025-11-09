@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace WpfApp1
 {
@@ -19,16 +20,33 @@ namespace WpfApp1
         Dictionary<int, string> tariffs = new Dictionary<int, string>();
         const int INCOMING_CLAIM_STATUS_ID = 1;
         int recordsCount = 0;
+        string[] currEditClaimDate;
         string filterOption = "";
         bool isEditing = false;
+        DispatcherTimer timerRef;
+        bool isExpired = false;
         public CreateClaim()
         {
             InitializeComponent();
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(300);
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
+            timerRef = timer;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if(!isEditing)
+                RefreshData();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ClearSelected();
+            timerRef.Stop();
+            timerRef.Tick -= Timer_Tick;
             this.Close();
         }
 
@@ -165,7 +183,7 @@ namespace WpfApp1
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
+            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
@@ -218,6 +236,7 @@ namespace WpfApp1
         {
             try
             {
+                string cmdUpdateExpired = "";
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
@@ -227,10 +246,41 @@ namespace WpfApp1
                                                         inner join `employees` on employees.idemployees = connection_claim.employees_id
                                                         inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
                                                         inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterOption};", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    cmd.ExecuteNonQuery();
                     DataTable dt = new DataTable();
-                    da.Fill(dt);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        DataColumn[] columns = new DataColumn[dr.FieldCount];
+                        for (int i = 0; i < columns.Length; i++)
+                        {
+                            columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
+                        }
+
+                        dt.Columns.AddRange(columns);
+                        dt.Columns.Add("isExpired", Type.GetType("System.Boolean"));
+                        object[] record = new object[dr.FieldCount + 1];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(record);
+                            DateTime executionDate = (DateTime)record[2];
+                            if (executionDate < DateTime.Now && record[7].ToString() == "Входящая")
+                                record[record.Length - 1] = true;
+                            else if (executionDate < DateTime.Today.AddDays(1) && record[7].ToString() == "В работе")
+                            {
+                                //record[record.Length - 1] = true;
+                                record[7] = "Отменена";
+                                cmdUpdateExpired += $"Update `connection_claim` set claim_status_id = (select idclaim_status from claim_status where `status` = 'Отменена') where id_claim = {record[0]};";
+                            }
+                            else
+                                record[record.Length - 1] = false;
+                            dt.LoadDataRow(record, true);
+                        }
+                    }
+
+                    if (cmdUpdateExpired != string.Empty)
+                    { 
+                        MySqlCommand cmd2 = new MySqlCommand(cmdUpdateExpired, conn);
+                        cmd2.ExecuteNonQuery();
+                    }
 
                     foreach (DataRow row in dt.Rows)
                     {
@@ -353,6 +403,11 @@ namespace WpfApp1
 
         private void PrepareToEditClaim(object sender, RoutedEventArgs e)
         {
+            PrepateToEditClaimMethod(false);
+        }
+
+        private void PrepateToEditClaimMethod(bool isCanceled)
+        {
             if (claimsDG.SelectedItem != null)
             {
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
@@ -379,9 +434,9 @@ namespace WpfApp1
                 claimNumber.Content = fieldValuesOfARecord[0];
                 creationDate.Content = ((DateTime)fieldValuesOfARecord[1]).ToString("dd.MM.yyyy");
                 FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
-                
-                if (!(DateTime.Parse(dateByParts[0]) < DateTime.Now))
-                { 
+
+                if (!((DateTime)fieldValuesOfARecord[2] < DateTime.Now))
+                {
                     dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
                     string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
                     List<string> times = ShowAvailableTime();
@@ -393,11 +448,16 @@ namespace WpfApp1
 
                 chooseAClientButton.IsEnabled = false;
                 claimStatusComboBox.IsEnabled = true;
+                currEditClaimDate = dateByParts;
                 mountAddressTextBox.IsEnabled = false;
                 claimsDG.IsEnabled = false;
+                isExpired = Convert.ToBoolean(fieldValuesOfARecord[fieldValuesOfARecord.Length - 1]);
                 mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 FillComboBoxStatusesManager();
-                claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
+                if(isCanceled)
+                    claimStatusComboBox.SelectedItem = "Отменена";
+                else
+                    claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
                 tariffComboBox.SelectedItem = fieldValuesOfARecord[4];
                 clientTextBox.Text = fieldValuesOfARecord[5].ToString();
                 masterTextBox.Text = MasterHolder.data[1].ToString();
@@ -406,6 +466,7 @@ namespace WpfApp1
                 endEditingButton.Visibility = Visibility.Visible;
                 cancelChangesButton.Visibility = Visibility.Visible;
             }
+
         }
 
         private void CancelEdit(object sender, RoutedEventArgs e)
@@ -433,6 +494,8 @@ namespace WpfApp1
             mountAddressTextBox.IsEnabled = true;
             chooseAClientButton.IsEnabled = true;
             claimsDG.IsEnabled = true;
+            currEditClaimDate = null;
+            isExpired = false;
             timeOfExecution.IsEnabled = false;
             showClaimButton.IsEnabled = false;
             editButton.IsEnabled = false;
@@ -610,6 +673,52 @@ namespace WpfApp1
         private void claimsDG_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
 
+        }
+
+        private void claimStatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Отменена")
+            {
+                PrepateToEditClaimMethod(true);
+                dateOfExecution.SelectedDate = DateTime.Parse(currEditClaimDate[0]);
+                timeOfExecution.ItemsSource = new string[] { DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm") };
+                timeOfExecution.SelectedItem = DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm");
+
+                dateOfExecution.IsEnabled = false;
+                timeOfExecution.IsEnabled = false;
+                chooseAMasterButton.IsEnabled = false;
+                tariffComboBox.IsEnabled = false;
+                clearFieldsButton.IsEnabled = false;
+            }
+            else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && isExpired)
+            {
+                dateOfExecution.SelectedDate = null;
+                timeOfExecution.SelectedItem = null;
+                dateOfExecution.IsEnabled = true;
+                chooseAMasterButton.IsEnabled = true;
+                tariffComboBox.IsEnabled = true;
+                clearFieldsButton.IsEnabled = true;
+            }
+            else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && !isExpired)
+            {
+                dateOfExecution.IsEnabled = true;
+                timeOfExecution.IsEnabled = true;
+                string currTime = DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm");
+                List<string> times = ShowAvailableTime();
+                times.Add(currTime);
+                timeOfExecution.ItemsSource = times;
+                timeOfExecution.SelectedItem = currTime;
+                chooseAMasterButton.IsEnabled = true;
+                tariffComboBox.IsEnabled = true;
+                clearFieldsButton.IsEnabled = true;
+            }
+            else
+            { 
+                dateOfExecution.IsEnabled = true;
+                chooseAMasterButton.IsEnabled = true;
+                tariffComboBox.IsEnabled = true;
+                clearFieldsButton.IsEnabled = true;
+            }
         }
     }
 }

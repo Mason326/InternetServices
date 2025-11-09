@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace WpfApp1
 {
@@ -26,13 +27,27 @@ namespace WpfApp1
         private string additionalDateFilterParams = "";
         private string additionalSortParams = "";
         private string additionalSearchParams = "";
+        DispatcherTimer timerRef;
         public AccountingClaim()
         {
             InitializeComponent();
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(300);
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
+            timerRef = timer;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            RefreshDatagrid();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            timerRef.Stop();
+            timerRef.Tick -= Timer_Tick;
             this.Close();
         }
 
@@ -80,46 +95,72 @@ namespace WpfApp1
             }
         }
 
-        private async void RefreshDatagrid()
+        private void RefreshDatagrid()
         {
             try
             {
+                string cmdUpdateExpired = "";
+                string filterParams = "";
+                if (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty)
+                {
+                    string betweenExpressions1 = additionalDateFilterParams != string.Empty && additionalFilterParams != string.Empty ? " And " : "";
+                    string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
+                    filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
+                }
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    string filterParams = "";
-                    if (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty)
-                    {
-                        string betweenExpressions1 = additionalDateFilterParams != string.Empty && additionalFilterParams != string.Empty ? " And " : "";
-                        string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
-                        filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
-                    }
-                    MySqlCommand cmd = new MySqlCommand($@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status'
-                                                        from `connection_claim`
-                                                        inner join `client` on client.idclient = connection_claim.client_id
-                                                        inner join `employees` on employees.idemployees = connection_claim.employees_id
-                                                        inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
-                                                        inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id
-                                                        {filterParams}{additionalSortParams};", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    MySqlCommand cmd = new MySqlCommand($@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio'
+                                                    from `connection_claim`
+                                                    inner join `client` on client.idclient = connection_claim.client_id
+                                                    inner join `employees` on employees.idemployees = connection_claim.employees_id
+                                                    inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                    inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterParams}{additionalSortParams};", conn);
                     DataTable dt = new DataTable();
-                    await cmd.ExecuteNonQueryAsync();
-                    da.Fill(dt);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        DataColumn[] columns = new DataColumn[dr.FieldCount];
+                        for (int i = 0; i < columns.Length; i++)
+                        {
+                            columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
+                        }
+
+                        dt.Columns.AddRange(columns);
+                        dt.Columns.Add("isExpired", Type.GetType("System.Boolean"));
+                        object[] record = new object[dr.FieldCount + 1];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(record);
+                            DateTime executionDate = (DateTime)record[2];
+                            if (executionDate < DateTime.Now && record[7].ToString() == "Входящая")
+                                record[record.Length - 1] = true;
+                            else if (executionDate < DateTime.Today.AddDays(1) && record[7].ToString() == "В работе")
+                            {
+                                //record[record.Length - 1] = true;
+                                record[7] = "Отменена";
+                                cmdUpdateExpired += $"Update `connection_claim` set claim_status_id = (select idclaim_status from claim_status where `status` = 'Отменена') where id_claim = {record[0]};";
+                            }
+                            else
+                                record[record.Length - 1] = false;
+                            dt.LoadDataRow(record, true);
+                        }
+                    }
+
+                    if (cmdUpdateExpired != string.Empty)
+                    {
+                        MySqlCommand cmd2 = new MySqlCommand(cmdUpdateExpired, conn);
+                        cmd2.ExecuteNonQuery();
+                    }
+
                     foreach (DataRow row in dt.Rows)
                     {
                         string fio = row.ItemArray[5].ToString();
-                        try
-                        {
-                            row.SetField<string>(5, FullNameSplitter.HideClientName(fio));
-                        }
-                        catch
-                        {
-                            ;
-                        }
+                        row.SetField<string>(5, HideName(fio));
                     }
+
                     claimsDG.ItemsSource = dt.AsDataView();
-                    ShowRecordsCount();
                 }
+                ShowRecordsCount();
             }
             catch (Exception exc)
             {
@@ -136,7 +177,7 @@ namespace WpfApp1
                     additionalFilterParams = "";
                     break;
                 case "incoming":
-                    additionalFilterParams = "`status` = 'Входящие'";
+                    additionalFilterParams = "`status` = 'Входящая'";
                     break;
                 case "inProgress":
                     additionalFilterParams = "`status` = 'В работе'";
@@ -228,6 +269,20 @@ namespace WpfApp1
                 MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from `connection_claim`;", conn);
                 int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
                 recordsCountLabel.Content = recordsCount.ToString();
+            }
+        }
+
+        private string HideName(string fullName)
+        {
+            try
+            {
+                string[] clientFio = fullName.Split(' ');
+                string hidden_name = $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+                return hidden_name;
+            }
+            catch
+            {
+                return fullName;
             }
         }
     }
