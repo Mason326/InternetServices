@@ -19,8 +19,10 @@ namespace WpfApp1
         Dictionary<int, string> tariffs = new Dictionary<int, string>();
         const int INCOMING_CLAIM_STATUS_ID = 1;
         int recordsCount = 0;
+        string[] currEditClaimDate;
         string filterOption = "";
         bool isEditing = false;
+        bool isExpired = false;
         public CreateClaim()
         {
             InitializeComponent();
@@ -400,7 +402,7 @@ namespace WpfApp1
                 creationDate.Content = ((DateTime)fieldValuesOfARecord[1]).ToString("dd.MM.yyyy");
                 FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
                 
-                if (!(DateTime.Parse(dateByParts[0]) < DateTime.Now))
+                if (!((DateTime)fieldValuesOfARecord[2] < DateTime.Now))
                 { 
                     dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
                     string time = DateTime.Parse(dateByParts[1].ToString()).ToString("HH:mm");
@@ -413,8 +415,10 @@ namespace WpfApp1
 
                 chooseAClientButton.IsEnabled = false;
                 claimStatusComboBox.IsEnabled = true;
+                currEditClaimDate = dateByParts;
                 mountAddressTextBox.IsEnabled = false;
                 claimsDG.IsEnabled = false;
+                isExpired = Convert.ToBoolean(fieldValuesOfARecord[fieldValuesOfARecord.Length - 1]);
                 mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 FillComboBoxStatusesManager();
                 claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
@@ -453,6 +457,8 @@ namespace WpfApp1
             mountAddressTextBox.IsEnabled = true;
             chooseAClientButton.IsEnabled = true;
             claimsDG.IsEnabled = true;
+            currEditClaimDate = null;
+            isExpired = false;
             timeOfExecution.IsEnabled = false;
             showClaimButton.IsEnabled = false;
             editButton.IsEnabled = false;
@@ -632,5 +638,34 @@ namespace WpfApp1
 
         }
 
+        private void claimStatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Отменена")
+            {
+                dateOfExecution.SelectedDate = DateTime.Parse(currEditClaimDate[0]);
+                timeOfExecution.ItemsSource = new string[] { DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm") };
+                timeOfExecution.SelectedItem = DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm");
+                dateOfExecution.IsEnabled = false;
+                timeOfExecution.IsEnabled = false;
+            }
+            else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && isExpired)
+            {
+                dateOfExecution.SelectedDate = null;
+                timeOfExecution.SelectedItem = null;
+                dateOfExecution.IsEnabled = true;
+            }
+            else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && !isExpired)
+            {
+                dateOfExecution.IsEnabled = true;
+                timeOfExecution.IsEnabled = true;
+                string currTime = DateTime.Parse(currEditClaimDate[1].ToString()).ToString("HH:mm");
+                List<string> times = ShowAvailableTime();
+                times.Add(currTime);
+                timeOfExecution.ItemsSource = times;
+                timeOfExecution.SelectedItem = currTime;
+            }
+            else
+                dateOfExecution.IsEnabled = true;
+        }
     }
 }
