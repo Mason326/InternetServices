@@ -13,6 +13,15 @@
                     <MenuItem Header="Просмотр" Click="Button_Click_1" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding isExpired}" Value="true">
+                            <Setter Property="Background" Value="#ffcc80"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№ Заявки" Binding="{Binding id_claim}" Width="70" />
                 <DataGridTextColumn Header="Дата создания" Binding="{Binding connection_creationDate, StringFormat=\{0:dd.MM.yy\}}" Width="120" />
