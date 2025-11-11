@@ -30,6 +30,7 @@
                 <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="120" />
                 <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}" Width="120" />
                 <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="120" />
+                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="120" />
                 <DataGridTextColumn Header="Статус" Binding="{Binding claim_status}" Width="95">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="{x:Type TextBlock}">
@@ -80,14 +81,18 @@
             </StackPanel>
         </GroupBox>
         <Button Content="Очистить фильтры и поиск" HorizontalAlignment="Left" Margin="434,51,0,0" VerticalAlignment="Top" Width="243" Height="32" Click="Button_Click_3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
-        <Label Content="Количество записей:" HorizontalAlignment="Left" Margin="13,534,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16"/>
-        <Label x:Name="recordsCountLabel" Content="" HorizontalAlignment="Left" Margin="177,534,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
         <StackPanel HorizontalAlignment="Left" Height="212" Margin="699,38,0,0" VerticalAlignment="Top" Width="267">
             <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="33" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
             <Button x:Name="printClaimButton" Content="Печать заявки" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
             <Button x:Name="orderButton" Content="Заказ-наряд" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
             <Button Content="На главную" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
         </StackPanel>
+        <DockPanel Margin="13,534,0,0">
+            <Label Content="Количество записей:" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Arial" FontSize="16"/>
+            <Label x:Name="recordsCountLabel" Content="" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+            <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="100,3,0,0" VerticalAlignment="Top" Width="31"/>
+            <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" FontSize="16"/>
+        </DockPanel>
 
     </Grid>
 </Window>

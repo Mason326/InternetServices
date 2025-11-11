@@ -1,7 +1,9 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Win32;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,6 +30,7 @@ namespace WpfApp1
         bool isEdit = false;
         bool isGenerateNewCredentials;
         int userId = -1;
+        string filePath;
         Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
         public CreateUser()
         {
@@ -336,14 +339,33 @@ namespace WpfApp1
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
-                        MySqlCommand cmd = new MySqlCommand($@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id) 
+                        MySqlCommand cmd = new MySqlCommand();
+                        cmd.Connection = conn;
+                        string cmdText = $@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id) 
                                                             value(
                                                                 '{fioTextBox.Text}',
                                                                 '{loginTextBox.Text}',
                                                                 '{CreateChecksum(passwordTextBox.Text)}',
                                                                 '{phoneTextBox.Text}',
                                                                  (Select idroles from `roles` where `role_name` = '{rolesComboBox.SelectedItem}')
-                                                            );", conn);
+                                                            );";
+                        cmd.CommandText = cmdText;
+                        if (filePath != null)
+                        {
+                            byte[] imageBytes = File.ReadAllBytes(filePath);
+
+                            cmdText = $@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id, photo) 
+                                                            value(
+                                                                '{fioTextBox.Text}',
+                                                                '{loginTextBox.Text}',
+                                                                '{CreateChecksum(passwordTextBox.Text)}',
+                                                                '{phoneTextBox.Text}',
+                                                                 (Select idroles from `roles` where `role_name` = '{rolesComboBox.SelectedItem}'),
+                                                                 @File
+                                                            );";
+                            cmd.CommandText = cmdText;
+                            cmd.Parameters.AddWithValue("@File", imageBytes);
+                        }
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Пользователь создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         ClearInputData();
@@ -610,6 +632,19 @@ namespace WpfApp1
         private void passwordTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             isGenerateNewCredentials = true;
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.FileName = "UserImage"; // имя файла по умолчанию 
+            dialog.Filter = "Images (.jpg)|*.jpg";
+
+            if (dialog.ShowDialog() == true)
+            {
+                filePath = dialog.FileName;
+                userImage.Source = new BitmapImage(new Uri(filePath));
+            }
         }
     }
 }
