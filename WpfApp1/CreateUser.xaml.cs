@@ -1,7 +1,9 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Win32;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -26,8 +28,10 @@ namespace WpfApp1
     {
         bool prevBack = false;
         bool isEdit = false;
+        int IMAGE_MAX_BYTE_SIZE = 2097152;
         bool isGenerateNewCredentials;
         int userId = -1;
+        string filePath;
         Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
         public CreateUser()
         {
@@ -336,14 +340,38 @@ namespace WpfApp1
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
-                        MySqlCommand cmd = new MySqlCommand($@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id) 
+                        MySqlCommand cmd = new MySqlCommand();
+                        cmd.Connection = conn;
+                        string cmdText = $@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id) 
                                                             value(
                                                                 '{fioTextBox.Text}',
                                                                 '{loginTextBox.Text}',
                                                                 '{CreateChecksum(passwordTextBox.Text)}',
                                                                 '{phoneTextBox.Text}',
                                                                  (Select idroles from `roles` where `role_name` = '{rolesComboBox.SelectedItem}')
-                                                            );", conn);
+                                                            );";
+                        cmd.CommandText = cmdText;
+                        if (filePath != null)
+                        {
+                            byte[] imageBytes = File.ReadAllBytes(filePath);
+                            bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
+                            if (imageSizeIsInvalid)
+                            {
+                                MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                return;
+                            }
+                            cmdText = $@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id, photo) 
+                                                            value(
+                                                                '{fioTextBox.Text}',
+                                                                '{loginTextBox.Text}',
+                                                                '{CreateChecksum(passwordTextBox.Text)}',
+                                                                '{phoneTextBox.Text}',
+                                                                 (Select idroles from `roles` where `role_name` = '{rolesComboBox.SelectedItem}'),
+                                                                 @File
+                                                            );";
+                            cmd.CommandText = cmdText;
+                            cmd.Parameters.AddWithValue("@File", imageBytes);
+                        }
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Пользователь создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         ClearInputData();
@@ -377,13 +405,32 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(@"SELECT idemployees, full_name, login, password, photo, roles.role_name, phoneNumber
-                                                        FROM employees
-                                                        inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    MySqlCommand cmd = new MySqlCommand(@"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo
+                                                          FROM employees
+                                                          inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;", conn);
                     DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        DataColumn[] columns = new DataColumn[dr.FieldCount];
+                        for (int i = 0; i < columns.Length; i++)
+                        {
+                            columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
+                        }
+
+                        dt.Columns.AddRange(columns);
+                        BitmapImage image = new BitmapImage();
+                        Type type = image.GetType();
+                        dt.Columns.Add("UserPhoto", type);
+                        object[] record = new object[dr.FieldCount + 1];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(record);
+                            byte[] imageBytes = record[6] as byte[];
+                            record[7] = LoadImage(imageBytes);
+                            dt.LoadDataRow(record, true);
+                        }
+                    }
+
                     userDG.ItemsSource = dt.AsDataView();
                 }
                 phoneTextBox.Text = "+7 (___) ___-__-__";
@@ -487,6 +534,7 @@ namespace WpfApp1
                 editUserButton.Visibility = Visibility.Collapsed;
                 deleteUserButton.Visibility = Visibility.Collapsed;
                 toMainButton.Visibility = Visibility.Collapsed;
+                userImage.Source = fieldValuesOfARecord[7] as BitmapImage;
 
                 passwordTextBox.Clear();
 
@@ -498,8 +546,8 @@ namespace WpfApp1
                     rolesComboBox.IsEnabled = true;
                 fioTextBox.Text = fieldValuesOfARecord[1].ToString().Trim();
                 loginTextBox.Text = fieldValuesOfARecord[2].ToString().Trim();
-                phoneTextBox.Text = fieldValuesOfARecord[6].ToString().Trim();
-                rolesComboBox.SelectedItem = fieldValuesOfARecord[5].ToString();
+                phoneTextBox.Text = fieldValuesOfARecord[5].ToString().Trim();
+                rolesComboBox.SelectedItem = fieldValuesOfARecord[4].ToString();
 
                 userDG.IsEnabled = false;
                 isGenerateNewCredentials = false;
@@ -519,6 +567,8 @@ namespace WpfApp1
 
             endEditingButton.Visibility = Visibility.Collapsed;
             cancelChangesButton.Visibility = Visibility.Collapsed;
+            userImage.Source = LoadImage(null);
+            filePath = null;
 
             ClearInputData();
 
@@ -574,16 +624,28 @@ namespace WpfApp1
                         conn.Open();
                         try
                         {
-                            string mainQuery = $@"Update `employees` 
+                            MySqlCommand cmd = new MySqlCommand();
+                            cmd.Connection = conn;
+                            cmd.CommandText = $@"Update `employees` 
                                                 set full_name = '{fioTextBox.Text}',
                                                 `login` = '{loginTextBox.Text}',
                                                 phoneNumber = '{phoneTextBox.Text}',
                                                 roles_id = (SELECT idroles FROM `roles` where `role_name` = '{rolesComboBox.SelectedItem}')";
                             if (isGenerateNewCredentials && passwordTextBox.Text.Length > 0)
+                                cmd.CommandText += $", `password` = '{CreateChecksum(passwordTextBox.Text)}'";
+                            if (filePath != null)
                             {
-                                mainQuery += $@", `password` = '{CreateChecksum(passwordTextBox.Text)}'";
+                                cmd.CommandText += ", photo = @File";
+                                byte[] imageBytes = File.ReadAllBytes(filePath);
+                                bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
+                                if (imageSizeIsInvalid)
+                                {
+                                    MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+                                cmd.Parameters.AddWithValue("@File", imageBytes);
                             }
-                            MySqlCommand cmd = new MySqlCommand($@"{mainQuery} where idemployees = {userId};", conn);
+                            cmd.CommandText += $" where idemployees = {userId}";
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Данные пользователя успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
@@ -610,6 +672,42 @@ namespace WpfApp1
         private void passwordTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             isGenerateNewCredentials = true;
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.FileName = "UserImage"; // имя файла по умолчанию 
+            dialog.Filter = "Images (.jpg)|*.jpg";
+
+            if (dialog.ShowDialog() == true)
+            {
+                filePath = dialog.FileName;
+                userImage.Source = new BitmapImage(new Uri(filePath));
+            }
+        }
+
+        private static BitmapImage LoadImage(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length == 0) return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/user.png"));
+            var image = new BitmapImage();
+            using (var mem = new MemoryStream(imageData))
+            {
+                mem.Position = 0;
+                image.BeginInit();
+                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = null;
+                image.StreamSource = mem;
+                image.EndInit();
+            }
+            image.Freeze();
+            return image;
+        }
+
+        private bool ImageIsTooLarge(byte[] imageBytes)
+        {
+            return imageBytes.Length > IMAGE_MAX_BYTE_SIZE;
         }
     }
 }

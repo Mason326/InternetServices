@@ -9,11 +9,11 @@
     <Grid Margin="0,0,25.6,-0.4">
 
         <DockPanel Height="502" LastChildFill="False" Margin="0,0,-31.8,0" VerticalAlignment="Top">
-            <Image HorizontalAlignment="Left" Height="487" VerticalAlignment="Top" Width="372" Source="Inet.jpg"/>
+            <Image HorizontalAlignment="Left" Height="487" VerticalAlignment="Top" Width="372" Source="Resources/Images/Inet.jpg"/>
             <StackPanel Margin="5,20,0.4,9.6" Width="326" HorizontalAlignment="Left">
                 <Button Content="" HorizontalAlignment="Left" Margin="265,0,0,0" VerticalAlignment="Top" Width="47" Height="41" RenderTransformOrigin="0.796,-0.022" BorderThickness="0" Click="Button_Click_3">
                     <Button.Background>
-                        <ImageBrush ImageSource="exit.png"/>
+                        <ImageBrush ImageSource="Resources/Images/exit.png"/>
                     </Button.Background>
                 </Button>
                 <Label Content="Логин" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
