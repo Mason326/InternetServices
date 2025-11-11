@@ -39,6 +39,13 @@
                 <DataGridTextColumn Header="Телефон" Binding="{Binding Path=phoneNumber}" Width="70" />
                 <DataGridTextColumn Header="Роль" Binding="{Binding Path=role_name}" Width="70" />
                 <DataGridTextColumn Header="Логин" Binding="{Binding Path=login}" Width="70" />
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding UserPhoto}" Width="100" Height="100" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="75,21,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
