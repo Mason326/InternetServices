@@ -266,7 +266,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="InetArt.webp" />
+    <Resource Include="Resources\Images\InetArt.webp" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -276,7 +276,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="user.png" />
+    <Resource Include="Resources\Images\user.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
@@ -294,18 +294,7 @@
     <Resource Include="Resources\Images\exit.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="exit.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Images\Inet.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Inet.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="view.png" />
-    <Resource Include="Visible.png" />
-    <Content Include="Visible.svg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

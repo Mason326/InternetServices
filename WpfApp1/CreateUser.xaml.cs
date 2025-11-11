@@ -509,6 +509,8 @@ namespace WpfApp1
                 editUserButton.Visibility = Visibility.Collapsed;
                 deleteUserButton.Visibility = Visibility.Collapsed;
                 toMainButton.Visibility = Visibility.Collapsed;
+                byte[] imageBytes = fieldValuesOfARecord[4] as byte[];
+                userImage.Source = LoadImage(imageBytes);
 
                 passwordTextBox.Clear();
 
@@ -645,6 +647,24 @@ namespace WpfApp1
                 filePath = dialog.FileName;
                 userImage.Source = new BitmapImage(new Uri(filePath));
             }
+        }
+
+        private static BitmapImage LoadImage(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length == 0) return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/user.png"));
+            var image = new BitmapImage();
+            using (var mem = new MemoryStream(imageData))
+            {
+                mem.Position = 0;
+                image.BeginInit();
+                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = null;
+                image.StreamSource = mem;
+                image.EndInit();
+            }
+            image.Freeze();
+            return image;
         }
     }
 }
