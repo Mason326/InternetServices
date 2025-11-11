@@ -543,6 +543,8 @@ namespace WpfApp1
 
             endEditingButton.Visibility = Visibility.Collapsed;
             cancelChangesButton.Visibility = Visibility.Collapsed;
+            userImage.Source = LoadImage(null);
+            filePath = null;
 
             ClearInputData();
 
@@ -598,16 +600,22 @@ namespace WpfApp1
                         conn.Open();
                         try
                         {
-                            string mainQuery = $@"Update `employees` 
+                            MySqlCommand cmd = new MySqlCommand();
+                            cmd.Connection = conn;
+                            cmd.CommandText = $@"Update `employees` 
                                                 set full_name = '{fioTextBox.Text}',
                                                 `login` = '{loginTextBox.Text}',
                                                 phoneNumber = '{phoneTextBox.Text}',
                                                 roles_id = (SELECT idroles FROM `roles` where `role_name` = '{rolesComboBox.SelectedItem}')";
                             if (isGenerateNewCredentials && passwordTextBox.Text.Length > 0)
+                                cmd.CommandText += $", `password` = '{CreateChecksum(passwordTextBox.Text)}'";
+                            if (filePath != null)
                             {
-                                mainQuery += $@", `password` = '{CreateChecksum(passwordTextBox.Text)}'";
+                                cmd.CommandText += ", photo = @File";
+                                byte[] imageBytes = File.ReadAllBytes(filePath);
+                                cmd.Parameters.AddWithValue("@File", imageBytes);
                             }
-                            MySqlCommand cmd = new MySqlCommand($@"{mainQuery} where idemployees = {userId};", conn);
+                            cmd.CommandText += $" where idemployees = {userId}";
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Данные пользователя успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();

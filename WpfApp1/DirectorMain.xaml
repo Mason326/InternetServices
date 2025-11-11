@@ -13,7 +13,7 @@
         <Button Content="Учёт заявок" HorizontalAlignment="Left" Margin="55,314,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
         <Button Content="Учёт договоров" HorizontalAlignment="Left" Margin="55,369,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_1" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
         <Grid>
-            <Image HorizontalAlignment="Left" Height="188" Margin="55,82,0,0" VerticalAlignment="Top" Width="221" Source="user.png"/>
+            <Image HorizontalAlignment="Left" Height="188" Margin="55,82,0,0" VerticalAlignment="Top" Width="221" Source="Resources/Images/user.png"/>
             <Button Content="Выйти из учётной записи" HorizontalAlignment="Left" Margin="55,431,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_3" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
 
         </Grid>
