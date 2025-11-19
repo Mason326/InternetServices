@@ -39,8 +39,10 @@ namespace WpfApp1
             mountAddressTextBox.Text = address;
             currStatus = selectedItems[7].ToString();
             isAccounting = true;
+            formAContractButton.Visibility = Visibility.Collapsed;
             isEdit = isEditStatus;
             Refresh = RefreshDG;
+            fieldValuesOfARecord = selectedItems;
             claimId = Convert.ToInt32(selectedItems[0]);
         }
 
@@ -57,6 +59,7 @@ namespace WpfApp1
             isEdit = isEditStatus;
             Refresh = RefreshDG;
             isAccounting = false;
+            formAContractButton.Visibility = Visibility.Collapsed;
             ReReleaseClaim = RereleaseClaim;
             claimId = Convert.ToInt32(selectedItems[0]);
             fieldValuesOfARecord = selectedItems;
@@ -77,6 +80,7 @@ namespace WpfApp1
                     string statusQuery = "SELECT `status` FROM claim_status;";
                     if (AccountHolder.UserRole == "Менеджер")
                     {
+                        formAContractButton.Visibility = Visibility.Visible;
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';";
                         if (currStatus != "Входящая")
                         {
@@ -92,6 +96,7 @@ namespace WpfApp1
                     }
                     else if (AccountHolder.UserRole == "Мастер")
                     {
+                        formAContractButton.Visibility = Visibility.Collapsed;
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'Входящая';";
                     }
                     if (!(currStatus == "В работе" || currStatus == "Закрыта"))
@@ -160,6 +165,14 @@ namespace WpfApp1
         {
             ReReleaseClaim(fieldValuesOfARecord);
             this.Close();
+        }
+
+        private void formAContractButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            var win = new Contract(fieldValuesOfARecord);
+            win.ShowDialog();
+            this.ShowDialog();
         }
     }
 }

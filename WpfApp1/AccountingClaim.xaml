@@ -23,8 +23,8 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="№ Заявки" Binding="{Binding id_claim}" Width="70" />
-                <DataGridTextColumn Header="Дата создания" Binding="{Binding connection_creationDate, StringFormat=\{0:dd.MM.yy\}}" Width="120" />
+                <DataGridTextColumn Header="№ Заявки" Binding="{Binding id_claim}" Width="40" />
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding connection_creationDate, StringFormat=\{0:dd.MM.yy\}}" Width="70" />
                 <DataGridTextColumn Header="Дата выполнения" Binding="{Binding mount_date, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Width="120" />
                 <DataGridTextColumn Header="Адрес монтирования" Binding="{Binding connection_address}" Width="140" />
                 <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="120" />
