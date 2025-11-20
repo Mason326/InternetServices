@@ -47,16 +47,6 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (AccountHolder.UserRole == "Директор")
-            {
-                saveChangesButton.Visibility = Visibility.Collapsed;
-                statusComboBox.IsEnabled = false;
-            }
-            else
-            {
-                saveChangesButton.Visibility = Visibility.Visible;
-                statusComboBox.IsEnabled = true;
-            }
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
