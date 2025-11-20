@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Заявка подробно" Height="405.265" Width="743.346" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Заявка подробно" Height="405.265" Width="754.146" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
         <GroupBox x:Name="ClaimGroupBox" Header="Заявка" HorizontalAlignment="Left" Height="379" Margin="10,10,0,0" VerticalAlignment="Top" Width="488" FontSize="16">
             <StackPanel>
@@ -31,9 +31,12 @@
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="523,20,0,0" VerticalAlignment="Top" Width="187" Height="48" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="saveChangesButton_Click"/>
-        <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="187" Height="47" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
-        <Button x:Name="rereleaseClaimButton" Content="Перевыпустить заявку" HorizontalAlignment="Left" Margin="523,164,0,0" VerticalAlignment="Top" Width="187" Height="46" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <StackPanel Margin="498,10,14.8,30.2">
+            <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="20,10,0,0" VerticalAlignment="Top" Width="204" Height="48" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="saveChangesButton_Click"/>
+            <Button x:Name="closeViewButton" Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Width="204" Height="47" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
+            <Button x:Name="rereleaseClaimButton" Content="Перевыпустить заявку" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Width="204" Height="46" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+            <Button x:Name="formAContractButton" Content="Оформление договора" HorizontalAlignment="Left" Margin="20,20,0,0" VerticalAlignment="Top" Width="204" Height="47" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="formAContractButton_Click" />
+        </StackPanel>
 
     </Grid>
 </Window>
