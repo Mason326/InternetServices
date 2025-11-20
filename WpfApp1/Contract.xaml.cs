@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace WpfApp1
 {
@@ -75,6 +77,7 @@ namespace WpfApp1
 
         private int GetContractNumber()
         {
+            // TODO check status
             if (CheckDuplicateUtil.HasNoDuplicate("contract", "connection_claim_id", $"{fieldVals[0]}"))
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -139,6 +142,39 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Не удалось оформить договор. Обнаружен дубликат", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            string fileName = Directory.GetCurrentDirectory();
+            if (fileName.Contains("bin\\"))
+            {
+                fileName = string.Join("\\", fileName.Split('\\').TakeWhile(el => el != "bin"));
+            }
+            fileName += "\\Resources\\Templates\\ContractTemplate.docx";
+            Word.Application wordApp = new Word.Application();
+            wordApp.Visible = false;
+
+            Word.Document wordDocument = wordApp.Documents.Open(fileName, ReadOnly: true);
+
+            ReplaceWord("{contractNumber}", contractNumberLabel.Content.ToString(), wordDocument);
+            ReplaceWord("{contractDate}", contractDateLabel.Content.ToString(), wordDocument);
+            ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
+            ReplaceWord("{companyDirector}", Properties.Settings.Default.companyDirector, wordDocument);
+            ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
+            //ReplaceWord("{orderStatus}", "Сформирован", wordDocument);
+            //ReplaceWord("{deliveryDate}", completionDate.Content.ToString(), wordDocument);
+            //ReplaceWord("{orderSum}", totalOrderCost.ToString(), wordDocument);
+
+            wordApp.Visible = true;
+        }
+
+        void ReplaceWord(string src, string dest, Word.Document doc)
+        {
+            Word.Range range = doc.Content; // всё содержимое 
+
+            //range.Find.ClearFormatting();
+            range.Find.Execute(FindText: src, ReplaceWith: dest);
         }
     }
 }

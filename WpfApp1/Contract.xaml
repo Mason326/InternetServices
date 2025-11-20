@@ -50,7 +50,7 @@
         <Label Content="Дата заключения договора: " HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="214" Margin="38,74,0,0"/>
         <Button Content="К заявке" HorizontalAlignment="Left" Margin="544,437,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click"/>
         <ComboBox x:Name="contractStatusComboBox" IsEnabled="False"  HorizontalAlignment="Left" Margin="544,78,0,0" FontSize="16" VerticalAlignment="Top" Width="220" Height="44"/>
-        <Button Content="Печать договора" HorizontalAlignment="Left" Margin="544,383,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+        <Button Content="Печать договора" HorizontalAlignment="Left" Margin="544,383,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
         <Label x:Name="contractNumberLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="181,43,0,0"/>
         <Label x:Name="tariffLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="608,144,0,0"/>
         <Label x:Name="contractDateLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="257,78,0,0"/>
