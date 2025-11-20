@@ -23,6 +23,7 @@ namespace WpfApp1
     public partial class Contract : Window
     {
         object[] fieldVals;
+        object[] clientVerbose;
         public Contract(object[] fieldValues)
         {
             InitializeComponent();
@@ -34,43 +35,44 @@ namespace WpfApp1
             contractNumberLabel.Content = GetContractNumber();
             contractDateLabel.Content = DateTime.Now.ToString("dd.MM.yyyy");
             claimNumberLabel.Content = fieldVals[0];
-            var clientDescription = GetClientFullName(Convert.ToInt32(fieldVals[0]));
+            var clientDescription = GetClientData(Convert.ToInt32(fieldVals[0]));
+            clientVerbose = clientDescription;
             claimСreationDateLabel.Content = fieldVals[1];
             claimExecutionDateLabel.Content = fieldVals[2];
             claimAddressTextBox.Text = fieldVals[3].ToString();
             tariffLabel.Content = fieldVals[4];
             claimClientLabel.Content = fieldVals[5];
             claimManagerLabel.Content = fieldVals[6];
-            claimClientLabel.Content = clientDescription.full_name;
-            abonentLoginTextBox.Text = clientDescription.login;
-            abonentPasswordTextBox.Text = clientDescription.password;
+            claimClientLabel.Content = clientDescription[10];
+            abonentLoginTextBox.Text = clientDescription[15].ToString();
+            abonentPasswordTextBox.Text = clientDescription[16].ToString();
             claimStatusLabel.Content = fieldVals[7];
             contractStatusComboBox.ItemsSource = new string[] { "Заключен" };
             contractStatusComboBox.SelectedItem = "Заключен";
         }
 
-        private (string full_name, string login, string password) GetClientFullName(int claimId)
+        private object[] GetClientData(int claimId)
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($"SELECT `client`.full_name, `client`.subscriber_login, `client`.subscriber_password FROM connection_claim inner join `client` on `client`.idclient = connection_claim.client_id where id_claim = {claimId};", conn);
-                    object[] clientDescr = new object[3];
+                    MySqlCommand cmd = new MySqlCommand($"SELECT * FROM connection_claim inner join `client` on `client`.idclient = connection_claim.client_id where id_claim = {claimId};", conn);
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
+                        object[] clientDescr = new object[dr.FieldCount];
                         while (dr.Read())
                         {
                             dr.GetValues(clientDescr);
                         }
+                        return clientDescr;
                     }
-                    return (clientDescr[0].ToString(), clientDescr[1].ToString(), clientDescr[2].ToString());
                 }
                 catch (Exception exc)
                 {
                     MessageBox.Show($"Не удалось получить данные клиента\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return ("", "", "");
+                    return new object[0];
                 }
             }
         }
@@ -151,7 +153,7 @@ namespace WpfApp1
             {
                 fileName = string.Join("\\", fileName.Split('\\').TakeWhile(el => el != "bin"));
             }
-            fileName += "\\Resources\\Templates\\ContractTemplate.docx";
+            fileName += "\\Resources\\Templates\\ContractTemplate.doc";
             Word.Application wordApp = new Word.Application();
             wordApp.Visible = false;
 
@@ -162,9 +164,28 @@ namespace WpfApp1
             ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
             ReplaceWord("{companyDirector}", Properties.Settings.Default.companyDirector, wordDocument);
             ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
-            //ReplaceWord("{orderStatus}", "Сформирован", wordDocument);
-            //ReplaceWord("{deliveryDate}", completionDate.Content.ToString(), wordDocument);
-            //ReplaceWord("{orderSum}", totalOrderCost.ToString(), wordDocument);
+            ReplaceWord("{abonentLogin}", abonentLoginTextBox.Text, wordDocument);
+            ReplaceWord("{abonentPassword}", abonentPasswordTextBox.Text, wordDocument);
+            ReplaceWord("{abonentEmail}", clientVerbose[11].ToString(), wordDocument);
+            string address = string.Join(", ", claimAddressTextBox.Text.Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+            ReplaceWord("{connectionAddress}", address, wordDocument);
+            ReplaceWord("{tariffName}", tariffLabel.Content.ToString(), wordDocument);
+            ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
+            ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
+            ReplaceWord("{companyDescription}", Properties.Settings.Default.companyDescription, wordDocument);
+            string[] director = Properties.Settings.Default.companyDirector.Split();
+            ReplaceWord("{companyDirector}", $"{director[0]} {director[1][0]}. {director[2][0]}.", wordDocument);
+            ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
+            ReplaceWord("{birthDate}", DateTime.Parse(clientVerbose[14].ToString()).ToString("dd.MM.yyyy"), wordDocument);
+            ReplaceWord("{passportSeries}", clientVerbose[17].ToString(), wordDocument);
+            ReplaceWord("{passportNumber}", clientVerbose[18].ToString(), wordDocument);
+            ReplaceWord("{issueDate}", DateTime.Parse(clientVerbose[20].ToString()).ToString("dd.MM.yyyy"), wordDocument);
+            ReplaceWord("{issuedBy}", clientVerbose[19].ToString(), wordDocument);
+            address = string.Join(", ", clientVerbose[13].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+            ReplaceWord("{residenceAddress}", address, wordDocument);
+            address = string.Join(", ", clientVerbose[1].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+            ReplaceWord("{mountAddress}", address, wordDocument);
+            ReplaceWord("{phoneNumber}", clientVerbose[12].ToString(), wordDocument);
 
             wordApp.Visible = true;
         }
