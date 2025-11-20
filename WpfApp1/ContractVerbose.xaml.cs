@@ -47,6 +47,16 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            if (AccountHolder.UserRole == "Директор")
+            {
+                saveChangesButton.Visibility = Visibility.Collapsed;
+                statusComboBox.IsEnabled = false;
+            }
+            else
+            {
+                saveChangesButton.Visibility = Visibility.Visible;
+                statusComboBox.IsEnabled = true;
+            }
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
@@ -57,8 +67,8 @@ namespace WpfApp1
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
                     da.Fill(dt);
-                    StatusComboBox.ItemsSource = dt.AsEnumerable().Select(dr => dr.ItemArray[0]);
-                    StatusComboBox.SelectedItem = currentStatus;
+                    statusComboBox.ItemsSource = dt.AsEnumerable().Select(dr => dr.ItemArray[0]);
+                    statusComboBox.SelectedItem = currentStatus;
                 }
                 catch (Exception exc)
                 {
@@ -74,7 +84,7 @@ namespace WpfApp1
                 try
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($"Update contract Set contract_status_id = (Select idcontract_status from contract_status where `status` = '{StatusComboBox.SelectedItem}') where idcontract = {contactId};", conn);
+                    MySqlCommand cmd = new MySqlCommand($"Update contract Set contract_status_id = (Select idcontract_status from contract_status where `status` = '{statusComboBox.SelectedItem}') where idcontract = {contactId};", conn);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     RefreshDG();

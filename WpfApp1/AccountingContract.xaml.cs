@@ -116,7 +116,7 @@ namespace WpfApp1
                     await cmd.ExecuteNonQueryAsync();
                     da.Fill(dt);
                     contractsDG.ItemsSource = dt.AsDataView();
-                    ShowRecordsCount();
+                    ShowRecordsCount(cmd.CommandText);
                 }
             }
             catch (Exception exc)
@@ -197,12 +197,12 @@ namespace WpfApp1
             showContractVerbose.IsEnabled = true;
         }
 
-        private void ShowRecordsCount()
+        private void ShowRecordsCount(string strCmd)
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from `contract`;", conn);
+                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
                 int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
                 recordsCountLabel.Content = recordsCount.ToString();
             }
