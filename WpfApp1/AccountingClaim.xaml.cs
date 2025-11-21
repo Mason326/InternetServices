@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Excel = Microsoft.Office.Interop.Excel;
 using System.Windows.Threading;
 
 namespace WpfApp1
@@ -297,10 +298,17 @@ namespace WpfApp1
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand($@"Select sum(`claim_cost`) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
-                int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
-                totalSumLabel.Content = recordsCount.ToString();
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($@"Select sum(`claim_cost`) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
+                    int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
+                    totalSumLabel.Content = recordsCount.ToString();
+                }
+                catch
+                {
+                    totalSumLabel.Content = "0";
+                }
             }
         }
 
@@ -321,7 +329,140 @@ namespace WpfApp1
 
         private void printClaimButton_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                if (claimsDG.Items.Count < 1)
+                {
+                    MessageBox.Show($"В отчете отсутствуют записи", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                var application = new Excel.Application();
+                var workbook = application.Workbooks.Add();
+                var worksheet = workbook.Worksheets[1] as Excel.Worksheet;
 
+                int rowCount = claimsDG.Items.Count;
+                int colCount = claimsDG.Columns.Count;
+
+                var data = new List<object[]>();
+                var cols = new List<object>();
+                foreach (var col in claimsDG.Columns)
+                    cols.Add(col.Header);
+                data.Add(cols.ToArray());
+                string filterParams = "";
+                if (masterId != -1 && (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty))
+                {
+                    string betweenExpressions1 = additionalDateFilterParams != string.Empty && additionalFilterParams != string.Empty ? " And " : "";
+                    string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
+                    filterParams = $" and {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
+                }
+                else if (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty)
+                {
+                    string betweenExpressions1 = additionalDateFilterParams != string.Empty && additionalFilterParams != string.Empty ? " And " : "";
+                    string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
+                    filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
+                }
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    string cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost
+                                                    from `connection_claim`
+                                                    inner join `client` on client.idclient = connection_claim.client_id
+                                                    inner join `employees` on employees.idemployees = connection_claim.employees_id
+                                                    inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                    left join `order` on `order`.idorder = connection_claim.order_id
+                                                    inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterParams}{additionalSortParams};";
+                    MySqlCommand cmd = new MySqlCommand(cmdText, conn);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        object[] record = new object[dr.FieldCount + 1];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(record);
+                            record[1] = ((DateTime)record[1]).ToString("dd.MM.yyyy");
+                            record[2] = ((DateTime)record[2]).ToString("dd.MM.yyyy");
+                            object[] valuesRightOrder = new object[] { record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[8], record[9], record[7], record[10] };
+                            data.Add(valuesRightOrder);
+                        }
+
+                        Excel.Range startCell = worksheet.Range["A1"];
+                        Excel.Range endCell = worksheet.Cells[rowCount, colCount];
+
+                        Excel.Range writeRange = worksheet.Range[startCell, endCell];
+                        object[,] dataArray = new object[rowCount, colCount];
+
+                        for (int i = 0; i < rowCount; i++)
+                        {
+                            for (int j = 0; j < colCount; j++)
+                            {
+                                dataArray[i, j] = data[i][j];
+                            }
+                        }
+
+                        writeRange.Value2 = dataArray;
+                        writeRange.Columns.AutoFit();
+
+                        for (int i = 2; i <= rowCount; i++)
+                        {
+                            Excel.Range cell = writeRange.Cells[colCount][i];
+                            cell.Font.Bold = true;
+                            cell.Font.Color = Excel.XlRgbColor.rgbWhite;
+                            if (cell.Text == "Закрыта")
+                                cell.Interior.Color = Excel.XlRgbColor.rgbDarkMagenta;
+                            else if (cell.Text == "Входящая")
+                                cell.Interior.Color = Excel.XlRgbColor.rgbForestGreen;
+                            else if (cell.Text == "В работе")
+                                cell.Interior.Color = Excel.XlRgbColor.rgbCoral;
+                            else
+                                cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;
+                        }
+
+                        Excel.ListObject table = worksheet.ListObjects.Add(
+                            Excel.XlListObjectSourceType.xlSrcRange,
+                            worksheet.Range[startCell, endCell],
+                            Type.Missing,
+                            Excel.XlYesNoGuess.xlYes,
+                            Type.Missing);
+                        table.Name = "Contracts";
+
+                        Excel.Range recordCount = worksheet.Cells[1][rowCount + 2];
+                        recordCount.Value = $"Количество заявок: {recordsCountLabel.Content}";
+                        recordCount.Font.Bold = true;
+                        recordCount.Font.Size = 16;
+
+                        Excel.Range incomes = worksheet.Cells[1][rowCount + 4];
+                        incomes.Value = $"Общий доход от реализации заявок: {totalSumLabel.Content}";
+                        incomes.Font.Bold = true;
+                        incomes.Font.Size = 16;
+
+                        if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
+                        {
+                            Excel.Range period = worksheet.Cells[1][rowCount + 6];
+                            period.Value = $"За период: {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
+                            period.Font.Bold = true;
+                            period.Font.Size = 12;
+                        }
+                        else if (fromDate.SelectedDate != null && toDate.SelectedDate == null)
+                        {
+                            Excel.Range period = worksheet.Cells[1][rowCount + 6];
+                            period.Value = $"За период {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {DateTime.Now.ToString("dd.MM.yyyy")}";
+                            period.Font.Bold = true;
+                            period.Font.Size = 12;
+                        }
+                        else if (fromDate.SelectedDate == null && toDate.SelectedDate != null)
+                        {
+                            Excel.Range period = worksheet.Cells[1][rowCount + 6];
+                            period.Value = $"За период до {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
+                            period.Font.Bold = true;
+                            period.Font.Size = 12;
+                        }
+                        application.Visible = true;
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось подготовить отчет к печати\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

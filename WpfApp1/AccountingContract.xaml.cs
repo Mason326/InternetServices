@@ -233,7 +233,6 @@ namespace WpfApp1
             foreach (var col in contractsDG.Columns)
                 cols.Add(col.Header);
             data.Add(cols.ToArray());
-            var ddss = contractsDG.Items;
             foreach (DataRowView row in contractsDG.Items)
             { 
                 object[] values = row.Row.ItemArray;
