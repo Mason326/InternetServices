@@ -80,13 +80,16 @@ namespace WpfApp1
                 case "Менеджер":
                     printClaimButton.Visibility = Visibility.Collapsed;
                     orderButton.Visibility = Visibility.Collapsed;
+                    incomesLabel.Visibility = Visibility.Collapsed;
                     break;
                 case "Мастер":
                     printClaimButton.Visibility = Visibility.Collapsed;
+                    incomesLabel.Visibility = Visibility.Collapsed;
                     masterId = AccountHolder.userId;
                     break;
                 case "Директор":
                     orderButton.Visibility = Visibility.Collapsed;
+                    incomesLabel.Visibility = Visibility.Visible;
                     break;
             }
             RefreshDatagrid();
@@ -117,18 +120,20 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    string cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio'
+                    string cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost
                                                     from `connection_claim`
                                                     inner join `client` on client.idclient = connection_claim.client_id
                                                     inner join `employees` on employees.idemployees = connection_claim.employees_id
                                                     inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                    left join `order` on `order`.idorder = connection_claim.order_id
                                                     inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterParams}{additionalSortParams};";
                     if (masterId != -1)
-                        cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio'
+                        cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost
                                                     from `connection_claim`
                                                     inner join `client` on client.idclient = connection_claim.client_id
                                                     inner join `employees` on employees.idemployees = connection_claim.employees_id
                                                     inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                    left join `order` on `order`.idorder = connection_claim.order_id
                                                     inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id where master_id = {masterId}{filterParams}{additionalSortParams};";
                     MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     DataTable dt = new DataTable();
@@ -173,8 +178,10 @@ namespace WpfApp1
                     }
 
                     claimsDG.ItemsSource = dt.AsDataView();
+                    ShowRecordsCount(cmdText);
+                    if (AccountHolder.UserRole == "Директор")
+                        ShowTotalSum(cmdText);
                 }
-                ShowRecordsCount();
             }
             catch (Exception exc)
             {
@@ -275,16 +282,28 @@ namespace WpfApp1
             showClaimButton.IsEnabled = true;
         }
 
-        private void ShowRecordsCount()
+        private void ShowRecordsCount(string strCmd)
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from `connection_claim`;", conn);
+                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
                 int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
                 recordsCountLabel.Content = recordsCount.ToString();
             }
         }
+
+        private void ShowTotalSum(string strCmd)
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand($@"Select sum(`claim_cost`) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
+                int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
+                totalSumLabel.Content = recordsCount.ToString();
+            }
+        }
+
 
         private string HideName(string fullName)
         {
@@ -298,6 +317,11 @@ namespace WpfApp1
             {
                 return fullName;
             }
+        }
+
+        private void printClaimButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
