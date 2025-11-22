@@ -31,12 +31,12 @@ namespace WpfApp1
             contactId = Convert.ToInt32(selectedItems[0]);
             ClientLabel.Content += selectedItems[2].ToString();
             ClaimNumberLabel.Content += selectedItems[3].ToString();
-            TariffNameLabel.Content += selectedItems[6].ToString();
-            ClaimDateLabel.Content += $"{((DateTime)selectedItems[7]).ToString("dd.MM.yyyy")}";
-            string address = string.Join(", ", selectedItems[8].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+            TariffNameLabel.Content += selectedItems[5].ToString();
+            ClaimDateLabel.Content += $"{((DateTime)selectedItems[6]).ToString("dd.MM.yyyy")}";
+            string address = string.Join(", ", selectedItems[7].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
             address = address.Replace(",,", ",");
             AddressTextBox.Text += address;
-            currentStatus = selectedItems[5].ToString();
+            currentStatus = selectedItems[4].ToString();
             RefreshDG += refresh;
         }
 

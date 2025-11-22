@@ -109,7 +109,7 @@ namespace WpfApp1
                     }
                     MySqlCommand cmd = new MySqlCommand($@"SELECT idcontract, contract_date, (Select full_name from `client`
                                                         where idclient = connection_claim.client_id) as 'client',
-                                                        connection_claim_id, order_id, `contract_status`.`status` as 'status',
+                                                        connection_claim_id, `contract_status`.`status` as 'status',
                                                         (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id) as 'tariff',
                                                         `connection_claim`.connection_creationDate as 'claimDate',
                                                         `connection_claim`.connection_address as 'connection_address'
@@ -238,17 +238,17 @@ namespace WpfApp1
                 object[] values = row.Row.ItemArray;
 
                 values[1] = ((DateTime)values[1]).ToString("dd.MM.yyyy");
-                values[7] = ((DateTime)values[7]).ToString("dd.MM.yyyy");
-                object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[6], values[8], values[7], values[1], values[5] };
+                values[6] = ((DateTime)values[6]).ToString("dd.MM.yyyy");
+                object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[5], values[7], values[6], values[1], values[4] };
                 data.Add(valuesRightOrder);
             }
             Excel.Range startCell = worksheet.Range["A1"];
-            Excel.Range endCell = worksheet.Cells[rowCount, colCount];
+            Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
 
             Excel.Range writeRange = worksheet.Range[startCell, endCell];
-            object[,] dataArray = new object[rowCount, colCount];
+            object[,] dataArray = new object[rowCount + 1, colCount];
 
-            for (int i = 0; i < rowCount; i++)
+            for (int i = 0; i < rowCount + 1; i++)
             {
                 for (int j = 0; j < colCount; j++)
                 {
@@ -259,7 +259,7 @@ namespace WpfApp1
             writeRange.Value2 = dataArray;
             writeRange.Columns.AutoFit();
 
-            for (int i = 2; i <= rowCount; i++)
+            for (int i = 2; i <= rowCount + 1; i++)
             {
                 Excel.Range cell = writeRange.Cells[colCount][i];
                 cell.Font.Bold = true;
@@ -278,28 +278,28 @@ namespace WpfApp1
                 Type.Missing);
             table.Name = "Contracts";
 
-            Excel.Range recordCount = worksheet.Cells[1][rowCount + 2];
+            Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
             recordCount.Value = $"Количество договоров: {recordsCountLabel.Content}";
             recordCount.Font.Bold = true;
             recordCount.Font.Size = 16;
 
             if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
             {
-                Excel.Range period = worksheet.Cells[1][rowCount + 4];
+                Excel.Range period = worksheet.Cells[1][rowCount + 5];
                 period.Value = $"За период: {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
                 period.Font.Bold = true;
                 period.Font.Size = 12;
             }
             else if (fromDate.SelectedDate != null && toDate.SelectedDate == null)
             {
-                Excel.Range period = worksheet.Cells[1][rowCount + 4];
+                Excel.Range period = worksheet.Cells[1][rowCount + 5];
                 period.Value = $"За период {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {DateTime.Now.ToString("dd.MM.yyyy")}";
                 period.Font.Bold = true;
                 period.Font.Size = 12;
             }
             else if (fromDate.SelectedDate == null && toDate.SelectedDate != null)
             {
-                Excel.Range period = worksheet.Cells[1][rowCount + 4];
+                Excel.Range period = worksheet.Cells[1][rowCount + 5];
                 period.Value = $"За период до {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
                 period.Font.Bold = true;
                 period.Font.Size = 12;

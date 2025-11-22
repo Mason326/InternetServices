@@ -417,12 +417,12 @@ namespace WpfApp1
                         }
 
                         Excel.Range startCell = worksheet.Range["A1"];
-                        Excel.Range endCell = worksheet.Cells[rowCount, colCount];
+                        Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
 
                         Excel.Range writeRange = worksheet.Range[startCell, endCell];
-                        object[,] dataArray = new object[rowCount, colCount];
+                        object[,] dataArray = new object[rowCount + 1, colCount];
 
-                        for (int i = 0; i <= rowCount; i++)
+                        for (int i = 0; i < rowCount + 1; i++)
                         {
                             for (int j = 0; j < colCount; j++)
                             {
@@ -433,7 +433,7 @@ namespace WpfApp1
                         writeRange.Value2 = dataArray;
                         writeRange.Columns.AutoFit();
 
-                        for (int i = 2; i <= rowCount; i++)
+                        for (int i = 2; i <= rowCount + 1; i++)
                         {
                             Excel.Range cell = writeRange.Cells[colCount][i];
                             cell.Font.Bold = true;
@@ -456,33 +456,33 @@ namespace WpfApp1
                             Type.Missing);
                         table.Name = "Claims";
 
-                        Excel.Range recordCount = worksheet.Cells[1][rowCount + 2];
+                        Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
                         recordCount.Value = $"Количество заявок: {recordsCountLabel.Content}";
                         recordCount.Font.Bold = true;
                         recordCount.Font.Size = 16;
 
-                        Excel.Range incomes = worksheet.Cells[1][rowCount + 4];
+                        Excel.Range incomes = worksheet.Cells[1][rowCount + 5];
                         incomes.Value = $"Общий доход от реализации заявок: {totalSumLabel.Content}";
                         incomes.Font.Bold = true;
                         incomes.Font.Size = 16;
 
                         if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
                         {
-                            Excel.Range period = worksheet.Cells[1][rowCount + 6];
+                            Excel.Range period = worksheet.Cells[1][rowCount + 7];
                             period.Value = $"За период: {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
                             period.Font.Bold = true;
                             period.Font.Size = 12;
                         }
                         else if (fromDate.SelectedDate != null && toDate.SelectedDate == null)
                         {
-                            Excel.Range period = worksheet.Cells[1][rowCount + 6];
+                            Excel.Range period = worksheet.Cells[1][rowCount + 7];
                             period.Value = $"За период {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {DateTime.Now.ToString("dd.MM.yyyy")}";
                             period.Font.Bold = true;
                             period.Font.Size = 12;
                         }
                         else if (fromDate.SelectedDate == null && toDate.SelectedDate != null)
                         {
-                            Excel.Range period = worksheet.Cells[1][rowCount + 6];
+                            Excel.Range period = worksheet.Cells[1][rowCount + 7];
                             period.Value = $"За период до {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
                             period.Font.Bold = true;
                             period.Font.Size = 12;
@@ -547,12 +547,12 @@ namespace WpfApp1
                         int colCount = cols.Count;
 
                         Excel.Range startCell = worksheet.Range["A1"];
-                        Excel.Range endCell = worksheet.Cells[rowCount, colCount];
+                        Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
 
                         Excel.Range writeRange = worksheet.Range[startCell, endCell];
-                        object[,] dataArray = new object[rowCount, colCount];
+                        object[,] dataArray = new object[rowCount + 1, colCount];
 
-                        for (int i = 0; i < rowCount; i++)
+                        for (int i = 0; i < rowCount + 1; i++)
                         {
                             for (int j = 0; j < colCount; j++)
                             {
@@ -571,28 +571,28 @@ namespace WpfApp1
                             Type.Missing);
                         table.Name = "Rating";
 
-                        Excel.Range recordCount = worksheet.Cells[1][rowCount + 2];
+                        Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
                         recordCount.Value = $"Лучший {roleName}: {bestMaster}";
                         recordCount.Font.Bold = true;
                         recordCount.Font.Size = 16;
 
                         if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
                         {
-                            Excel.Range period = worksheet.Cells[1][rowCount + 4];
+                            Excel.Range period = worksheet.Cells[1][rowCount + 5];
                             period.Value = $"За период: {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
                             period.Font.Bold = true;
                             period.Font.Size = 12;
                         }
                         else if (fromDate.SelectedDate != null && toDate.SelectedDate == null)
                         {
-                            Excel.Range period = worksheet.Cells[1][rowCount + 4];
+                            Excel.Range period = worksheet.Cells[1][rowCount + 5];
                             period.Value = $"За период {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {DateTime.Now.ToString("dd.MM.yyyy")}";
                             period.Font.Bold = true;
                             period.Font.Size = 12;
                         }
                         else if (fromDate.SelectedDate == null && toDate.SelectedDate != null)
                         {
-                            Excel.Range period = worksheet.Cells[1][rowCount + 4];
+                            Excel.Range period = worksheet.Cells[1][rowCount + 5];
                             period.Value = $"За период до {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
                             period.Font.Bold = true;
                             period.Font.Size = 12;
