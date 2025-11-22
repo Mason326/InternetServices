@@ -33,7 +33,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(@"SELECT * FROM employees where roles_id = (select idroles from `roles` where role_name = 'Мастер');", conn);
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM employees where roles_id = (select idroles from `roles` where role_name = 'Мастер');", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     cmd.ExecuteNonQuery();
                     DataTable dt = new DataTable();
