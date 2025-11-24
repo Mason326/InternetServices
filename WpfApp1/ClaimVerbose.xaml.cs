@@ -81,23 +81,32 @@ namespace WpfApp1
                     if (AccountHolder.UserRole == "Менеджер")
                     {
                         formAContractButton.Visibility = Visibility.Visible;
+                        saveChangesButton.Visibility = Visibility.Collapsed;
+                        statusComboBox.IsEnabled = true;
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';";
                         if (currStatus != "Входящая")
                         {
-                            if(currStatus == "Отменена" && !isAccounting)
+                            if (currStatus == "Отменена" && !isAccounting)
                                 rereleaseClaimButton.Visibility = Visibility.Visible;
                             else
                                 rereleaseClaimButton.Visibility = Visibility.Collapsed;
                             statusComboBox.ItemsSource = new string[] { currStatus };
                             statusComboBox.SelectedItem = currStatus;
                             statusComboBox.IsEnabled = false;
-                            saveChangesButton.IsEnabled =  false;
+                            saveChangesButton.IsEnabled = false;
                         }
                     }
                     else if (AccountHolder.UserRole == "Мастер")
                     {
                         formAContractButton.Visibility = Visibility.Collapsed;
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'Входящая';";
+                        saveChangesButton.Visibility = Visibility.Collapsed;
+                        statusComboBox.IsEnabled = true;
+                    }
+                    else if (AccountHolder.UserRole == "Директор")
+                    {
+                        saveChangesButton.Visibility = Visibility.Collapsed;
+                        statusComboBox.IsEnabled = false;
                     }
                     if (!(currStatus == "В работе" || currStatus == "Закрыта"))
                     { 

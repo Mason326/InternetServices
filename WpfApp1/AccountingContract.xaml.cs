@@ -1,9 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace WpfApp1
 {
@@ -48,7 +50,11 @@ namespace WpfApp1
             fromDate.DisplayDateEnd = DateTime.Today.AddDays(-1);
             toDate.DisplayDateEnd = DateTime.Today;
             showContractVerbose.IsEnabled = false;
-
+            printAReportButton.Visibility = Visibility.Collapsed;
+            if (AccountHolder.UserRole == "Директор")
+            {
+                printAReportButton.Visibility = Visibility.Visible;
+            }
         }
 
         private void FilterByStatus_Checked(object sender, RoutedEventArgs e)
@@ -103,7 +109,7 @@ namespace WpfApp1
                     }
                     MySqlCommand cmd = new MySqlCommand($@"SELECT idcontract, contract_date, (Select full_name from `client`
                                                         where idclient = connection_claim.client_id) as 'client',
-                                                        connection_claim_id, order_id, `contract_status`.`status` as 'status',
+                                                        connection_claim_id, `contract_status`.`status` as 'status',
                                                         (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id) as 'tariff',
                                                         `connection_claim`.connection_creationDate as 'claimDate',
                                                         `connection_claim`.connection_address as 'connection_address'
@@ -116,7 +122,7 @@ namespace WpfApp1
                     await cmd.ExecuteNonQueryAsync();
                     da.Fill(dt);
                     contractsDG.ItemsSource = dt.AsDataView();
-                    ShowRecordsCount();
+                    ShowRecordsCount(cmd.CommandText);
                 }
             }
             catch (Exception exc)
@@ -197,15 +203,108 @@ namespace WpfApp1
             showContractVerbose.IsEnabled = true;
         }
 
-        private void ShowRecordsCount()
+        private void ShowRecordsCount(string strCmd)
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from `contract`;", conn);
+                MySqlCommand cmd = new MySqlCommand($@"Select Count(*) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
                 int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
                 recordsCountLabel.Content = recordsCount.ToString();
             }
+        }
+
+        private void printAReportButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (contractsDG.Items.Count < 1)
+            {
+                MessageBox.Show($"В отчете отсутствуют записи", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            var application = new Excel.Application();
+            var workbook = application.Workbooks.Add();
+            var worksheet = workbook.Worksheets[1] as Excel.Worksheet;
+
+            int rowCount = contractsDG.Items.Count;
+            int colCount = contractsDG.Columns.Count;
+
+            var data = new List<object[]>();
+            var cols = new List<object>();
+            foreach (var col in contractsDG.Columns)
+                cols.Add(col.Header);
+            data.Add(cols.ToArray());
+            foreach (DataRowView row in contractsDG.Items)
+            { 
+                object[] values = row.Row.ItemArray;
+
+                values[1] = ((DateTime)values[1]).ToString("dd.MM.yyyy");
+                values[6] = ((DateTime)values[6]).ToString("dd.MM.yyyy");
+                object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[5], values[7], values[6], values[1], values[4] };
+                data.Add(valuesRightOrder);
+            }
+            Excel.Range startCell = worksheet.Range["A1"];
+            Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
+
+            Excel.Range writeRange = worksheet.Range[startCell, endCell];
+            object[,] dataArray = new object[rowCount + 1, colCount];
+
+            for (int i = 0; i < rowCount + 1; i++)
+            {
+                for (int j = 0; j < colCount; j++)
+                {
+                    dataArray[i, j] = data[i][j];
+                }
+            }
+
+            writeRange.Value2 = dataArray;
+            writeRange.Columns.AutoFit();
+
+            for (int i = 2; i <= rowCount + 1; i++)
+            {
+                Excel.Range cell = writeRange.Cells[colCount][i];
+                cell.Font.Bold = true;
+                cell.Font.Color = Excel.XlRgbColor.rgbWhite;
+                if (cell.Text == "Заключен")
+                    cell.Interior.Color = Excel.XlRgbColor.rgbDarkGreen;
+                else
+                    cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;
+            }
+
+            Excel.ListObject table = worksheet.ListObjects.Add(
+                Excel.XlListObjectSourceType.xlSrcRange,
+                worksheet.Range[startCell, endCell],
+                Type.Missing,
+                Excel.XlYesNoGuess.xlYes,
+                Type.Missing);
+            table.Name = "Contracts";
+
+            Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
+            recordCount.Value = $"Количество договоров: {recordsCountLabel.Content}";
+            recordCount.Font.Bold = true;
+            recordCount.Font.Size = 16;
+
+            if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
+            {
+                Excel.Range period = worksheet.Cells[1][rowCount + 5];
+                period.Value = $"За период: {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
+                period.Font.Bold = true;
+                period.Font.Size = 12;
+            }
+            else if (fromDate.SelectedDate != null && toDate.SelectedDate == null)
+            {
+                Excel.Range period = worksheet.Cells[1][rowCount + 5];
+                period.Value = $"За период {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {DateTime.Now.ToString("dd.MM.yyyy")}";
+                period.Font.Bold = true;
+                period.Font.Size = 12;
+            }
+            else if (fromDate.SelectedDate == null && toDate.SelectedDate != null)
+            {
+                Excel.Range period = worksheet.Cells[1][rowCount + 5];
+                period.Value = $"За период до {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
+                period.Font.Bold = true;
+                period.Font.Size = 12;
+            }
+            application.Visible = true;
         }
     }
 }

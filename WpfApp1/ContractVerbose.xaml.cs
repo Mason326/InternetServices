@@ -31,12 +31,12 @@ namespace WpfApp1
             contactId = Convert.ToInt32(selectedItems[0]);
             ClientLabel.Content += selectedItems[2].ToString();
             ClaimNumberLabel.Content += selectedItems[3].ToString();
-            TariffNameLabel.Content += selectedItems[6].ToString();
-            ClaimDateLabel.Content += $"{((DateTime)selectedItems[7]).ToString("dd.MM.yyyy")}";
-            string address = string.Join(", ", selectedItems[8].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+            TariffNameLabel.Content += selectedItems[5].ToString();
+            ClaimDateLabel.Content += $"{((DateTime)selectedItems[6]).ToString("dd.MM.yyyy")}";
+            string address = string.Join(", ", selectedItems[7].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
             address = address.Replace(",,", ",");
             AddressTextBox.Text += address;
-            currentStatus = selectedItems[5].ToString();
+            currentStatus = selectedItems[4].ToString();
             RefreshDG += refresh;
         }
 
@@ -57,8 +57,8 @@ namespace WpfApp1
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
                     da.Fill(dt);
-                    StatusComboBox.ItemsSource = dt.AsEnumerable().Select(dr => dr.ItemArray[0]);
-                    StatusComboBox.SelectedItem = currentStatus;
+                    statusComboBox.ItemsSource = dt.AsEnumerable().Select(dr => dr.ItemArray[0]);
+                    statusComboBox.SelectedItem = currentStatus;
                 }
                 catch (Exception exc)
                 {
@@ -74,7 +74,7 @@ namespace WpfApp1
                 try
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($"Update contract Set contract_status_id = (Select idcontract_status from contract_status where `status` = '{StatusComboBox.SelectedItem}') where idcontract = {contactId};", conn);
+                    MySqlCommand cmd = new MySqlCommand($"Update contract Set contract_status_id = (Select idcontract_status from contract_status where `status` = '{statusComboBox.SelectedItem}') where idcontract = {contactId};", conn);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     RefreshDG();

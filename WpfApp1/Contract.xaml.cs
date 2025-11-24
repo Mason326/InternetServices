@@ -148,46 +148,53 @@ namespace WpfApp1
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            string fileName = Directory.GetCurrentDirectory();
-            if (fileName.Contains("bin\\"))
+            try
             {
-                fileName = string.Join("\\", fileName.Split('\\').TakeWhile(el => el != "bin"));
+                string fileName = Directory.GetCurrentDirectory();
+                if (fileName.Contains("bin\\"))
+                {
+                    fileName = string.Join("\\", fileName.Split('\\').TakeWhile(el => el != "bin"));
+                }
+                fileName += "\\Resources\\Templates\\ContractTemplate.doc";
+                Word.Application wordApp = new Word.Application();
+                wordApp.Visible = false;
+
+                Word.Document wordDocument = wordApp.Documents.Open(fileName, ReadOnly: true);
+
+                ReplaceWord("{contractNumber}", contractNumberLabel.Content.ToString(), wordDocument);
+                ReplaceWord("{contractDate}", contractDateLabel.Content.ToString(), wordDocument);
+                ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
+                ReplaceWord("{companyDirector}", Properties.Settings.Default.companyDirector, wordDocument);
+                ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
+                ReplaceWord("{abonentLogin}", abonentLoginTextBox.Text, wordDocument);
+                ReplaceWord("{abonentPassword}", abonentPasswordTextBox.Text, wordDocument);
+                ReplaceWord("{abonentEmail}", clientVerbose[11].ToString(), wordDocument);
+                string address = string.Join(", ", claimAddressTextBox.Text.Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+                ReplaceWord("{connectionAddress}", address, wordDocument);
+                ReplaceWord("{tariffName}", tariffLabel.Content.ToString(), wordDocument);
+                ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
+                ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
+                ReplaceWord("{companyDescription}", Properties.Settings.Default.companyDescription, wordDocument);
+                string[] director = Properties.Settings.Default.companyDirector.Split();
+                ReplaceWord("{companyDirector}", $"{director[0]} {director[1][0]}. {director[2][0]}.", wordDocument);
+                ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
+                ReplaceWord("{birthDate}", DateTime.Parse(clientVerbose[14].ToString()).ToString("dd.MM.yyyy"), wordDocument);
+                ReplaceWord("{passportSeries}", clientVerbose[17].ToString(), wordDocument);
+                ReplaceWord("{passportNumber}", clientVerbose[18].ToString(), wordDocument);
+                ReplaceWord("{issueDate}", DateTime.Parse(clientVerbose[20].ToString()).ToString("dd.MM.yyyy"), wordDocument);
+                ReplaceWord("{issuedBy}", clientVerbose[19].ToString(), wordDocument);
+                address = string.Join(", ", clientVerbose[13].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+                ReplaceWord("{residenceAddress}", address, wordDocument);
+                address = string.Join(", ", clientVerbose[1].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+                ReplaceWord("{mountAddress}", address, wordDocument);
+                ReplaceWord("{phoneNumber}", clientVerbose[12].ToString(), wordDocument);
+
+                wordApp.Visible = true;
             }
-            fileName += "\\Resources\\Templates\\ContractTemplate.doc";
-            Word.Application wordApp = new Word.Application();
-            wordApp.Visible = false;
-
-            Word.Document wordDocument = wordApp.Documents.Open(fileName, ReadOnly: true);
-
-            ReplaceWord("{contractNumber}", contractNumberLabel.Content.ToString(), wordDocument);
-            ReplaceWord("{contractDate}", contractDateLabel.Content.ToString(), wordDocument);
-            ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
-            ReplaceWord("{companyDirector}", Properties.Settings.Default.companyDirector, wordDocument);
-            ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
-            ReplaceWord("{abonentLogin}", abonentLoginTextBox.Text, wordDocument);
-            ReplaceWord("{abonentPassword}", abonentPasswordTextBox.Text, wordDocument);
-            ReplaceWord("{abonentEmail}", clientVerbose[11].ToString(), wordDocument);
-            string address = string.Join(", ", claimAddressTextBox.Text.Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
-            ReplaceWord("{connectionAddress}", address, wordDocument);
-            ReplaceWord("{tariffName}", tariffLabel.Content.ToString(), wordDocument);
-            ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
-            ReplaceWord("{companyName}", Properties.Settings.Default.companyName, wordDocument);
-            ReplaceWord("{companyDescription}", Properties.Settings.Default.companyDescription, wordDocument);
-            string[] director = Properties.Settings.Default.companyDirector.Split();
-            ReplaceWord("{companyDirector}", $"{director[0]} {director[1][0]}. {director[2][0]}.", wordDocument);
-            ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
-            ReplaceWord("{birthDate}", DateTime.Parse(clientVerbose[14].ToString()).ToString("dd.MM.yyyy"), wordDocument);
-            ReplaceWord("{passportSeries}", clientVerbose[17].ToString(), wordDocument);
-            ReplaceWord("{passportNumber}", clientVerbose[18].ToString(), wordDocument);
-            ReplaceWord("{issueDate}", DateTime.Parse(clientVerbose[20].ToString()).ToString("dd.MM.yyyy"), wordDocument);
-            ReplaceWord("{issuedBy}", clientVerbose[19].ToString(), wordDocument);
-            address = string.Join(", ", clientVerbose[13].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
-            ReplaceWord("{residenceAddress}", address, wordDocument);
-            address = string.Join(", ", clientVerbose[1].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
-            ReplaceWord("{mountAddress}", address, wordDocument);
-            ReplaceWord("{phoneNumber}", clientVerbose[12].ToString(), wordDocument);
-
-            wordApp.Visible = true;
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось подготовить договор к печати в Word.\nОшибка: {exc.Message}", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         void ReplaceWord(string src, string dest, Word.Document doc)
