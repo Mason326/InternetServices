@@ -547,12 +547,12 @@ namespace WpfApp1
                         int colCount = cols.Count;
 
                         Excel.Range startCell = worksheet.Range["A1"];
-                        Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
+                        Excel.Range endCell = worksheet.Cells[rowCount, colCount];
 
                         Excel.Range writeRange = worksheet.Range[startCell, endCell];
-                        object[,] dataArray = new object[rowCount + 1, colCount];
+                        object[,] dataArray = new object[rowCount, colCount];
 
-                        for (int i = 0; i < rowCount + 1; i++)
+                        for (int i = 0; i < rowCount; i++)
                         {
                             for (int j = 0; j < colCount; j++)
                             {
