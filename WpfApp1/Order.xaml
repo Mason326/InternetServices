@@ -53,7 +53,7 @@
                 <DataGridTextColumn Header="Стоимость" Binding="{Binding service_cost}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="429,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
+        <TextBox x:Name="searchServiceTextBox" HorizontalAlignment="Left" Height="23" Margin="429,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" KeyUp="searchTextBox_KeyUp"/>
         <DataGrid HorizontalAlignment="Left" Height="119" Margin="891,97,0,0" VerticalAlignment="Top" Width="328">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Услуга"/>
@@ -93,10 +93,10 @@
             </DataGrid.Columns>
         </DataGrid>
         <Label Content="Поиск доп. услуги" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="429,220,0,0"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="429,251,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
+        <TextBox x:Name="searchAddServiceTextBox" HorizontalAlignment="Left" Height="23" Margin="429,251,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" KeyUp="searchTextBox_KeyUp"/>
         <Label Content="Доп. услуги наряда" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="891,243,0,0"/>
         <Label Content="Поиск материала" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="41,462,0,0"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="41,493,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
+        <TextBox x:Name="searchMaterialTextBox" HorizontalAlignment="Left" Height="23" Margin="41,493,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" KeyUp="searchTextBox_KeyUp"/>
         <Label Content="Материалы наряда" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="156" Margin="478,485,0,0"/>
         <Label Content="Стоимость скидки: XXXX руб." HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="225" Margin="739,444,0,0"/>
         <CheckBox Content="Скидка пенсионерам" HorizontalAlignment="Left" Margin="739,427,0,0" VerticalAlignment="Top" FontSize="16"/>

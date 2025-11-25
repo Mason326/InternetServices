@@ -73,9 +73,9 @@ namespace WpfApp1
                 MessageBox.Show($"Не удалось загрузить заказ-наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            FillServicesDG();
-            FillAdditionalServicesDG();
-            FillMaterials();
+            FillServicesDG("");
+            FillAdditionalServicesDG("");
+            FillMaterialsDG("");
         }
         private int GetOrderNumber()
         {
@@ -96,14 +96,14 @@ namespace WpfApp1
             }
         }
 
-        private void FillServicesDG()
+        private void FillServicesDG(string searchWord)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM `services`;", conn);
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM `services` where `service_name` LIKE '%{searchWord}%';", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     cmd.ExecuteNonQuery();
                     DataTable dt = new DataTable();
@@ -118,14 +118,14 @@ namespace WpfApp1
             }
         }
 
-        private void FillAdditionalServicesDG()
+        private void FillAdditionalServicesDG(string searchWord)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM `additional_services`;", conn);
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM `additional_services` where `additional_service_name` LIKE '%{searchWord}%';;", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     cmd.ExecuteNonQuery();
                     DataTable dt = new DataTable();
@@ -140,14 +140,14 @@ namespace WpfApp1
             }
         }
 
-        private void FillMaterials()
+        private void FillMaterialsDG(string searchWord)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM `materials`;", conn);
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM `materials` where `material_name` LIKE '%{searchWord}%';;", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     cmd.ExecuteNonQuery();
                     DataTable dt = new DataTable();
@@ -160,6 +160,31 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Не удалось загрузить материалы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void searchTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            Action<string> targetName;
+            switch (textBox.Name)
+            {
+                case "searchServiceTextBox":
+                    targetName = FillServicesDG;
+                    break;
+                case "searchAddServiceTextBox":
+                    targetName = FillAdditionalServicesDG;
+                    break;
+                case "searchMaterialTextBox":
+                    targetName = FillMaterialsDG;
+                    break;
+                default:
+                    targetName = (string str) => { };
+                    break;
+            }
+            if (textBox.Text.Length > 3)
+                targetName(textBox.Text);
+            else if (textBox.Text.Length == 0)
+                targetName("");
         }
     }
 
