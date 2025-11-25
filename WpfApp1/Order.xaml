@@ -5,32 +5,55 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Заказ-наряд" Height="673.4" Width="1267.6" WindowStartupLocation="CenterScreen" WindowStyle="None">
+        Title="Заказ-наряд" Height="673.4" Width="1267.6" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <GroupBox Header="Заявка" HorizontalAlignment="Left" Height="263" Margin="40,83,0,0" VerticalAlignment="Top" Width="470" FontSize="16">
-            <StackPanel HorizontalAlignment="Left" Height="220" Margin="10,10,0,-35.6" VerticalAlignment="Top" Width="459">
-                <Label Content="Номер заявки: 12345" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="178"/>
-                <Label Content="Дата создания: 13.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="221"/>
-                <Label Content="Дата выполнения: 15.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="234"/>
-                <Label Content="Клиент: Иванов Иван Иванович" HorizontalAlignment="Left" Margin="0,0,-7.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="329"/>
-                <Label Content="Адрес монтирования: ул. Пушкина, д. X, кв. X" HorizontalAlignment="Left" Margin="0,0,-95.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="417"/>
-                <Label Content="Менеджер: Петров Пётр Петрович" HorizontalAlignment="Left" Margin="0,0,-138.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="460"/>
+        <GroupBox Header="Заявка" HorizontalAlignment="Left" Height="381" Margin="40,76,0,0" VerticalAlignment="Top" Width="373" FontSize="16">
+            <StackPanel HorizontalAlignment="Left" Height="344" Margin="10,10,-2.2,-1.2" VerticalAlignment="Top" Width="353">
                 <DockPanel>
-                    <Label Content="Статус" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="58"/>
-                    <ComboBox Width="218" Margin="10,0,0,0" HorizontalAlignment="Left" />
+                    <Label Content="Номер заявки:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="115"/>
+                    <Label x:Name="numberClaimLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Дата создания:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="122"/>
+                    <Label x:Name="creationDateLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Дата выполнения:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="144"/>
+                    <Label x:Name="executionDateLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Клиент:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="66"/>
+                    <Label x:Name="clientLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31"/>
+                </DockPanel>
+                <StackPanel HorizontalAlignment="Left">
+                    <Label Content="Адрес монтирования" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="171"/>
+                    <TextBox x:Name="mountAddressTextBox" Height="95" Width="259" AcceptsReturn="False" Margin="5,0,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+                <DockPanel>
+                    <Label Content="Тариф:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="59"/>
+                    <Label x:Name="tariffLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Менеджер:" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="92"/>
+                    <Label x:Name="managerLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Статус:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="60"/>
+                    <Label x:Name="statusLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31"/>
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <Label Content="Номер заказ-наряда: 543210" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="40,43,0,0"/>
-        <Label Content="Поиск услуги" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="540,33,0,0"/>
-        <DataGrid HorizontalAlignment="Left" Height="119" Margin="540,97,0,0" VerticalAlignment="Top" Width="314">
+        <Label Content="Номер заказ-наряда:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="163" Margin="40,43,0,0"/>
+        <Label x:Name="numberOrderLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="205,43,0,0"/>
+        <Label Content="Поиск услуги" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="429,33,0,0"/>
+        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" x:Name="servicesDG" HorizontalAlignment="Left" Height="119" Margin="429,97,0,0" VerticalAlignment="Top" Width="403">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Услуга"/>
-                <DataGridTextColumn Header="Технология"/>
-                <DataGridTextColumn Header="Стоимость"/>
+                <DataGridTextColumn Header="Услуга" Binding="{Binding service_name}" Width="252"/>
+                <DataGridTextColumn Header="Единицы измерения" Binding="{Binding units}" Width="60"/>
+                <DataGridTextColumn Header="Стоимость" Binding="{Binding service_cost}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="540,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="429,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
         <DataGrid HorizontalAlignment="Left" Height="119" Margin="891,97,0,0" VerticalAlignment="Top" Width="328">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Услуга"/>
@@ -39,23 +62,21 @@
             </DataGrid.Columns>
         </DataGrid>
         <Button Content="Закрытие наряда" HorizontalAlignment="Left" Margin="971,445,0,0" VerticalAlignment="Top" Width="248" Height="45" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
-        <Label Content="Стоимость наряда: XXXX руб." HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="225" Margin="738,539,0,0"/>
-        <DataGrid HorizontalAlignment="Left" Height="130" Margin="540,283,0,0" VerticalAlignment="Top" Width="314">
+        <Label Content="Стоимость наряда: XXXX руб." HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="225" Margin="739,472,0,0"/>
+        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" x:Name="additionalServicesDG" HorizontalAlignment="Left" Height="130" Margin="429,283,0,0" VerticalAlignment="Top" Width="403">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Услуга"/>
-                <DataGridTextColumn Header="Месячная плата"/>
-                <DataGridTextColumn Header="Стоимость"/>
-                <DataGridTextColumn Header="Описание"/>
+                <DataGridTextColumn Header="Услуга" Binding="{Binding additional_service_name}" Width="280"/>
+                <DataGridTextColumn Header="Стоимость" Binding="{Binding monthly_fee}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
-        <DataGrid HorizontalAlignment="Left" Height="130" Margin="40,472,0,0" VerticalAlignment="Top" Width="314">
+        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" x:Name="materialsDG" HorizontalAlignment="Left" Height="130" Margin="41,525,0,0" VerticalAlignment="Top" Width="388">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Материал"/>
-                <DataGridTextColumn Header="Единицы измерения"/>
-                <DataGridTextColumn Header="Стоимость"/>
+                <DataGridTextColumn Header="Материал" Binding="{Binding material_name}" Width="220"/>
+                <DataGridTextColumn Header="Единицы измерения" Binding="{Binding units}" Width="60"/>
+                <DataGridTextColumn Header="Стоимость" Binding="{Binding cost}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
-        <DataGrid HorizontalAlignment="Left" Height="130" Margin="391,468,0,0" VerticalAlignment="Top" Width="328">
+        <DataGrid HorizontalAlignment="Left" Height="130" Margin="478,521,0,0" VerticalAlignment="Top" Width="426">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Материал"/>
                 <DataGridTextColumn Header="Единицы измерения"/>
@@ -71,14 +92,14 @@
                 <DataGridTextColumn Header="Описание"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Label Content="Поиск доп. услуги" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="540,220,0,0"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="540,251,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
+        <Label Content="Поиск доп. услуги" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="429,220,0,0"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="429,251,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
         <Label Content="Доп. услуги наряда" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="891,243,0,0"/>
-        <Label Content="Поиск материала" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="40,409,0,0"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="40,440,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
-        <Label Content="Материалы наряда" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="391,432,0,0"/>
-        <Label Content="Стоимость скидки: XXXX руб." HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="225" Margin="738,503,0,0"/>
-        <CheckBox Content="Скидка пенсионерам" HorizontalAlignment="Left" Margin="738,474,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Label Content="Поиск материала" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="41,462,0,0"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="41,493,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256"/>
+        <Label Content="Материалы наряда" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="156" Margin="478,485,0,0"/>
+        <Label Content="Стоимость скидки: XXXX руб." HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="225" Margin="739,444,0,0"/>
+        <CheckBox Content="Скидка пенсионерам" HorizontalAlignment="Left" Margin="739,427,0,0" VerticalAlignment="Top" FontSize="16"/>
         <Button Content="К заявкам" HorizontalAlignment="Left" Margin="971,568,0,0" VerticalAlignment="Top" Width="248" Height="45" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
         <Button Content="Распечатать акт" HorizontalAlignment="Left" Margin="971,505,0,0" VerticalAlignment="Top" Width="248" Height="45" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
     </Grid>
