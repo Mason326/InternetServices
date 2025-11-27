@@ -99,7 +99,7 @@
         <Button Content="К заявкам" HorizontalAlignment="Left" Margin="959,531,0,0" VerticalAlignment="Top" Width="206" Height="38" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
         <Button Content="Распечатать акт" HorizontalAlignment="Left" Margin="959,485,0,0" VerticalAlignment="Top" Width="206" Height="37" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="841,128,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_1"/>
-        <Button Content="&lt;" HorizontalAlignment="Left" Margin="841,164,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}"/>
+        <Button Content="&lt;" HorizontalAlignment="Left" Margin="841,164,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_4"/>
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="841,322,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_2"/>
         <Button Content="&lt;" HorizontalAlignment="Left" Margin="841,358,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}"/>
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="439,545,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_3"/>

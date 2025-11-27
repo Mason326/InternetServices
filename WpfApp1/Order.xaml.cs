@@ -297,6 +297,33 @@ namespace WpfApp1
                 }
             }
         }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            if (orderServiceDG.SelectedItem != null)
+            {
+                var drv = orderServiceDG.SelectedItem as DataRowView;
+                var items = drv.Row.ItemArray;
+                if (servicesDictionary.ContainsKey(items[0].ToString()))
+                {
+                    (int, DataRowView) values;
+                    servicesDictionary.TryGetValue(items[0].ToString(), out values);
+                    int newCount = --values.Item1;
+                    if (newCount >= 1)
+                    {
+                        drv.Row.SetField<int>(1, newCount);
+                        drv.Row.AcceptChanges();
+                        servicesDictionary.Remove(items[0].ToString());
+                        servicesDictionary.Add(items[0].ToString(), (newCount, drv));
+                    }
+                    else
+                    {
+                        orderServiceDG.Items.Remove(drv);
+                        servicesDictionary.Remove(items[0].ToString());
+                    }
+                }
+            }
+        }
     }
 
 }
