@@ -84,8 +84,7 @@
         <Label Content="Услуги наряда" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="891,64,0,0"/>
         <DataGrid x:Name="orderAddServiceDG" SelectionMode="Single" HorizontalAlignment="Left" Height="130" Margin="891,283,0,0" VerticalAlignment="Top" Width="328">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Услуга" Binding="{Binding additional_service_name}" Width="240"/>
-                <DataGridTextColumn Header="Количество" Binding="{Binding count}" Width="75"/>
+                <DataGridTextColumn Header="Услуга" Binding="{Binding additional_service_name}"/>
             </DataGrid.Columns>
         </DataGrid>
         <Label Content="Поиск доп. услуги" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="429,220,0,0"/>
@@ -101,8 +100,8 @@
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="841,128,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_1"/>
         <Button Content="&lt;" HorizontalAlignment="Left" Margin="841,164,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_4"/>
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="841,322,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_2"/>
-        <Button Content="&lt;" HorizontalAlignment="Left" Margin="841,358,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}"/>
+        <Button Content="&lt;" HorizontalAlignment="Left" Margin="841,358,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_5"/>
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="439,545,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_3"/>
-        <Button Content="&lt;" HorizontalAlignment="Left" Margin="439,581,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}"/>
+        <Button Content="&lt;" HorizontalAlignment="Left" Margin="439,581,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_6"/>
     </Grid>
 </Window>

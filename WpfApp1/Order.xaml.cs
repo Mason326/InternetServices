@@ -25,7 +25,7 @@ namespace WpfApp1
         DataTable dtServices = new DataTable();
         Dictionary<string, (int, DataRowView)> servicesDictionary = new Dictionary<string, (int, DataRowView)>();
         DataTable dtAddServices = new DataTable();
-        Dictionary<string, (int, DataRowView)> addServicesDictionary = new Dictionary<string, (int, DataRowView)>();
+        Dictionary<string, DataRowView> addServicesDictionary = new Dictionary<string, DataRowView>();
         DataTable dtMaterials = new DataTable();
         Dictionary<string, (int, DataRowView)> materialsDictionary = new Dictionary<string, (int, DataRowView)>();
         public Order(int claimIdentifier)
@@ -35,7 +35,6 @@ namespace WpfApp1
             dtServices.Columns.Add("service_name", typeof(string));
             dtServices.Columns.Add("count", typeof(int));
             dtAddServices.Columns.Add("additional_service_name", typeof(string));
-            dtAddServices.Columns.Add("count", typeof(int));
             dtMaterials.Columns.Add("material_name", typeof(string));
             dtMaterials.Columns.Add("count", typeof(int));
         }
@@ -240,26 +239,15 @@ namespace WpfApp1
                 var items = drv.Row.ItemArray;
                 if (addServicesDictionary.ContainsKey(items[1].ToString()))
                 {
-                    (int, DataRowView) values;
-                    addServicesDictionary.TryGetValue(items[1].ToString(), out values);
-                    orderAddServiceDG.Items.Remove(values.Item2);
-                    DataRow dr = dtAddServices.NewRow();
-                    int newCount = ++values.Item1;
-                    dr.ItemArray = new object[] { items[1].ToString(), newCount };
-                    dtAddServices.Rows.Add(dr);
-                    DataRowView addedToOrderDg = dtAddServices.DefaultView[dtAddServices.Rows.IndexOf(dr)];
-                    addServicesDictionary.Remove(items[1].ToString());
-                    addServicesDictionary.Add(items[1].ToString(), (newCount, addedToOrderDg));
-                    orderAddServiceDG.Items.Add(addedToOrderDg);
-                    dtAddServices.Rows.Remove(values.Item2.Row);
+                    MessageBox.Show("Не удалось добавить услугу. Обнаружен дубликат", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else
                 {
                     DataRow dr = dtAddServices.NewRow();
-                    dr.ItemArray = new object[] { items[1].ToString(), 1 };
+                    dr.ItemArray = new object[] { items[1].ToString() };
                     dtAddServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtAddServices.DefaultView[dtAddServices.Rows.IndexOf(dr)];
-                    addServicesDictionary.Add(items[1].ToString(), (1, addedToOrderDg));
+                    addServicesDictionary.Add(items[1].ToString(), addedToOrderDg);
                     orderAddServiceDG.Items.Add(addedToOrderDg);
                 }
             }
@@ -320,6 +308,47 @@ namespace WpfApp1
                     {
                         orderServiceDG.Items.Remove(drv);
                         servicesDictionary.Remove(items[0].ToString());
+                    }
+                }
+            }
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            if (orderAddServiceDG.SelectedItem != null)
+            {
+                var drv = orderAddServiceDG.SelectedItem as DataRowView;
+                var items = drv.Row.ItemArray;
+                if (addServicesDictionary.ContainsKey(items[0].ToString()))
+                {
+                    orderAddServiceDG.Items.Remove(drv);
+                    addServicesDictionary.Remove(items[0].ToString());
+                }
+            }
+        }
+
+        private void Button_Click_6(object sender, RoutedEventArgs e)
+        {
+            if (orderMaterials.SelectedItem != null)
+            {
+                var drv = orderMaterials.SelectedItem as DataRowView;
+                var items = drv.Row.ItemArray;
+                if (materialsDictionary.ContainsKey(items[0].ToString()))
+                {
+                    (int, DataRowView) values;
+                    materialsDictionary.TryGetValue(items[0].ToString(), out values);
+                    int newCount = --values.Item1;
+                    if (newCount >= 1)
+                    {
+                        drv.Row.SetField<int>(1, newCount);
+                        drv.Row.AcceptChanges();
+                        materialsDictionary.Remove(items[0].ToString());
+                        materialsDictionary.Add(items[0].ToString(), (newCount, drv));
+                    }
+                    else
+                    {
+                        orderMaterials.Items.Remove(drv);
+                        materialsDictionary.Remove(items[0].ToString());
                     }
                 }
             }
