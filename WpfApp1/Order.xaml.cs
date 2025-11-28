@@ -32,6 +32,7 @@ namespace WpfApp1
         {
             InitializeComponent();
             claimId = claimIdentifier;
+            dtServices.Columns.Add("service_id", typeof(int));
             dtServices.Columns.Add("service_name", typeof(string));
             dtServices.Columns.Add("count", typeof(int));
             dtServices.Columns.Add("cost", typeof(double));
@@ -214,7 +215,7 @@ namespace WpfApp1
                     orderServiceDG.Items.Remove(values.Item2);
                     DataRow dr = dtServices.NewRow();
                     int newCount = ++values.Item1;
-                    dr.ItemArray = new object[] { items[1].ToString(), newCount, items[3] };
+                    dr.ItemArray = new object[] { items[0], items[1].ToString(), newCount, items[3] };
                     dtServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtServices.DefaultView[dtServices.Rows.IndexOf(dr)];
                     servicesDictionary.Remove(items[1].ToString());
@@ -225,7 +226,7 @@ namespace WpfApp1
                 else
                 {
                     DataRow dr = dtServices.NewRow();
-                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3] };
+                    dr.ItemArray = new object[] { items[0], items[1].ToString(), 1, items[3] };
                     dtServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtServices.DefaultView[dtServices.Rows.IndexOf(dr)];
                     servicesDictionary.Add(items[1].ToString(), (1, addedToOrderDg));
@@ -326,7 +327,10 @@ namespace WpfApp1
                 if (cost != 0)
                 {
                     cost -= Convert.ToDouble(items[2]);
-                    servicesTotalCostLabel.Content = cost;
+                    if(cost == 0)
+                        servicesTotalCostLabel.Content = "";
+                    else
+                        servicesTotalCostLabel.Content = cost;
                 }
             }
         }
@@ -346,7 +350,10 @@ namespace WpfApp1
                 if (cost != 0)
                 {
                     cost -= Convert.ToDouble(items[1]);
-                    addServicesTotalCostLabel.Content = cost;
+                    if (cost == 0)
+                        addServicesTotalCostLabel.Content = "";
+                    else
+                        addServicesTotalCostLabel.Content = cost;
                 }
             }
         }
@@ -379,7 +386,40 @@ namespace WpfApp1
                 if (cost != 0)
                 {
                     cost -= Convert.ToDouble(items[2]);
-                    materialsTotalCostLabel.Content = cost;
+                    if (cost == 0)
+                        materialsTotalCostLabel.Content = "";
+                    else
+                        materialsTotalCostLabel.Content = cost;
+                }
+            }
+        }
+
+        private void Button_Click_7(object sender, RoutedEventArgs e)
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                conn.Open();
+                MySqlTransaction transaction = conn.BeginTransaction();
+                string cmdText = "INSERT INTO `services_pack` VALUES ";
+                foreach (var el in servicesDictionary)
+                {
+                    DataRowView drv = el.Value.Item2;
+                    int serviceId = Convert.ToInt32(drv.Row.ItemArray[0]);
+                    cmdText += $"({serviceId}, {numberOrderLabel.Content}, {el.Value.Item1}),";
+                }
+                try
+                {
+                    cmdText = cmdText.TrimEnd(new char[] { ',' });
+                    MySqlCommand cmd = new MySqlCommand($"{cmdText};", conn);
+                    cmd.Transaction = transaction;
+                    cmd.ExecuteNonQuery();
+                    transaction.Commit();
+                    MessageBox.Show("Робит");
+                }
+                catch (Exception exc)
+                {
+                    transaction.Rollback();
+                    MessageBox.Show($"Не удалось загрузить материалы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
