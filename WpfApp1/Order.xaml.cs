@@ -24,8 +24,6 @@ namespace WpfApp1
         int claimId;
         DataTable dtServices = new DataTable();
         Dictionary<string, (int, DataRowView)> servicesDictionary = new Dictionary<string, (int, DataRowView)>();
-        DataTable dtAddServices = new DataTable();
-        Dictionary<string, DataRowView> addServicesDictionary = new Dictionary<string, DataRowView>();
         DataTable dtMaterials = new DataTable();
         Dictionary<string, (int, DataRowView)> materialsDictionary = new Dictionary<string, (int, DataRowView)>();
         public Order(int claimIdentifier)
@@ -36,8 +34,6 @@ namespace WpfApp1
             dtServices.Columns.Add("service_name", typeof(string));
             dtServices.Columns.Add("count", typeof(int));
             dtServices.Columns.Add("cost", typeof(double));
-            dtAddServices.Columns.Add("additional_service_name", typeof(string));
-            dtAddServices.Columns.Add("cost", typeof(double));
             dtMaterials.Columns.Add("material_name", typeof(string));
             dtMaterials.Columns.Add("count", typeof(int));
             dtMaterials.Columns.Add("cost", typeof(double));
@@ -89,7 +85,6 @@ namespace WpfApp1
             }
 
             FillServicesDG("");
-            FillAdditionalServicesDG("");
             FillMaterialsDG("");
         }
         private int GetOrderNumber()
@@ -133,28 +128,6 @@ namespace WpfApp1
             }
         }
 
-        private void FillAdditionalServicesDG(string searchWord)
-        {
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM `additional_services` where `additional_service_name` LIKE '%{searchWord}%';;", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    cmd.ExecuteNonQuery();
-                    DataTable dt = new DataTable();
-                    da.Fill(dt);
-                    additionalServicesDG.ItemsSource = dt.AsDataView();
-                }
-
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Не удалось загрузить дополнительные услуги\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private void FillMaterialsDG(string searchWord)
         {
             try
@@ -185,9 +158,6 @@ namespace WpfApp1
             {
                 case "searchServiceTextBox":
                     targetName = FillServicesDG;
-                    break;
-                case "searchAddServiceTextBox":
-                    targetName = FillAdditionalServicesDG;
                     break;
                 case "searchMaterialTextBox":
                     targetName = FillMaterialsDG;
@@ -238,30 +208,7 @@ namespace WpfApp1
             }
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-            if (additionalServicesDG.SelectedItem != null)
-            {
-                var drv = additionalServicesDG.SelectedItem as DataRowView;
-                var items = drv.Row.ItemArray;
-                if (addServicesDictionary.ContainsKey(items[1].ToString()))
-                {
-                    MessageBox.Show("Не удалось добавить услугу. Обнаружен дубликат", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-                else
-                {
-                    DataRow dr = dtAddServices.NewRow();
-                    dr.ItemArray = new object[] { items[1].ToString(), items[2] };
-                    dtAddServices.Rows.Add(dr);
-                    DataRowView addedToOrderDg = dtAddServices.DefaultView[dtAddServices.Rows.IndexOf(dr)];
-                    addServicesDictionary.Add(items[1].ToString(), addedToOrderDg);
-                    orderAddServiceDG.Items.Add(addedToOrderDg);
-                    double cost = addServicesTotalCostLabel.Content.ToString() != string.Empty ? Convert.ToDouble(addServicesTotalCostLabel.Content) : 0;
-                    cost += Convert.ToDouble(items[2]);
-                    addServicesTotalCostLabel.Content = cost;
-                }
-            }
-        }
+       
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
@@ -335,28 +282,7 @@ namespace WpfApp1
             }
         }
 
-        private void Button_Click_5(object sender, RoutedEventArgs e)
-        {
-            if (orderAddServiceDG.SelectedItem != null)
-            {
-                var drv = orderAddServiceDG.SelectedItem as DataRowView;
-                var items = drv.Row.ItemArray;
-                if (addServicesDictionary.ContainsKey(items[0].ToString()))
-                {
-                    orderAddServiceDG.Items.Remove(drv);
-                    addServicesDictionary.Remove(items[0].ToString());
-                }
-                double cost = addServicesTotalCostLabel.Content.ToString() != string.Empty ? Convert.ToDouble(addServicesTotalCostLabel.Content) : 0;
-                if (cost != 0)
-                {
-                    cost -= Convert.ToDouble(items[1]);
-                    if (cost == 0)
-                        addServicesTotalCostLabel.Content = "";
-                    else
-                        addServicesTotalCostLabel.Content = cost;
-                }
-            }
-        }
+        
 
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
@@ -414,12 +340,12 @@ namespace WpfApp1
                     cmd.Transaction = transaction;
                     cmd.ExecuteNonQuery();
                     transaction.Commit();
-                    MessageBox.Show("Робит");
+                    MessageBox.Show("Наряд успешно закрыт");
                 }
                 catch (Exception exc)
                 {
                     transaction.Rollback();
-                    MessageBox.Show($"Не удалось загрузить материалы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось закрыть наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

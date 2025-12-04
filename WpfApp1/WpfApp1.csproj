@@ -104,6 +104,9 @@
     </Compile>
     <Compile Include="FullNameSplitter.cs" />
     <Compile Include="MasterHolder.cs" />
+    <Compile Include="PickAdditionalServices.xaml.cs">
+      <DependentUpon>PickAdditionalServices.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services.xaml.cs">
       <DependentUpon>Services.xaml</DependentUpon>
     </Compile>
@@ -181,6 +184,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EmployeesViewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PickAdditionalServices.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
