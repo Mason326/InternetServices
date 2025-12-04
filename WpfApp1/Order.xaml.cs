@@ -23,20 +23,29 @@ namespace WpfApp1
     {
         int claimId;
         DataTable dtServices = new DataTable();
-        Dictionary<string, (int, DataRowView)> servicesDictionary = new Dictionary<string, (int, DataRowView)>();
+        Dictionary<string, DataRowView> servicesDictionary = new Dictionary<string, DataRowView>();
+        DataTable dtAddServices = new DataTable();
+        Dictionary<string, DataRowView> addServicesDictionary = new Dictionary<string, DataRowView>();
         DataTable dtMaterials = new DataTable();
-        Dictionary<string, (int, DataRowView)> materialsDictionary = new Dictionary<string, (int, DataRowView)>();
+        Dictionary<string, DataRowView> materialsDictionary = new Dictionary<string, DataRowView>();
         public Order(int claimIdentifier)
         {
             InitializeComponent();
             claimId = claimIdentifier;
-            dtServices.Columns.Add("service_id", typeof(int));
             dtServices.Columns.Add("service_name", typeof(string));
             dtServices.Columns.Add("count", typeof(int));
             dtServices.Columns.Add("cost", typeof(double));
+            dtServices.Columns.Add("service_id", typeof(int));
+            dtAddServices.Columns.Add("additional_service_name", typeof(string));
+            dtAddServices.Columns.Add("cost", typeof(double));
+            dtAddServices.Columns.Add("additional_service_id", typeof(int));
             dtMaterials.Columns.Add("material_name", typeof(string));
             dtMaterials.Columns.Add("count", typeof(int));
             dtMaterials.Columns.Add("cost", typeof(double));
+            dtMaterials.Columns.Add("material_id", typeof(int));
+            materialsTotalCostLabel.Content = 0;
+            servicesTotalCostLabel.Content = 0;
+            orderTotalCostLabel.Content = 0;
         }
 
 
@@ -180,35 +189,38 @@ namespace WpfApp1
                 var items = drv.Row.ItemArray;
                 if (servicesDictionary.ContainsKey(items[1].ToString()))
                 {
-                    (int, DataRowView) values;
+                    DataRowView values;
                     servicesDictionary.TryGetValue(items[1].ToString(), out values);
-                    orderServiceDG.Items.Remove(values.Item2);
+                    orderServiceDG.Items.Remove(values);
                     DataRow dr = dtServices.NewRow();
-                    int newCount = ++values.Item1;
-                    dr.ItemArray = new object[] { items[0], items[1].ToString(), newCount, items[3] };
+                    int newCount = Convert.ToInt32(values[1]);
+                    dr.ItemArray = new object[] { items[1].ToString(), ++newCount, items[3].ToString(), items[0] };
                     dtServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtServices.DefaultView[dtServices.Rows.IndexOf(dr)];
                     servicesDictionary.Remove(items[1].ToString());
-                    servicesDictionary.Add(items[1].ToString(), (newCount, addedToOrderDg));
+                    servicesDictionary.Add(items[1].ToString(), addedToOrderDg);
                     orderServiceDG.Items.Add(addedToOrderDg);
-                    dtServices.Rows.Remove(values.Item2.Row);
+                    dtServices.Rows.Remove(values.Row);
                 }
                 else
                 {
                     DataRow dr = dtServices.NewRow();
-                    dr.ItemArray = new object[] { items[0], items[1].ToString(), 1, items[3] };
+                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0] };
                     dtServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtServices.DefaultView[dtServices.Rows.IndexOf(dr)];
-                    servicesDictionary.Add(items[1].ToString(), (1, addedToOrderDg));
+                    servicesDictionary.Add(items[1].ToString(), addedToOrderDg);
                     orderServiceDG.Items.Add(addedToOrderDg);
                 }
-                double cost = servicesTotalCostLabel.Content.ToString() != string.Empty ? Convert.ToDouble(servicesTotalCostLabel.Content) : 0;
-                cost += Convert.ToDouble(items[3]);
-                servicesTotalCostLabel.Content = cost;
+
+                double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
+                servicesCost += Convert.ToDouble(items[3]);
+                servicesTotalCostLabel.Content = servicesCost;
+
+                double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
+
+                orderTotalCostLabel.Content = servicesCost + materialsCost;
             }
         }
-
-       
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
@@ -218,31 +230,35 @@ namespace WpfApp1
                 var items = drv.Row.ItemArray;
                 if (materialsDictionary.ContainsKey(items[1].ToString()))
                 {
-                    (int, DataRowView) values;
+                    DataRowView values;
                     materialsDictionary.TryGetValue(items[1].ToString(), out values);
-                    orderMaterials.Items.Remove(values.Item2);
+                    orderMaterials.Items.Remove(values);
                     DataRow dr = dtMaterials.NewRow();
-                    int newCount = ++values.Item1;
-                    dr.ItemArray = new object[] { items[1].ToString(), newCount, items[3] };
+                    int newCount = Convert.ToInt32(values[1]);
+                    dr.ItemArray = new object[] { items[1].ToString(), ++newCount, items[3], items[0] };
                     dtMaterials.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtMaterials.DefaultView[dtMaterials.Rows.IndexOf(dr)];
                     materialsDictionary.Remove(items[1].ToString());
-                    materialsDictionary.Add(items[1].ToString(), (newCount, addedToOrderDg));
+                    materialsDictionary.Add(items[1].ToString(), addedToOrderDg);
                     orderMaterials.Items.Add(addedToOrderDg);
-                    dtMaterials.Rows.Remove(values.Item2.Row);
+                    dtMaterials.Rows.Remove(values.Row);
                 }
                 else
                 {
                     DataRow dr = dtMaterials.NewRow();
-                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3] };
+                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0] };
                     dtMaterials.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtMaterials.DefaultView[dtMaterials.Rows.IndexOf(dr)];
-                    materialsDictionary.Add(items[1].ToString(), (1, addedToOrderDg));
+                    materialsDictionary.Add(items[1].ToString(), addedToOrderDg);
                     orderMaterials.Items.Add(addedToOrderDg);
                 }
-                double cost = materialsTotalCostLabel.Content.ToString() != string.Empty ? Convert.ToDouble(materialsTotalCostLabel.Content) : 0;
-                cost += Convert.ToDouble(items[3]);
-                materialsTotalCostLabel.Content = cost;
+                double materialCost = Convert.ToDouble(materialsTotalCostLabel.Content);
+                materialCost += Convert.ToDouble(items[3]);
+                materialsTotalCostLabel.Content = materialCost;
+
+                double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
+
+                orderTotalCostLabel.Content = servicesCost + materialCost;
             }
         }
 
@@ -254,15 +270,15 @@ namespace WpfApp1
                 var items = drv.Row.ItemArray;
                 if (servicesDictionary.ContainsKey(items[0].ToString()))
                 {
-                    (int, DataRowView) values;
+                    DataRowView values;
                     servicesDictionary.TryGetValue(items[0].ToString(), out values);
-                    int newCount = --values.Item1;
-                    if (newCount >= 1)
+                    int newCount = Convert.ToInt32(values[1]);
+                    if (--newCount >= 1)
                     {
                         drv.Row.SetField<int>(1, newCount);
                         drv.Row.AcceptChanges();
                         servicesDictionary.Remove(items[0].ToString());
-                        servicesDictionary.Add(items[0].ToString(), (newCount, drv));
+                        servicesDictionary.Add(items[0].ToString(), drv);
                     }
                     else
                     {
@@ -270,19 +286,18 @@ namespace WpfApp1
                         servicesDictionary.Remove(items[0].ToString());
                     }
                 }
-                double cost = servicesTotalCostLabel.Content.ToString() != string.Empty ? Convert.ToDouble(servicesTotalCostLabel.Content) : 0;
-                if (cost != 0)
+                double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
+
+                if (servicesCost != 0)
                 {
-                    cost -= Convert.ToDouble(items[2]);
-                    if(cost == 0)
-                        servicesTotalCostLabel.Content = "";
-                    else
-                        servicesTotalCostLabel.Content = cost;
+                    servicesCost -= Convert.ToDouble(items[2]);
+                    servicesTotalCostLabel.Content = servicesCost;
                 }
+                double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
+
+                orderTotalCostLabel.Content = servicesCost + materialsCost;
             }
         }
-
-        
 
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
@@ -292,15 +307,15 @@ namespace WpfApp1
                 var items = drv.Row.ItemArray;
                 if (materialsDictionary.ContainsKey(items[0].ToString()))
                 {
-                    (int, DataRowView) values;
+                    DataRowView values;
                     materialsDictionary.TryGetValue(items[0].ToString(), out values);
-                    int newCount = --values.Item1;
-                    if (newCount >= 1)
+                    int newCount = Convert.ToInt32(values.Row.ItemArray[1]);
+                    if (--newCount >= 1)
                     {
                         drv.Row.SetField<int>(1, newCount);
                         drv.Row.AcceptChanges();
                         materialsDictionary.Remove(items[0].ToString());
-                        materialsDictionary.Add(items[0].ToString(), (newCount, drv));
+                        materialsDictionary.Add(items[0].ToString(), drv);
                     }
                     else
                     {
@@ -308,15 +323,16 @@ namespace WpfApp1
                         materialsDictionary.Remove(items[0].ToString());
                     }
                 }
-                double cost = materialsTotalCostLabel.Content.ToString() != string.Empty ? Convert.ToDouble(materialsTotalCostLabel.Content) : 0;
-                if (cost != 0)
+                double materialCost = Convert.ToDouble(materialsTotalCostLabel.Content);
+                if (materialCost != 0)
                 {
-                    cost -= Convert.ToDouble(items[2]);
-                    if (cost == 0)
-                        materialsTotalCostLabel.Content = "";
-                    else
-                        materialsTotalCostLabel.Content = cost;
+                    materialCost -= Convert.ToDouble(items[2]);
+                    materialsTotalCostLabel.Content = materialCost;
                 }
+
+                double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
+
+                orderTotalCostLabel.Content = servicesCost + materialCost;
             }
         }
 
@@ -326,12 +342,13 @@ namespace WpfApp1
             {
                 conn.Open();
                 MySqlTransaction transaction = conn.BeginTransaction();
-                string cmdText = "INSERT INTO `services_pack` VALUES ";
+                string cmdText = $"INSERT INTO `order`(`idorder`, `orderDate`, `totalCost`, `connection_claim_id`) VALUE ({numberOrderLabel.Content}, {DateTime.Now.Date}, total_Cost_delai);";
+                cmdText += "INSERT INTO `services_pack` VALUES ";
                 foreach (var el in servicesDictionary)
                 {
-                    DataRowView drv = el.Value.Item2;
+                    DataRowView drv = el.Value;
                     int serviceId = Convert.ToInt32(drv.Row.ItemArray[0]);
-                    cmdText += $"({serviceId}, {numberOrderLabel.Content}, {el.Value.Item1}),";
+                    cmdText += $"({serviceId}, {numberOrderLabel.Content}, {el.Value[1]}),";
                 }
                 try
                 {
@@ -340,12 +357,12 @@ namespace WpfApp1
                     cmd.Transaction = transaction;
                     cmd.ExecuteNonQuery();
                     transaction.Commit();
-                    MessageBox.Show("Наряд успешно закрыт");
+                    MessageBox.Show("Робит");
                 }
                 catch (Exception exc)
                 {
                     transaction.Rollback();
-                    MessageBox.Show($"Не удалось закрыть наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось загрузить материалы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

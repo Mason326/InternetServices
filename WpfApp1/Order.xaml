@@ -61,7 +61,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <Button Content="Закрытие наряда" HorizontalAlignment="Left" Margin="981,436,0,0" VerticalAlignment="Top" Width="206" Height="38" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_7"/>
-        <Label Content="Стоимость наряда:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="225" Margin="602,508,0,0"/>
+        <Label Content="Стоимость наряда:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="149" Margin="602,508,0,0"/>
         <DataGrid SelectionMode="Single" IsReadOnly="True" AutoGenerateColumns="False" x:Name="materialsDG" HorizontalAlignment="Left" Height="130" Margin="426,274,0,0" VerticalAlignment="Top" Width="406">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Материал" Binding="{Binding material_name}" Width="220"/>
@@ -79,7 +79,7 @@
         <Label Content="Поиск материала" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="426,211,0,0"/>
         <TextBox x:Name="searchMaterialTextBox" HorizontalAlignment="Left" Height="23" Margin="426,242,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" KeyUp="searchTextBox_KeyUp"/>
         <Label Content="Материалы наряда" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="156" Margin="893,238,0,0"/>
-        <Label Content="Стоимость скидки:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="225" Margin="602,472,0,0"/>
+        <Label Content="Стоимость скидки:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="149" Margin="602,472,0,0"/>
         <CheckBox Content="Скидка пенсионерам" HorizontalAlignment="Left" Margin="602,445,0,0" VerticalAlignment="Top" FontSize="16"/>
         <Button Content="К заявкам" HorizontalAlignment="Left" Margin="981,532,0,0" VerticalAlignment="Top" Width="206" Height="38" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
         <Button Content="Распечатать акт" HorizontalAlignment="Left" Margin="981,486,0,0" VerticalAlignment="Top" Width="206" Height="37" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
@@ -91,5 +91,7 @@
         <Label Name="servicesTotalCostLabel" Content="" HorizontalAlignment="Left" Margin="1119,216,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
         <Label Content="Стоимость:" HorizontalAlignment="Left" Margin="1038,401,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
         <Label x:Name="materialsTotalCostLabel" Content="" HorizontalAlignment="Left" Margin="1124,401,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
+        <Label x:Name="discountAmountLabel" Content="" HorizontalAlignment="Left" Margin="753,473,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
+        <Label x:Name="orderTotalCostLabel" Content="" HorizontalAlignment="Left" Margin="753,509,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
     </Grid>
 </Window>
