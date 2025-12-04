@@ -342,13 +342,34 @@ namespace WpfApp1
             {
                 conn.Open();
                 MySqlTransaction transaction = conn.BeginTransaction();
-                string cmdText = $"INSERT INTO `order`(`idorder`, `orderDate`, `totalCost`, `connection_claim_id`) VALUE ({numberOrderLabel.Content}, {DateTime.Now.Date}, total_Cost_delai);";
-                cmdText += "INSERT INTO `services_pack` VALUES ";
+                if (servicesDictionary.Count < 1 && materialsDictionary.Count < 1)
+                {
+                    MessageBox.Show($"В заказ-наряде должны быть оказаны указаны выполненные услуги и затраченные материалы", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                string cmdText = $"INSERT INTO `order`(`idorder`, `orderDate`, `totalCost`, `connection_claim_id`) VALUE ({numberOrderLabel.Content}, '{DateTime.Now.Date.ToString("yyyy-MM-dd")}', {orderTotalCostLabel.Content}, {claimId});";
+                
+                if (servicesDictionary.Count > 0) 
+                { 
+                    cmdText += "INSERT INTO `services_pack` VALUES ";
+                }
                 foreach (var el in servicesDictionary)
                 {
                     DataRowView drv = el.Value;
-                    int serviceId = Convert.ToInt32(drv.Row.ItemArray[0]);
+                    int serviceId = Convert.ToInt32(drv.Row.ItemArray[3]);
                     cmdText += $"({serviceId}, {numberOrderLabel.Content}, {el.Value[1]}),";
+                }
+                if (materialsDictionary.Count > 0)
+                {
+                    cmdText = cmdText.Trim(new char[] { ',' });
+                    cmdText += ";";
+                    cmdText += "INSERT INTO `materials_pack` VALUES ";
+                }
+                foreach (var el in materialsDictionary)
+                {
+                    DataRowView drv = el.Value;
+                    int materialId = Convert.ToInt32(drv.Row.ItemArray[3]);
+                    cmdText += $"({materialId}, {numberOrderLabel.Content}, {el.Value[1]}),";
                 }
                 try
                 {
@@ -357,12 +378,12 @@ namespace WpfApp1
                     cmd.Transaction = transaction;
                     cmd.ExecuteNonQuery();
                     transaction.Commit();
-                    MessageBox.Show("Робит");
+                    MessageBox.Show($"Наряд успешно закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception exc)
                 {
                     transaction.Rollback();
-                    MessageBox.Show($"Не удалось загрузить материалы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось закрыть наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
