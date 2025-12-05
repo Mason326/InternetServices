@@ -24,8 +24,6 @@ namespace WpfApp1
         int claimId;
         DataTable dtServices = new DataTable();
         Dictionary<string, DataRowView> servicesDictionary = new Dictionary<string, DataRowView>();
-        DataTable dtAddServices = new DataTable();
-        Dictionary<string, DataRowView> addServicesDictionary = new Dictionary<string, DataRowView>();
         DataTable dtMaterials = new DataTable();
         Dictionary<string, DataRowView> materialsDictionary = new Dictionary<string, DataRowView>();
         public Order(int claimIdentifier)
@@ -36,9 +34,6 @@ namespace WpfApp1
             dtServices.Columns.Add("count", typeof(int));
             dtServices.Columns.Add("cost", typeof(double));
             dtServices.Columns.Add("service_id", typeof(int));
-            dtAddServices.Columns.Add("additional_service_name", typeof(string));
-            dtAddServices.Columns.Add("cost", typeof(double));
-            dtAddServices.Columns.Add("additional_service_id", typeof(int));
             dtMaterials.Columns.Add("material_name", typeof(string));
             dtMaterials.Columns.Add("count", typeof(int));
             dtMaterials.Columns.Add("cost", typeof(double));
@@ -46,6 +41,7 @@ namespace WpfApp1
             materialsTotalCostLabel.Content = 0;
             servicesTotalCostLabel.Content = 0;
             orderTotalCostLabel.Content = 0;
+            discountAmountLabel.Content = 0;
         }
 
 
@@ -219,6 +215,7 @@ namespace WpfApp1
                 double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
 
                 orderTotalCostLabel.Content = servicesCost + materialsCost;
+                RefreshDiscountLabel();
             }
         }
 
@@ -259,6 +256,7 @@ namespace WpfApp1
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
 
                 orderTotalCostLabel.Content = servicesCost + materialCost;
+                RefreshDiscountLabel();
             }
         }
 
@@ -296,6 +294,7 @@ namespace WpfApp1
                 double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
 
                 orderTotalCostLabel.Content = servicesCost + materialsCost;
+                RefreshDiscountLabel();
             }
         }
 
@@ -333,6 +332,7 @@ namespace WpfApp1
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
 
                 orderTotalCostLabel.Content = servicesCost + materialCost;
+                RefreshDiscountLabel();
             }
         }
 
@@ -374,6 +374,8 @@ namespace WpfApp1
                 try
                 {
                     cmdText = cmdText.TrimEnd(new char[] { ',' });
+                    cmdText += ";";
+                    cmdText += $"Update `connection_claim` SET `claim_status_id` = (Select `idclaim_status` from `claim_status` where `status` = 'Закрыта'), `order_id` = {numberOrderLabel.Content} where `id_claim` = {claimId}";
                     MySqlCommand cmd = new MySqlCommand($"{cmdText};", conn);
                     cmd.Transaction = transaction;
                     cmd.ExecuteNonQuery();
@@ -386,6 +388,20 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось закрыть наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+        }
+
+        private void discountCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshDiscountLabel();
+        }
+
+        private void RefreshDiscountLabel()
+        {
+            double currentOrderCost = Convert.ToDouble(orderTotalCostLabel.Content);
+            bool checkedFlag = discountCheckBox.IsChecked.HasValue && discountCheckBox.IsChecked.Value;
+            double discount = currentOrderCost * 0.15;
+            discountAmountLabel.Content = checkedFlag ? Math.Round(discount, 3) : 0;
+            orderTotalCostLabel.Content = checkedFlag ? Math.Round(currentOrderCost - discount, 3) : Math.Round(Convert.ToDouble(servicesTotalCostLabel.Content) + Convert.ToDouble(materialsTotalCostLabel.Content), 3);
         }
     }
 

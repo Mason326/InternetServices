@@ -28,6 +28,7 @@ namespace WpfApp1
             InitializeComponent();
             dtAddServices.Columns.Add("additional_service_name", typeof(string));
             dtAddServices.Columns.Add("cost", typeof(double));
+            dtAddServices.Columns.Add("additional_service_id", typeof(int));
         }
 
         private void Button_Click_5(object sender, RoutedEventArgs e)
