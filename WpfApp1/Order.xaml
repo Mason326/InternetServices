@@ -82,7 +82,7 @@
         <Label Content="Стоимость скидки:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="149" Margin="602,472,0,0"/>
         <CheckBox x:Name="discountCheckBox" Content="Скидка пенсионерам" HorizontalAlignment="Left" Margin="602,445,0,0" VerticalAlignment="Top" FontSize="16" Click="discountCheckBox_Click"/>
         <Button Content="К заявкам" HorizontalAlignment="Left" Margin="981,532,0,0" VerticalAlignment="Top" Width="206" Height="38" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
-        <Button Content="Распечатать акт" HorizontalAlignment="Left" Margin="981,486,0,0" VerticalAlignment="Top" Width="206" Height="37" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <Button Content="Распечатать акт" HorizontalAlignment="Left" Margin="981,486,0,0" VerticalAlignment="Top" Width="206" Height="37" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_2"/>
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="841,128,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_1"/>
         <Button Content="&lt;" HorizontalAlignment="Left" Margin="841,164,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_4"/>
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="839,310,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_3"/>

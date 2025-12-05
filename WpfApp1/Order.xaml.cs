@@ -12,7 +12,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Word = Microsoft.Office.Interop.Word;
 using MySql.Data.MySqlClient;
+using System.IO;
 
 namespace WpfApp1
 {
@@ -34,10 +36,12 @@ namespace WpfApp1
             dtServices.Columns.Add("count", typeof(int));
             dtServices.Columns.Add("cost", typeof(double));
             dtServices.Columns.Add("service_id", typeof(int));
+            dtServices.Columns.Add("units", typeof(string));
             dtMaterials.Columns.Add("material_name", typeof(string));
             dtMaterials.Columns.Add("count", typeof(int));
             dtMaterials.Columns.Add("cost", typeof(double));
             dtMaterials.Columns.Add("material_id", typeof(int));
+            dtMaterials.Columns.Add("units", typeof(string));
             materialsTotalCostLabel.Content = 0;
             servicesTotalCostLabel.Content = 0;
             orderTotalCostLabel.Content = 0;
@@ -190,7 +194,7 @@ namespace WpfApp1
                     orderServiceDG.Items.Remove(values);
                     DataRow dr = dtServices.NewRow();
                     int newCount = Convert.ToInt32(values[1]);
-                    dr.ItemArray = new object[] { items[1].ToString(), ++newCount, items[3].ToString(), items[0] };
+                    dr.ItemArray = new object[] { items[1].ToString(), ++newCount, items[3].ToString(), items[0], items[2].ToString() };
                     dtServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtServices.DefaultView[dtServices.Rows.IndexOf(dr)];
                     servicesDictionary.Remove(items[1].ToString());
@@ -201,7 +205,7 @@ namespace WpfApp1
                 else
                 {
                     DataRow dr = dtServices.NewRow();
-                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0] };
+                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0], items[2].ToString() };
                     dtServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtServices.DefaultView[dtServices.Rows.IndexOf(dr)];
                     servicesDictionary.Add(items[1].ToString(), addedToOrderDg);
@@ -232,7 +236,7 @@ namespace WpfApp1
                     orderMaterials.Items.Remove(values);
                     DataRow dr = dtMaterials.NewRow();
                     int newCount = Convert.ToInt32(values[1]);
-                    dr.ItemArray = new object[] { items[1].ToString(), ++newCount, items[3], items[0] };
+                    dr.ItemArray = new object[] { items[1].ToString(), ++newCount, items[3], items[0], items[2].ToString() };
                     dtMaterials.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtMaterials.DefaultView[dtMaterials.Rows.IndexOf(dr)];
                     materialsDictionary.Remove(items[1].ToString());
@@ -243,7 +247,7 @@ namespace WpfApp1
                 else
                 {
                     DataRow dr = dtMaterials.NewRow();
-                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0] };
+                    dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0], items[2].ToString() };
                     dtMaterials.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtMaterials.DefaultView[dtMaterials.Rows.IndexOf(dr)];
                     materialsDictionary.Add(items[1].ToString(), addedToOrderDg);
@@ -403,6 +407,101 @@ namespace WpfApp1
             discountAmountLabel.Content = checkedFlag ? Math.Round(discount, 3) : 0;
             orderTotalCostLabel.Content = checkedFlag ? Math.Round(currentOrderCost - discount, 3) : Math.Round(Convert.ToDouble(servicesTotalCostLabel.Content) + Convert.ToDouble(materialsTotalCostLabel.Content), 3);
         }
-    }
 
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            string fileName = Directory.GetCurrentDirectory();
+            if (fileName.Contains("bin\\"))
+            {
+                fileName = string.Join("\\", fileName.Split('\\').TakeWhile(el => el != "bin"));
+            }
+            fileName += "\\Resources\\Templates\\ActTemplate.doc";
+            Word.Application wordApp = new Word.Application();
+            wordApp.Visible = false;
+
+            Word.Document doc = wordApp.Documents.Open(fileName, ReadOnly: false);
+            try
+            {
+                Word.Range range = doc.Content;
+
+                // Ищем маркер {table}
+                if (range.Find.Execute("{table}"))
+                {
+                    // Удаляем маркер
+                    range.Text = "";
+                    // Создаем новую таблицу (например, 3 строки, 3 столбца)
+                    int rowCount = 10;
+                    if (servicesDictionary.Count > 0)
+                        rowCount = servicesDictionary.Count;
+                    Word.Table tbl = doc.Tables.Add(range, rowCount + 1, 4);
+
+                    tbl.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                    tbl.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                    for (int i = 1; i < 5; i++)
+                    {
+                        tbl.Rows[1].Cells[i].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        tbl.Rows[1].Cells[i].Range.Bold = 3;
+                        tbl.Rows[1].Cells[i].Range.Font.Name = "Arial";
+                        tbl.Rows[1].Cells[i].Range.Font.Size = 8;
+                        tbl.Rows[1].Cells[i].Range.ParagraphFormat.LeftIndent = 0;
+                        tbl.Rows[1].Cells[i].Range.ParagraphFormat.RightIndent = 0;
+                    }
+                    tbl.Rows[1].Cells[1].Range.Text = "Наименование услуги";
+                    tbl.Rows[1].Cells[2].Range.Text = "Единица измерения";
+                    tbl.Rows[1].Cells[3].Range.Text = "Количество";
+                    tbl.Rows[1].Cells[4].Range.Text = "Сумма (руб.)";
+                    int contentCounter = 2;
+                    foreach (var el in servicesDictionary)
+                    {
+                        double serviceCost = Convert.ToDouble(el.Value.Row.ItemArray[2]);
+                        double serviceQuantity = Convert.ToInt32(el.Value.Row.ItemArray[1]);
+                        tbl.Rows[contentCounter].Cells[1].Range.Text = el.Value.Row.ItemArray[0].ToString();
+                        tbl.Rows[contentCounter].Cells[2].Range.Text = el.Value.Row.ItemArray[4].ToString();
+                        tbl.Rows[contentCounter].Cells[3].Range.Text = el.Value.Row.ItemArray[1].ToString();
+                        tbl.Rows[contentCounter].Cells[4].Range.Text = Math.Round(serviceCost * serviceQuantity, 2).ToString("f2");
+                        for (int i = 1; i < 5; i++)
+                        {
+                            tbl.Rows[contentCounter].Cells[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+                            tbl.Rows[contentCounter].Cells[2].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                            tbl.Rows[contentCounter].Cells[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                            tbl.Rows[contentCounter].Cells[4].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                            tbl.Rows[contentCounter].Cells[i].Range.Font.Name = "Segoe UI";
+                            tbl.Rows[contentCounter].Cells[i].Range.Font.Size = 8;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.LeftIndent = 0;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.RightIndent = 0;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.LineSpacingRule = Word.WdLineSpacing.wdLineSpaceSingle;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.SpaceAfter = 2f;
+                        }
+                        contentCounter++;
+                    }
+                    //tbl.Rows[].Cells[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    var tblOverallRow = tbl.Rows.Add();
+                    tblOverallRow.Range.Shading.BackgroundPatternColor = Word.WdColor.wdColorGray10;
+                    tblOverallRow.Cells[1].Range.Text = "Итого оказано услуг";
+                    tblOverallRow.Cells[1].Range.Bold = 3;
+                    tblOverallRow.Cells[1].Range.Font.Name = "Arial";
+                    tblOverallRow.Cells[1].Range.Font.Size = 8;
+                    tblOverallRow.Cells[1].Range.ParagraphFormat.LeftIndent = 0;
+                    tblOverallRow.Cells[1].Range.ParagraphFormat.RightIndent = 0;
+
+                    tblOverallRow.Cells[4].Range.Text = $"{Convert.ToDouble(orderTotalCostLabel.Content).ToString("f2")}";
+                    tblOverallRow.Cells[4].Range.Bold = 3;
+                    tblOverallRow.Cells[4].Range.Font.Name = "Arial";
+                    tblOverallRow.Cells[4].Range.Font.Size = 8;
+                    tblOverallRow.Cells[4].Range.ParagraphFormat.LeftIndent = 0;
+                    tblOverallRow.Cells[4].Range.ParagraphFormat.RightIndent = 0;
+                }
+            }
+            finally
+            {
+                // в конце делаем документ видимым
+                wordApp.Visible = true;
+            }
+        }
+        private void ReplaceWord(string src, string dest, Word.Document doc)
+        {
+            Word.Range range = doc.Content;
+            range.Find.Execute(FindText: src, ReplaceWith: dest);
+        }
+    }
 }

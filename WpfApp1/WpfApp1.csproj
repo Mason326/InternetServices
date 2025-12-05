@@ -274,6 +274,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Resources\Templates\ActTemplate.doc" />
     <None Include="Resources\Templates\ContractTemplate.doc" />
     <Resource Include="Resources\Images\InetArt.webp" />
     <None Include="Properties\Settings.settings">
