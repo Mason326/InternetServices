@@ -133,6 +133,7 @@ namespace WpfApp1
                         MySqlCommand cmd = new MySqlCommand($"Insert into `contract`(idcontract, contract_date, connection_claim_id, contract_status_id) Value ({contractNumberLabel.Content}, '{DateTime.Parse(contractDateLabel.Content.ToString()).ToString("yyyy-MM-dd")}', {claimNumberLabel.Content}, (SELECT idcontract_status FROM contract_status where `status` = 'Заключен'));", conn);
                         cmd.ExecuteNonQuery();
                         MessageBox.Show($"Договор успешно оформлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        this.Close();
                     }
                     catch (Exception exc)
                     {

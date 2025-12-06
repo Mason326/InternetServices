@@ -27,6 +27,7 @@ namespace WpfApp1
         Action<object[]> ReReleaseClaim;
         object[] fieldValuesOfARecord;
         bool isAccounting = true;
+        bool isExpired;
         bool isEdit;
         public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action RefreshDG)
         {
@@ -42,6 +43,7 @@ namespace WpfApp1
             formAContractButton.Visibility = Visibility.Collapsed;
             isEdit = isEditStatus;
             Refresh = RefreshDG;
+            isExpired = Convert.ToBoolean(selectedItems[10]);
             fieldValuesOfARecord = selectedItems;
             claimId = Convert.ToInt32(selectedItems[0]);
         }
@@ -86,8 +88,12 @@ namespace WpfApp1
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';";
                         if (currStatus != "Входящая")
                         {
-                            if (currStatus == "Отменена" && !isAccounting)
-                                rereleaseClaimButton.Visibility = Visibility.Visible;
+                            if (currStatus == "Отменена")
+                            {
+                                formAContractButton.Visibility = Visibility.Collapsed;
+                                if (!isAccounting)
+                                    rereleaseClaimButton.Visibility = Visibility.Visible;
+                            }
                             else
                                 rereleaseClaimButton.Visibility = Visibility.Collapsed;
                             statusComboBox.ItemsSource = new string[] { currStatus };
@@ -95,20 +101,50 @@ namespace WpfApp1
                             statusComboBox.IsEnabled = false;
                             saveChangesButton.IsEnabled = false;
                         }
+                        else
+                        {
+                            if(isExpired) 
+                                formAContractButton.Visibility = Visibility.Collapsed;
+                            saveChangesButton.Visibility = Visibility.Visible;
+                        }
                     }
                     else if (AccountHolder.UserRole == "Мастер")
                     {
                         formAContractButton.Visibility = Visibility.Collapsed;
-                        statusQuery = "SELECT `status` FROM claim_status where `status` != 'Входящая';";
                         saveChangesButton.Visibility = Visibility.Collapsed;
-                        statusComboBox.IsEnabled = true;
+                        switch (currStatus)
+                        {
+                            case "Входящая":
+                                statusQuery = "SELECT `status` FROM claim_status where `status` != 'Отменена' AND `status` != 'Закрыта';";
+                                if (isExpired)
+                                    statusComboBox.IsEnabled = false;
+                                else
+                                { 
+                                    statusComboBox.IsEnabled = true;
+                                    saveChangesButton.Visibility = Visibility.Visible;
+                                }
+                                break;
+                            case "В работе":
+                                statusQuery = "SELECT `status` FROM claim_status where `status` != 'Входящая' AND `status` != 'Закрыта';";
+                                statusComboBox.IsEnabled = true;
+                                saveChangesButton.Visibility = Visibility.Visible;
+                                break;
+                            case "Отменена":
+                                statusQuery = "SELECT `status` FROM claim_status where `status` = 'Отменена';";
+                                statusComboBox.IsEnabled = false;
+                                break;
+                            case "Закрыта":
+                                statusQuery = "SELECT `status` FROM claim_status where `status` = 'Закрыта';";
+                                statusComboBox.IsEnabled = false;
+                                break;
+                        }
                     }
                     else if (AccountHolder.UserRole == "Директор")
                     {
                         saveChangesButton.Visibility = Visibility.Collapsed;
                         statusComboBox.IsEnabled = false;
                     }
-                    if (!(currStatus == "В работе" || currStatus == "Закрыта"))
+                    if (!(currStatus == "В работе" || currStatus == "Закрыта") || AccountHolder.UserRole == "Мастер")
                     { 
                         conn.Open();
                         MySqlCommand cmd = new MySqlCommand(statusQuery, conn);
