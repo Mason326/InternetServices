@@ -29,7 +29,8 @@ namespace WpfApp1
         Dictionary<string, DataRowView> servicesDictionary = new Dictionary<string, DataRowView>();
         DataTable dtMaterials = new DataTable();
         Dictionary<string, DataRowView> materialsDictionary = new Dictionary<string, DataRowView>();
-        public Order(int claimIdentifier)
+        Action RefreshDG;
+        public Order(int claimIdentifier, Action refreshDG)
         {
             InitializeComponent();
             claimId = claimIdentifier;
@@ -48,6 +49,7 @@ namespace WpfApp1
             orderTotalCostLabel.Content = 0;
             discountAmountLabel.Content = 0;
             printOrderButton.IsEnabled = false;
+            RefreshDG += refreshDG;
         }
 
 
@@ -347,15 +349,18 @@ namespace WpfApp1
 
         private void Button_Click_7(object sender, RoutedEventArgs e)
         {
+            if (servicesDictionary.Count < 1)
+            {
+                MessageBox.Show($"В заказ-наряде должны быть оказаны указаны выполненные услуги", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            MessageBoxResult res = MessageBox.Show("Вы уверены, что хотите закрыть наряд?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes)
+                return;
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
                 MySqlTransaction transaction = conn.BeginTransaction();
-                if (servicesDictionary.Count < 1 && materialsDictionary.Count < 1)
-                {
-                    MessageBox.Show($"В заказ-наряде должны быть оказаны указаны выполненные услуги и затраченные материалы", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
                 string cmdText = $"INSERT INTO `order`(`idorder`, `orderDate`, `totalCost`, `connection_claim_id`) VALUE ({numberOrderLabel.Content}, '{DateTime.Now.Date.ToString("yyyy-MM-dd")}', {orderTotalCostLabel.Content}, {claimId});";
                 
                 if (servicesDictionary.Count > 0) 
@@ -390,6 +395,8 @@ namespace WpfApp1
                     cmd.ExecuteNonQuery();
                     transaction.Commit();
                     MessageBox.Show($"Наряд успешно закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    RefreshDG();
+                    this.Close();
                 }
                 catch (Exception exc)
                 {

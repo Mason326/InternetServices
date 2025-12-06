@@ -72,7 +72,7 @@ namespace WpfApp1
             {
                 var drv = claimsDG.SelectedItem as DataRowView;
                 this.Hide();
-                var win = new Order(Convert.ToInt32(drv.Row.ItemArray[0]));
+                var win = new Order(Convert.ToInt32(drv.Row.ItemArray[0]), RefreshDatagrid);
                 win.ShowDialog();
                 this.ShowDialog();
             }    
