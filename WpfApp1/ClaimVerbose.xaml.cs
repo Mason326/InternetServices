@@ -88,14 +88,24 @@ namespace WpfApp1
                         statusQuery = "SELECT `status` FROM claim_status where `status` != 'В работе' && `status` != 'Закрыта';";
                         if (currStatus != "Входящая")
                         {
-                            if (currStatus == "Отменена" && !isAccounting)
-                                rereleaseClaimButton.Visibility = Visibility.Visible;
+                            if (currStatus == "Отменена")
+                            {
+                                formAContractButton.Visibility = Visibility.Collapsed;
+                                if (!isAccounting)
+                                    rereleaseClaimButton.Visibility = Visibility.Visible;
+                            }
                             else
                                 rereleaseClaimButton.Visibility = Visibility.Collapsed;
                             statusComboBox.ItemsSource = new string[] { currStatus };
                             statusComboBox.SelectedItem = currStatus;
                             statusComboBox.IsEnabled = false;
                             saveChangesButton.IsEnabled = false;
+                        }
+                        else
+                        {
+                            if(isExpired) 
+                                formAContractButton.Visibility = Visibility.Collapsed;
+                            saveChangesButton.Visibility = Visibility.Visible;
                         }
                     }
                     else if (AccountHolder.UserRole == "Мастер")
