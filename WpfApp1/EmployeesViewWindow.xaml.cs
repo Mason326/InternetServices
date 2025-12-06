@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,11 +34,30 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($@"SELECT * FROM employees where roles_id = (select idroles from `roles` where role_name = 'Мастер');", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    cmd.ExecuteNonQuery();
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT idemployees, full_name, login, password, roles_id, phoneNumber, photo FROM employees where roles_id = (select idroles from `roles` where role_name = 'Мастер');", conn);
                     DataTable dt = new DataTable();
-                    da.Fill(dt);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        DataColumn[] columns = new DataColumn[dr.FieldCount];
+                        for (int i = 0; i < columns.Length; i++)
+                        {
+                            columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
+                        }
+
+                        dt.Columns.AddRange(columns);
+                        BitmapImage image = new BitmapImage();
+                        Type type = image.GetType();
+                        dt.Columns.Add("UserPhoto", type);
+                        object[] record = new object[dr.FieldCount + 1];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(record);
+                            byte[] imageBytes = record[6] as byte[];
+                            record[7] = LoadImage(imageBytes);
+                            dt.LoadDataRow(record, true);
+                        }
+                    }
+
                     employeesDG.ItemsSource = dt.AsDataView();
                 }
             }
@@ -66,6 +86,24 @@ namespace WpfApp1
         private void employeesDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             inClaimButton.IsEnabled = true;
+        }
+
+        private static BitmapImage LoadImage(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length == 0) return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/user.png"));
+            var image = new BitmapImage();
+            using (var mem = new MemoryStream(imageData))
+            {
+                mem.Position = 0;
+                image.BeginInit();
+                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = null;
+                image.StreamSource = mem;
+                image.EndInit();
+            }
+            image.Freeze();
+            return image;
         }
     }
 }

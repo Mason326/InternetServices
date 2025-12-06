@@ -13,7 +13,13 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ФИО" Binding="{Binding full_name}" Width="200" />
                 <DataGridTextColumn Header="Номер Телефона" Binding="{Binding phoneNumber}" Width="150"/>
-                <DataGridTextColumn Header="Фото" Binding="{Binding photo}" Width="150"/>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding UserPhoto}" Width="100" Height="100" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
 
