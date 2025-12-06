@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Word = Microsoft.Office.Interop.Word;
 using MySql.Data.MySqlClient;
 using System.IO;
+using System.Reflection;
 
 namespace WpfApp1
 {
@@ -426,8 +427,32 @@ namespace WpfApp1
 
             try
             {
-                Word.Document doc = wordApp.Documents.Open(fileName, ReadOnly: false);
+                Word.Document doc = wordApp.Documents.Add();
                 Word.Range range = doc.Content;
+                Word.PageSetup pageSetup = doc.PageSetup;
+
+                pageSetup.LeftMargin = wordApp.CentimetersToPoints(0.75f);
+                pageSetup.RightMargin = wordApp.CentimetersToPoints(0.75f);
+                pageSetup.TopMargin = wordApp.CentimetersToPoints(1.5f);
+                pageSetup.BottomMargin = wordApp.CentimetersToPoints(2.68f);
+
+                pageSetup.PaperSize = Word.WdPaperSize.wdPaperA4;
+                pageSetup.Orientation = Word.WdOrientation.wdOrientPortrait;
+
+                range.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+                if (range.End > 1)
+                    range.MoveEnd(Word.WdUnits.wdCharacter, -1);
+
+
+                range.InsertFile(
+                    FileName: fileName,
+                    Link: false,
+                    Range: Missing.Value,
+                    ConfirmConversions: false
+                );
+
+                doc.Fields.Update();
 
                 ReplaceWord("{orderNumber}", numberOrderLabel.Content.ToString(), doc);
                 ReplaceWord("{orderDate}", (DateTime.Parse(executionDateLabel.Content.ToString())).ToString("dd.MM.yyyy"), doc);
@@ -575,9 +600,12 @@ namespace WpfApp1
                     ReplaceWord("{totalMaterialsCost}", "", doc);
                 }
             }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось подготовить к печати заказ-наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             finally
             {
-                // в конце делаем документ видимым
                 wordApp.Visible = true;
             }
 
