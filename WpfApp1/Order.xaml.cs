@@ -361,7 +361,7 @@ namespace WpfApp1
             {
                 conn.Open();
                 MySqlTransaction transaction = conn.BeginTransaction();
-                string cmdText = $"INSERT INTO `order`(`idorder`, `orderDate`, `totalCost`, `connection_claim_id`) VALUE ({numberOrderLabel.Content}, '{DateTime.Now.Date.ToString("yyyy-MM-dd")}', {orderTotalCostLabel.Content}, {claimId});";
+                string cmdText = $"INSERT INTO `order`(`idorder`, `orderDate`, `totalCost`, `connection_claim_id`) VALUE ({numberOrderLabel.Content}, '{DateTime.Now.Date.ToString("yyyy-MM-dd")}', {orderTotalCostLabel.Content.ToString().Replace(',', '.')}, {claimId});";
                 
                 if (servicesDictionary.Count > 0) 
                 { 
