@@ -47,6 +47,7 @@ namespace WpfApp1
             servicesTotalCostLabel.Content = 0;
             orderTotalCostLabel.Content = 0;
             discountAmountLabel.Content = 0;
+            printOrderButton.IsEnabled = false;
         }
 
 
@@ -220,6 +221,7 @@ namespace WpfApp1
                 double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
 
                 orderTotalCostLabel.Content = servicesCost + materialsCost;
+                printOrderButton.IsEnabled = true;
                 RefreshDiscountLabel();
             }
         }
@@ -299,6 +301,8 @@ namespace WpfApp1
                 double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
 
                 orderTotalCostLabel.Content = servicesCost + materialsCost;
+                if(servicesDictionary.Count < 1)
+                    printOrderButton.IsEnabled = false;
                 RefreshDiscountLabel();
             }
         }
