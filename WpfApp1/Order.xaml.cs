@@ -410,6 +410,11 @@ namespace WpfApp1
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            if (servicesDictionary.Count < 1)
+            {
+                MessageBox.Show("В наряде должны быть выбраны выполненные услуги", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             string fileName = Directory.GetCurrentDirectory();
             if (fileName.Contains("bin\\"))
             {
@@ -419,20 +424,30 @@ namespace WpfApp1
             Word.Application wordApp = new Word.Application();
             wordApp.Visible = false;
 
-            Word.Document doc = wordApp.Documents.Open(fileName, ReadOnly: false);
             try
             {
+                Word.Document doc = wordApp.Documents.Open(fileName, ReadOnly: false);
                 Word.Range range = doc.Content;
 
-                // Ищем маркер {table}
-                if (range.Find.Execute("{table}"))
+                ReplaceWord("{orderNumber}", numberOrderLabel.Content.ToString(), doc);
+                ReplaceWord("{orderDate}", (DateTime.Parse(executionDateLabel.Content.ToString())).ToString("dd.MM.yyyy"), doc);
+                ReplaceWord("{companyName}", Properties.Settings.Default.companyName, doc);
+                ReplaceWord("{companyDescription}", Properties.Settings.Default.companyDescription, doc);
+                ReplaceWord("{clientName}", clientLabel.Content.ToString(), doc);
+                string address = string.Join(", ", mountAddressTextBox.Text.Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+                ReplaceWord("{mountAddress}", address, doc);
+                ReplaceWord("{totalServicesCost}", Convert.ToDouble(servicesTotalCostLabel.Content).ToString("f2"), doc);
+                ReplaceWord("{companyName}", Properties.Settings.Default.companyName, doc);
+                if (discountCheckBox.IsChecked.HasValue && discountCheckBox.IsChecked.Value)
+                    ReplaceWord("{discountAmount}", $"Размер скидки: {discountAmountLabel.Content} руб.", doc);
+                else
+                    ReplaceWord("{discountAmount}", "", doc);
+                ReplaceWord("{totalOrderCost}", orderTotalCostLabel.Content.ToString(), doc);
+
+                if (range.Find.Execute("{tableServices}"))
                 {
-                    // Удаляем маркер
                     range.Text = "";
-                    // Создаем новую таблицу (например, 3 строки, 3 столбца)
-                    int rowCount = 10;
-                    if (servicesDictionary.Count > 0)
-                        rowCount = servicesDictionary.Count;
+                    int rowCount = servicesDictionary.Count;
                     Word.Table tbl = doc.Tables.Add(range, rowCount + 1, 4);
 
                     tbl.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
@@ -474,7 +489,6 @@ namespace WpfApp1
                         }
                         contentCounter++;
                     }
-                    //tbl.Rows[].Cells[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
                     var tblOverallRow = tbl.Rows.Add();
                     tblOverallRow.Range.Shading.BackgroundPatternColor = Word.WdColor.wdColorGray10;
                     tblOverallRow.Cells[1].Range.Text = "Итого оказано услуг";
@@ -484,12 +498,81 @@ namespace WpfApp1
                     tblOverallRow.Cells[1].Range.ParagraphFormat.LeftIndent = 0;
                     tblOverallRow.Cells[1].Range.ParagraphFormat.RightIndent = 0;
 
-                    tblOverallRow.Cells[4].Range.Text = $"{Convert.ToDouble(orderTotalCostLabel.Content).ToString("f2")}";
+                    tblOverallRow.Cells[4].Range.Text = $"{Convert.ToDouble(servicesTotalCostLabel.Content).ToString("f2")}";
                     tblOverallRow.Cells[4].Range.Bold = 3;
                     tblOverallRow.Cells[4].Range.Font.Name = "Arial";
                     tblOverallRow.Cells[4].Range.Font.Size = 8;
                     tblOverallRow.Cells[4].Range.ParagraphFormat.LeftIndent = 0;
                     tblOverallRow.Cells[4].Range.ParagraphFormat.RightIndent = 0;
+                }
+
+                if (range.Find.Execute("{tableMaterials}") && materialsDictionary.Count > 0)
+                {
+                    range.Text = "";
+                    int rowCount = materialsDictionary.Count;
+                    Word.Table tbl = doc.Tables.Add(range, rowCount + 1, 4);
+
+                    tbl.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                    tbl.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                    for (int i = 1; i < 5; i++)
+                    {
+                        tbl.Rows[1].Cells[i].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        tbl.Rows[1].Cells[i].Range.Bold = 3;
+                        tbl.Rows[1].Cells[i].Range.Font.Name = "Arial";
+                        tbl.Rows[1].Cells[i].Range.Font.Size = 8;
+                        tbl.Rows[1].Cells[i].Range.ParagraphFormat.LeftIndent = 0;
+                        tbl.Rows[1].Cells[i].Range.ParagraphFormat.RightIndent = 0;
+                    }
+                    tbl.Rows[1].Cells[1].Range.Text = "Наименование материала";
+                    tbl.Rows[1].Cells[2].Range.Text = "Единица измерения";
+                    tbl.Rows[1].Cells[3].Range.Text = "Количество";
+                    tbl.Rows[1].Cells[4].Range.Text = "Сумма (руб.)";
+                    int contentCounter = 2;
+                    foreach (var el in materialsDictionary)
+                    {
+                        double materialCost = Convert.ToDouble(el.Value.Row.ItemArray[2]);
+                        double materialQuantity = Convert.ToInt32(el.Value.Row.ItemArray[1]);
+                        tbl.Rows[contentCounter].Cells[1].Range.Text = el.Value.Row.ItemArray[0].ToString();
+                        tbl.Rows[contentCounter].Cells[2].Range.Text = el.Value.Row.ItemArray[4].ToString();
+                        tbl.Rows[contentCounter].Cells[3].Range.Text = el.Value.Row.ItemArray[1].ToString();
+                        tbl.Rows[contentCounter].Cells[4].Range.Text = Math.Round(materialCost * materialQuantity, 2).ToString("f2");
+                        for (int i = 1; i < 5; i++)
+                        {
+                            tbl.Rows[contentCounter].Cells[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+                            tbl.Rows[contentCounter].Cells[2].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                            tbl.Rows[contentCounter].Cells[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                            tbl.Rows[contentCounter].Cells[4].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                            tbl.Rows[contentCounter].Cells[i].Range.Font.Name = "Segoe UI";
+                            tbl.Rows[contentCounter].Cells[i].Range.Font.Size = 8;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.LeftIndent = 0;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.RightIndent = 0;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.LineSpacingRule = Word.WdLineSpacing.wdLineSpaceSingle;
+                            tbl.Rows[contentCounter].Cells[i].Range.ParagraphFormat.SpaceAfter = 2f;
+                        }
+                        contentCounter++;
+                    }
+                    var tblOverallRow = tbl.Rows.Add();
+                    tblOverallRow.Range.Shading.BackgroundPatternColor = Word.WdColor.wdColorGray10;
+                    tblOverallRow.Cells[1].Range.Text = "Итого материалов";
+                    tblOverallRow.Cells[1].Range.Bold = 3;
+                    tblOverallRow.Cells[1].Range.Font.Name = "Arial";
+                    tblOverallRow.Cells[1].Range.Font.Size = 8;
+                    tblOverallRow.Cells[1].Range.ParagraphFormat.LeftIndent = 0;
+                    tblOverallRow.Cells[1].Range.ParagraphFormat.RightIndent = 0;
+
+                    tblOverallRow.Cells[4].Range.Text = $"{Convert.ToDouble(materialsTotalCostLabel.Content).ToString("f2")}";
+                    tblOverallRow.Cells[4].Range.Bold = 3;
+                    tblOverallRow.Cells[4].Range.Font.Name = "Arial";
+                    tblOverallRow.Cells[4].Range.Font.Size = 8;
+                    tblOverallRow.Cells[4].Range.ParagraphFormat.LeftIndent = 0;
+                    tblOverallRow.Cells[4].Range.ParagraphFormat.RightIndent = 0;
+
+                    ReplaceWord("{totalMaterialsCost}", $"Затрачено материалов на выполнение услуг на сумму: {Convert.ToDouble(materialsTotalCostLabel.Content).ToString("f2")} руб.", doc);
+                }
+                else
+                {
+                    ReplaceWord("{tableMaterials}", "", doc);
+                    ReplaceWord("{totalMaterialsCost}", "", doc);
                 }
             }
             finally
@@ -497,6 +580,7 @@ namespace WpfApp1
                 // в конце делаем документ видимым
                 wordApp.Visible = true;
             }
+
         }
         private void ReplaceWord(string src, string dest, Word.Document doc)
         {
