@@ -71,10 +71,34 @@ namespace WpfApp1
             if (claimsDG.SelectedItem != null)
             {
                 var drv = claimsDG.SelectedItem as DataRowView;
-                this.Hide();
-                var win = new Order(Convert.ToInt32(drv.Row.ItemArray[0]), RefreshDatagrid);
-                win.ShowDialog();
-                this.ShowDialog();
+                object[] claimDescription = drv.Row.ItemArray;
+                string currStatus = claimDescription[7].ToString();
+                bool isExpired = Convert.ToBoolean(claimDescription[10]);
+                string message = "";
+                switch(currStatus)
+                {
+                    case "Входящая":
+                        if (isExpired)
+                            message = "Дата выполнения заявки просрочена, необходим перенос заявки на другое время";
+                        else
+                            message = "Заявку изначально необходимо взять в работу";
+                        break;
+                    case "Закрыта":
+                        message = "Заявка закрыта, формирование заказ-наряда не требуется";
+                        break;
+                    case "Отменена":
+                        message = "Заявка отменеа, формирование заказ-наряда не производится";
+                        break;
+                }
+                if (message == "")
+                {
+                    this.Hide();
+                    var win = new Order(Convert.ToInt32(drv.Row.ItemArray[0]), RefreshDatagrid);
+                    win.ShowDialog();
+                    this.ShowDialog();
+                }
+                else
+                    MessageBox.Show(message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             }    
         }
 
