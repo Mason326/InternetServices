@@ -68,10 +68,14 @@ namespace WpfApp1
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            this.Hide();
-            var win = new Order();
-            win.ShowDialog();
-            this.ShowDialog();
+            if (claimsDG.SelectedItem != null)
+            {
+                var drv = claimsDG.SelectedItem as DataRowView;
+                this.Hide();
+                var win = new Order(Convert.ToInt32(drv.Row.ItemArray[0]));
+                win.ShowDialog();
+                this.ShowDialog();
+            }    
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

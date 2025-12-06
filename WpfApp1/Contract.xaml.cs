@@ -43,9 +43,9 @@ namespace WpfApp1
             tariffLabel.Content = fieldVals[4];
             claimClientLabel.Content = fieldVals[5];
             claimManagerLabel.Content = fieldVals[6];
-            claimClientLabel.Content = clientDescription[10];
-            abonentLoginTextBox.Text = clientDescription[15].ToString();
-            abonentPasswordTextBox.Text = clientDescription[16].ToString();
+            claimClientLabel.Content = clientDescription[1];
+            abonentLoginTextBox.Text = clientDescription[6].ToString();
+            abonentPasswordTextBox.Text = clientDescription[7].ToString();
             claimStatusLabel.Content = fieldVals[7];
             contractStatusComboBox.ItemsSource = new string[] { "Заключен" };
             contractStatusComboBox.SelectedItem = "Заключен";
@@ -58,7 +58,7 @@ namespace WpfApp1
                 try
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($"SELECT * FROM connection_claim inner join `client` on `client`.idclient = connection_claim.client_id where id_claim = {claimId};", conn);
+                    MySqlCommand cmd = new MySqlCommand($"SELECT `idclient`, `full_name`, `email`, `phone_number`, `place_of_residence`, `birthdate`, `subscriber_login`, `subscriber_password`, `passport_series`, `passport_number`, `issued_by`, `issue_date`, `department_code`, `client_status_id` FROM connection_claim inner join `client` on `client`.idclient = connection_claim.client_id where id_claim = {claimId};", conn);
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
                         object[] clientDescr = new object[dr.FieldCount];
@@ -168,7 +168,7 @@ namespace WpfApp1
                 ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
                 ReplaceWord("{abonentLogin}", abonentLoginTextBox.Text, wordDocument);
                 ReplaceWord("{abonentPassword}", abonentPasswordTextBox.Text, wordDocument);
-                ReplaceWord("{abonentEmail}", clientVerbose[11].ToString(), wordDocument);
+                ReplaceWord("{abonentEmail}", clientVerbose[2].ToString(), wordDocument);
                 string address = string.Join(", ", claimAddressTextBox.Text.Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
                 ReplaceWord("{connectionAddress}", address, wordDocument);
                 ReplaceWord("{tariffName}", tariffLabel.Content.ToString(), wordDocument);
@@ -178,16 +178,16 @@ namespace WpfApp1
                 string[] director = Properties.Settings.Default.companyDirector.Split();
                 ReplaceWord("{companyDirector}", $"{director[0]} {director[1][0]}. {director[2][0]}.", wordDocument);
                 ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
-                ReplaceWord("{birthDate}", DateTime.Parse(clientVerbose[14].ToString()).ToString("dd.MM.yyyy"), wordDocument);
-                ReplaceWord("{passportSeries}", clientVerbose[17].ToString(), wordDocument);
-                ReplaceWord("{passportNumber}", clientVerbose[18].ToString(), wordDocument);
-                ReplaceWord("{issueDate}", DateTime.Parse(clientVerbose[20].ToString()).ToString("dd.MM.yyyy"), wordDocument);
-                ReplaceWord("{issuedBy}", clientVerbose[19].ToString(), wordDocument);
-                address = string.Join(", ", clientVerbose[13].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+                ReplaceWord("{birthDate}", DateTime.Parse(clientVerbose[11].ToString()).ToString("dd.MM.yyyy"), wordDocument);
+                ReplaceWord("{passportSeries}", clientVerbose[8].ToString(), wordDocument);
+                ReplaceWord("{passportNumber}", clientVerbose[9].ToString(), wordDocument);
+                ReplaceWord("{issueDate}", DateTime.Parse(clientVerbose[11].ToString()).ToString("dd.MM.yyyy"), wordDocument);
+                ReplaceWord("{issuedBy}", clientVerbose[10].ToString(), wordDocument);
+                address = string.Join(", ", clientVerbose[4].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
                 ReplaceWord("{residenceAddress}", address, wordDocument);
-                address = string.Join(", ", clientVerbose[1].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
+                address = string.Join(", ", fieldVals[3].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
                 ReplaceWord("{mountAddress}", address, wordDocument);
-                ReplaceWord("{phoneNumber}", clientVerbose[12].ToString(), wordDocument);
+                ReplaceWord("{phoneNumber}", clientVerbose[3].ToString(), wordDocument);
 
                 wordApp.Visible = true;
             }
