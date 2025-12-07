@@ -111,7 +111,7 @@ namespace WpfApp1
                 foreach (var el in AdditionalServicesHolder.additionalServices)
                 {
                     DataRow dr = dtAddServices.NewRow();
-                    dr.ItemArray = new object[] { el.Value.Row.ItemArray[0].ToString(), el.Value.Row.ItemArray[1] };
+                    dr.ItemArray = new object[] { el.Value.Row.ItemArray[0].ToString(), el.Value.Row.ItemArray[1], el.Value.Row.ItemArray[2] };
                     dtAddServices.Rows.Add(dr);
                     DataRowView addedToOrderDg = dtAddServices.DefaultView[dtAddServices.Rows.IndexOf(dr)];
                     addServicesDictionary.Add(el.Value.Row.ItemArray[0].ToString(), addedToOrderDg);

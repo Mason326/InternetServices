@@ -564,7 +564,7 @@ namespace WpfApp1
 
         private void EditClaim(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
+            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
@@ -577,6 +577,7 @@ namespace WpfApp1
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
+                        MySqlTransaction transaction = conn.BeginTransaction();
                         try
                         {
                             string fullExectionDate = $"{((DateTime)dateOfExecution.SelectedDate).ToString("yyyy-MM-dd")} {timeOfExecution.SelectedItem.ToString()}:00";
@@ -587,7 +588,20 @@ namespace WpfApp1
                                                                    tariff_id = (SELECT idtariff FROM tariff where `tariff_name` = '{tariffComboBox.SelectedItem}'),
                                                                    master_id = {MasterHolder.data[0]}
                                                                    where id_claim = {claimNumber.Content};", conn);
+                            cmd.CommandText += $"Delete from `additional_service_pack` where `idclaim` = {claimNumber.Content};";
+                            if (AdditionalServicesHolder.additionalServices.Count > 0)
+                            {
+                                cmd.CommandText += "Insert into additional_service_pack Values ";
+                                foreach (var el in AdditionalServicesHolder.additionalServices)
+                                {
+                                    cmd.CommandText += $"({claimNumber.Content}, {el.Value.Row.ItemArray[2]}),";
+                                }
+                                cmd.CommandText = cmd.CommandText.TrimEnd(new char[] { ',' });
+                                cmd.CommandText += ";";
+                            }
+                            cmd.Transaction = transaction;
                             cmd.ExecuteNonQuery();
+                            transaction.Commit();
                             MessageBox.Show($"Заявка успешно обновлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
                             RefreshData();
@@ -595,6 +609,7 @@ namespace WpfApp1
                         catch (Exception exc)
                         {
                             MessageBox.Show($"Не удалось обновить заявку\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            transaction.Rollback();
                             return;
                         }
                     }
