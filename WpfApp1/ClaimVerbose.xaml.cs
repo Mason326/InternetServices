@@ -188,13 +188,27 @@ namespace WpfApp1
 
         private void saveChangesButton_Click(object sender, RoutedEventArgs e)
         {
+            int contractId = -1;
+            try
+            { 
+                contractId = CheckDuplicateUtil.HasNoDuplicate("contract", "connection_claim_id", $"{claimId}", false);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось загрузить договор\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
+                conn.Open();
+                MySqlTransaction transaction = conn.BeginTransaction();
                 try
                 {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($"Update `connection_claim` SET `claim_status_id` = (SELECT idclaim_status from claim_status where `status` = '{statusComboBox.SelectedItem}') where id_claim = {claimId}", conn);
+                    MySqlCommand cmd = new MySqlCommand($"Update `connection_claim` SET `claim_status_id` = (SELECT idclaim_status from claim_status where `status` = '{statusComboBox.SelectedItem}') where id_claim = {claimId};", conn);
+                    if (contractId != -1 && statusComboBox.SelectedItem.ToString() == "Отменена")
+                        cmd.CommandText += $"update contract set contract_status_id = (Select idcontract_status from contract_status where `status` = 'Расторгнут') where idcontract = {contractId};";
+                    cmd.Transaction = transaction;
                     cmd.ExecuteNonQuery();
+                    transaction.Commit();
                     MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     Refresh();
                     this.Close();
@@ -202,6 +216,7 @@ namespace WpfApp1
                 catch (Exception exc)
                 {
                     MessageBox.Show($"Не удалось обновить статусы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    transaction.Rollback();
                 }
             }
         }
