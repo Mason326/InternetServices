@@ -9,7 +9,7 @@
     <Grid>
         <Label Content="Дата и время выполнения" HorizontalAlignment="Left" Margin="463,15,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="209"/>
         <Label Content="Статус" HorizontalAlignment="Left" Margin="255,35,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <DataGrid x:Name="claimsDG" SelectionMode="Single" Margin="10,364,9.8,57.2" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="claimsDG_SelectionChanged" MouseDoubleClick="claimsDG_MouseDoubleClick">
+        <DataGrid x:Name="claimsDG" SelectionMode="Single" Margin="10,395,9.8,57.2" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="claimsDG_SelectionChanged" MouseDoubleClick="claimsDG_MouseDoubleClick">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="ShowClaimVerbose" />
@@ -100,9 +100,10 @@
             <Button x:Name="endEditingButton" Visibility="Collapsed" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="20,30,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="EditClaim" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
             <Button x:Name="cancelChangesButton" Visibility="Collapsed" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="CancelEdit" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         </StackPanel>
-        <Label Content="Поиск по номеру заявки и ФИО клиента" HorizontalAlignment="Left" Margin="548,263,0,0" VerticalAlignment="Top" FontSize="16" Height="30" Width="315"/>
-        <TextBox x:Name="searchByClaimNumAndFio" HorizontalAlignment="Left" Height="36" Margin="550,293,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="391" TextChanged="searchByClaimNumAndFio_TextChanged"/>
+        <Label Content="Поиск по номеру заявки и ФИО клиента" HorizontalAlignment="Left" Margin="544,291,0,0" VerticalAlignment="Top" FontSize="16" Height="30" Width="315"/>
+        <TextBox x:Name="searchByClaimNumAndFio" HorizontalAlignment="Left" Height="36" Margin="546,321,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="391" TextChanged="searchByClaimNumAndFio_TextChanged"/>
         <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="25,688,0,0" VerticalAlignment="Top" Width="31"/>
         <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="62,687,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Button Content="Доп. услуги" HorizontalAlignment="Left" Margin="361,350,0,0" VerticalAlignment="Top" Width="151" Click="Button_Click_5" Height="30"/>
     </Grid>
 </Window>

@@ -720,5 +720,13 @@ namespace WpfApp1
                 clearFieldsButton.IsEnabled = true;
             }
         }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            var win = new PickAdditionalServices();
+            win.ShowDialog();
+            this.ShowDialog();
+        }
     }
 }

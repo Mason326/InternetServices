@@ -86,6 +86,7 @@
     <Compile Include="AdditionalServices.xaml.cs">
       <DependentUpon>AdditionalServices.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AdditionalServicesHolder.cs" />
     <Compile Include="CheckDuplicateUtil.cs" />
     <Compile Include="ClientHolder.cs" />
     <Compile Include="ClientVerbose.xaml.cs">
