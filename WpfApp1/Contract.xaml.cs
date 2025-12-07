@@ -47,8 +47,6 @@ namespace WpfApp1
             abonentLoginTextBox.Text = clientDescription[6].ToString();
             abonentPasswordTextBox.Text = clientDescription[7].ToString();
             claimStatusLabel.Content = fieldVals[7];
-            contractStatusComboBox.ItemsSource = new string[] { "Заключен" };
-            contractStatusComboBox.SelectedItem = "Заключен";
         }
 
         private object[] GetClientData(int claimId)
@@ -79,8 +77,7 @@ namespace WpfApp1
 
         private int GetContractNumber()
         {
-            // TODO check status
-            if (CheckDuplicateUtil.HasNoDuplicate("contract", "connection_claim_id", $"{fieldVals[0]}"))
+            if (CheckDuplicateUtil.HasNoDuplicateContract("contract", "connection_claim_id", $"{fieldVals[0]}"))
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
@@ -89,6 +86,9 @@ namespace WpfApp1
                         conn.Open();
                         MySqlCommand cmd = new MySqlCommand($"SELECT max(idcontract) FROM contract;", conn);
                         int contractId = Convert.ToInt32(cmd.ExecuteScalar()) + 1;
+                        contractStatusComboBox.ItemsSource = new string[] { "Не заключен" };
+                        contractStatusComboBox.SelectedItem = "Не заключен";
+                        formAContractButton.IsEnabled = true;
                         return contractId;
                     }
                     catch
@@ -106,6 +106,9 @@ namespace WpfApp1
                         conn.Open();
                         MySqlCommand cmd = new MySqlCommand($"SELECT idcontract FROM contract where connection_claim_id = {fieldVals[0]};", conn);
                         int contractId = Convert.ToInt32(cmd.ExecuteScalar());
+                        contractStatusComboBox.ItemsSource = new string[] { "Заключен" };
+                        contractStatusComboBox.SelectedItem = "Заключен";
+                        formAContractButton.IsEnabled = false;
                         return contractId;
                     }
                     catch
@@ -123,27 +126,20 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            if (CheckDuplicateUtil.HasNoDuplicate("contract", "connection_claim_id", $"{claimNumberLabel.Content}"))
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                try
                 {
-                    try
-                    {
-                        conn.Open();
-                        MySqlCommand cmd = new MySqlCommand($"Insert into `contract`(idcontract, contract_date, connection_claim_id, contract_status_id) Value ({contractNumberLabel.Content}, '{DateTime.Parse(contractDateLabel.Content.ToString()).ToString("yyyy-MM-dd")}', {claimNumberLabel.Content}, (SELECT idcontract_status FROM contract_status where `status` = 'Заключен'));", conn);
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show($"Договор успешно оформлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                        this.Close();
-                    }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show($"Не удалось оформить договор\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"Insert into `contract`(idcontract, contract_date, connection_claim_id, contract_status_id) Value ({contractNumberLabel.Content}, '{DateTime.Parse(contractDateLabel.Content.ToString()).ToString("yyyy-MM-dd")}', {claimNumberLabel.Content}, (SELECT idcontract_status FROM contract_status where `status` = 'Заключен'));", conn);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show($"Договор успешно оформлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    this.Close();
                 }
-            }
-            else
-            {
-                MessageBox.Show($"Не удалось оформить договор. Обнаружен дубликат", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось оформить договор\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -198,11 +194,9 @@ namespace WpfApp1
             }
         }
 
-        void ReplaceWord(string src, string dest, Word.Document doc)
+        private void ReplaceWord(string src, string dest, Word.Document doc)
         {
-            Word.Range range = doc.Content; // всё содержимое 
-
-            //range.Find.ClearFormatting();
+            Word.Range range = doc.Content;
             range.Find.Execute(FindText: src, ReplaceWith: dest);
         }
     }
