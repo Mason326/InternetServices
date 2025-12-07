@@ -25,6 +25,7 @@ namespace WpfApp1
         bool isEditing = false;
         DispatcherTimer timerRef;
         bool isExpired = false;
+        DataTable dtAddServices = new DataTable();
         public CreateClaim()
         {
             InitializeComponent();
@@ -32,6 +33,9 @@ namespace WpfApp1
             timer.Interval = TimeSpan.FromSeconds(300);
             timer.Tick += Timer_Tick;
             timer.Start();
+            dtAddServices.Columns.Add("additional_service_name", typeof(string));
+            dtAddServices.Columns.Add("cost", typeof(double));
+            dtAddServices.Columns.Add("additional_service_id", typeof(int));
 
             timerRef = timer;
         }
@@ -195,6 +199,7 @@ namespace WpfApp1
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
+                        MySqlTransaction transaction = conn.BeginTransaction();
                         try
                         {
                             MySqlCommand cmd = new MySqlCommand($@"Insert into connection_claim(id_claim, connection_address, mount_date, employees_id, client_id, claim_status_id, connection_creationDate, tariff_id, master_id)
@@ -209,13 +214,26 @@ namespace WpfApp1
                                                                 {tariffs.Where(pair => pair.Value == tariffComboBox.SelectedItem.ToString()).Select(pair => pair.Key).Single()},
                                                                 {MasterHolder.data[0]}
                                                                  );", conn);
+                            if (AdditionalServicesHolder.additionalServices.Count > 0)
+                            {
+                                cmd.CommandText += "Insert into additional_service_pack Values ";
+                                foreach (var el in AdditionalServicesHolder.additionalServices)
+                                {
+                                    cmd.CommandText += $"({claimNumber.Content}, {el.Value.Row.ItemArray[2]}),";
+                                }
+                                cmd.CommandText = cmd.CommandText.TrimEnd(new char[] { ',' });
+                                cmd.CommandText += ";";
+                            }
+                            cmd.Transaction = transaction;
                             cmd.ExecuteNonQuery();
+                            transaction.Commit();
                             MessageBox.Show($"Заявка успешно создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             RefreshData();
                             ClearSelected();
                         }
                         catch (Exception exc)
                         {
+                            transaction.Rollback();
                             MessageBox.Show($"Не удалось создать заявку\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
@@ -335,6 +353,7 @@ namespace WpfApp1
             masterTextBox.Clear();
             MasterHolder.data = null;
             searchByClaimNumAndFio.Clear();
+            AdditionalServicesHolder.additionalServices.Clear();
             if (!isEditing)
             {
                 clientTextBox.Clear();
@@ -406,11 +425,49 @@ namespace WpfApp1
             PrepateToEditClaimMethod(false);
         }
 
+        private void FillAdditionalServicesHolder(int claimId)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT additional_services.additional_service_name,
+                                                        additional_services.monthly_fee,
+                                                        id_additional_service 
+                                                        FROM additional_service_pack
+                                                        inner join additional_services
+                                                        on id_additional_service = additional_services.idadditional_service
+                                                        where idclaim = {claimId};", conn);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        object[] values = new object[dr.FieldCount];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(values);
+                            DataRow drow = dtAddServices.NewRow();
+                            drow.ItemArray = new object[] { values[0].ToString(), values[1], values[2] };
+                            dtAddServices.Rows.Add(drow);
+                            DataRowView addedToOrderDg = dtAddServices.DefaultView[dtAddServices.Rows.IndexOf(drow)];
+                            AdditionalServicesHolder.additionalServices.Add(values[0].ToString(), addedToOrderDg);
+                        }
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось получить дополнительные услуги заявки\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                AdditionalServicesHolder.additionalServices.Clear();
+            }
+        }
+
         private void PrepateToEditClaimMethod(bool isCanceled)
         {
             if (claimsDG.SelectedItem != null)
             {
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
+                AdditionalServicesHolder.additionalServices.Clear();
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
                 if (fieldValuesOfARecord[7].ToString() == "Закрыта" || fieldValuesOfARecord[7].ToString() == "В работе")
                 {
@@ -454,7 +511,8 @@ namespace WpfApp1
                 isExpired = Convert.ToBoolean(fieldValuesOfARecord[fieldValuesOfARecord.Length - 1]);
                 mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 FillComboBoxStatusesManager();
-                if(isCanceled)
+                FillAdditionalServicesHolder(Convert.ToInt32(claimNumber.Content));
+                if (isCanceled)
                     claimStatusComboBox.SelectedItem = "Отменена";
                 else
                     claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
@@ -468,6 +526,8 @@ namespace WpfApp1
             }
 
         }
+
+
 
         private void CancelEdit(object sender, RoutedEventArgs e)
         {
@@ -504,7 +564,7 @@ namespace WpfApp1
 
         private void EditClaim(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 5 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
+            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
@@ -517,6 +577,7 @@ namespace WpfApp1
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
+                        MySqlTransaction transaction = conn.BeginTransaction();
                         try
                         {
                             string fullExectionDate = $"{((DateTime)dateOfExecution.SelectedDate).ToString("yyyy-MM-dd")} {timeOfExecution.SelectedItem.ToString()}:00";
@@ -527,7 +588,20 @@ namespace WpfApp1
                                                                    tariff_id = (SELECT idtariff FROM tariff where `tariff_name` = '{tariffComboBox.SelectedItem}'),
                                                                    master_id = {MasterHolder.data[0]}
                                                                    where id_claim = {claimNumber.Content};", conn);
+                            cmd.CommandText += $"Delete from `additional_service_pack` where `idclaim` = {claimNumber.Content};";
+                            if (AdditionalServicesHolder.additionalServices.Count > 0)
+                            {
+                                cmd.CommandText += "Insert into additional_service_pack Values ";
+                                foreach (var el in AdditionalServicesHolder.additionalServices)
+                                {
+                                    cmd.CommandText += $"({claimNumber.Content}, {el.Value.Row.ItemArray[2]}),";
+                                }
+                                cmd.CommandText = cmd.CommandText.TrimEnd(new char[] { ',' });
+                                cmd.CommandText += ";";
+                            }
+                            cmd.Transaction = transaction;
                             cmd.ExecuteNonQuery();
+                            transaction.Commit();
                             MessageBox.Show($"Заявка успешно обновлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
                             RefreshData();
@@ -535,6 +609,7 @@ namespace WpfApp1
                         catch (Exception exc)
                         {
                             MessageBox.Show($"Не удалось обновить заявку\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            transaction.Rollback();
                             return;
                         }
                     }
@@ -719,6 +794,14 @@ namespace WpfApp1
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
             }
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            var win = new PickAdditionalServices();
+            win.ShowDialog();
+            this.ShowDialog();
         }
     }
 }
