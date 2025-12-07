@@ -574,6 +574,8 @@ namespace WpfApp1
                         MessageBox.Show($"Не удалось обновить заявку. Указанный мастер превысил количество взятых заявок в сутки", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
+                    int contractId = CheckDuplicateUtil.HasNoDuplicate("contract", "connection_claim_id", $"{claimNumber.Content}", false);
+
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
@@ -587,8 +589,12 @@ namespace WpfApp1
                                                                    claim_status_id = (SELECT idclaim_status FROM claim_status where `status` = '{claimStatusComboBox.SelectedItem}'),
                                                                    tariff_id = (SELECT idtariff FROM tariff where `tariff_name` = '{tariffComboBox.SelectedItem}'),
                                                                    master_id = {MasterHolder.data[0]}
-                                                                   where id_claim = {claimNumber.Content};", conn);
+                                                                   where id_claim = {claimNumber.Content};", conn) ;
                             cmd.CommandText += $"Delete from `additional_service_pack` where `idclaim` = {claimNumber.Content};";
+                            if (contractId != -1 && claimStatusComboBox.SelectedItem.ToString() == "Отменена")
+                            {
+                                cmd.CommandText += $"update contract set contract_status_id = (Select idcontract_status from contract_status where `status` = 'Расторгнут') where idcontract = {contractId};";
+                            }
                             if (AdditionalServicesHolder.additionalServices.Count > 0)
                             {
                                 cmd.CommandText += "Insert into additional_service_pack Values ";
