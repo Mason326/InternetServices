@@ -25,8 +25,8 @@
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <Button Content="К договорам" HorizontalAlignment="Left" Margin="453,96,0,0" VerticalAlignment="Top" Width="185" Click="Button_Click" Height="32" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
-        <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="453,38,0,0" VerticalAlignment="Top" Width="185" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16" Click="Button_Click_1"/>
+        <Button Content="К договорам" HorizontalAlignment="Left" Margin="453,96,0,0" VerticalAlignment="Top" Width="185" Click="Button_Click" Height="38" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
+        <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="453,38,0,0" VerticalAlignment="Top" Width="185" Height="42" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16" Click="Button_Click_1"/>
 
     </Grid>
 </Window>

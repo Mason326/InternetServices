@@ -52,7 +52,7 @@ namespace WpfApp1
                 try
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT `status` FROM contract_status;", conn);
+                    MySqlCommand cmd = new MySqlCommand("SELECT `status` FROM contract_status where `status` != 'Не заключен';", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();

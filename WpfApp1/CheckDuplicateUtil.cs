@@ -57,5 +57,36 @@ namespace WpfApp1
                 return -1;
             }
         }
+
+        public static bool HasNoDuplicateContract(string tableName, string fieldName, string inputValue)
+        {
+            try
+            {
+                string[] removedMultipleSpacesArray = inputValue.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string removedMultipleSpaces = string.Join(" ", removedMultipleSpacesArray);
+                string trimmedInputValue = removedMultipleSpaces.Trim();
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"Select idcontract, contract_date, connection_claim_id, contract_status.`status` from `{tableName}` inner join contract_status on contract_status_id = contract_status.idcontract_status where trim({fieldName}) = '{trimmedInputValue}'", conn);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        object[] currentRecord = new object[dr.FieldCount];
+                        while(dr.Read())
+                        {
+                            dr.GetValues(currentRecord);
+                            string status = currentRecord[3].ToString();
+                            if (status == "Заключен")
+                                return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
