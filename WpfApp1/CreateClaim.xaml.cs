@@ -25,6 +25,7 @@ namespace WpfApp1
         bool isEditing = false;
         DispatcherTimer timerRef;
         bool isExpired = false;
+        DataTable dtAddServices = new DataTable();
         public CreateClaim()
         {
             InitializeComponent();
@@ -32,6 +33,9 @@ namespace WpfApp1
             timer.Interval = TimeSpan.FromSeconds(300);
             timer.Tick += Timer_Tick;
             timer.Start();
+            dtAddServices.Columns.Add("additional_service_name", typeof(string));
+            dtAddServices.Columns.Add("cost", typeof(double));
+            dtAddServices.Columns.Add("additional_service_id", typeof(int));
 
             timerRef = timer;
         }
@@ -421,6 +425,43 @@ namespace WpfApp1
             PrepateToEditClaimMethod(false);
         }
 
+        private void FillAdditionalServicesHolder(int claimId)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+
+                    MySqlCommand cmd = new MySqlCommand($@"SELECT additional_services.additional_service_name,
+                                                        additional_services.monthly_fee,
+                                                        id_additional_service 
+                                                        FROM additional_service_pack
+                                                        inner join additional_services
+                                                        on id_additional_service = additional_services.idadditional_service
+                                                        where idclaim = {claimId};", conn);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        object[] values = new object[dr.FieldCount];
+                        while (dr.Read())
+                        {
+                            dr.GetValues(values);
+                            DataRow drow = dtAddServices.NewRow();
+                            drow.ItemArray = new object[] { values[0].ToString(), values[1], values[2] };
+                            dtAddServices.Rows.Add(drow);
+                            DataRowView addedToOrderDg = dtAddServices.DefaultView[dtAddServices.Rows.IndexOf(drow)];
+                            AdditionalServicesHolder.additionalServices.Add(values[0].ToString(), addedToOrderDg);
+                        }
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось получить дополнительные услуги заявки\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                AdditionalServicesHolder.additionalServices.Clear();
+            }
+        }
+
         private void PrepateToEditClaimMethod(bool isCanceled)
         {
             if (claimsDG.SelectedItem != null)
@@ -470,7 +511,8 @@ namespace WpfApp1
                 isExpired = Convert.ToBoolean(fieldValuesOfARecord[fieldValuesOfARecord.Length - 1]);
                 mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 FillComboBoxStatusesManager();
-                if(isCanceled)
+                FillAdditionalServicesHolder(Convert.ToInt32(claimNumber.Content));
+                if (isCanceled)
                     claimStatusComboBox.SelectedItem = "Отменена";
                 else
                     claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
@@ -484,6 +526,8 @@ namespace WpfApp1
             }
 
         }
+
+
 
         private void CancelEdit(object sender, RoutedEventArgs e)
         {

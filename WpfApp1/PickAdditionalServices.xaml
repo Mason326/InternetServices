@@ -24,7 +24,7 @@
         <Button Content="&gt;" HorizontalAlignment="Left" Margin="441,165,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_2"/>
         <Button Content="&lt;" HorizontalAlignment="Left" Margin="441,201,0,0" VerticalAlignment="Top" Width="42" FontSize="16" Background="{x:Null}" Click="Button_Click_5"/>
         <Label Content="Оплата в месяц:" HorizontalAlignment="Left" Margin="633,251,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
-        <Label x:Name="addServicesTotalCostLabel" Content="" HorizontalAlignment="Left" Margin="746,249,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
+        <Label x:Name="addServicesTotalCostLabel" Content="" HorizontalAlignment="Left" Margin="746,253,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
         <Button Content="Сохранить изменения" HorizontalAlignment="Left" Margin="655,287,0,0" VerticalAlignment="Top" Width="164" Height="30" Click="Button_Click_1" />
         <Button Content="К заявке" HorizontalAlignment="Left" Margin="655,328,0,0" VerticalAlignment="Top" Width="164" Height="30" Click="Button_Click"/>
 
