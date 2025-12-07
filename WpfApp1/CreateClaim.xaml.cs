@@ -195,6 +195,7 @@ namespace WpfApp1
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
+                        MySqlTransaction transaction = conn.BeginTransaction();
                         try
                         {
                             MySqlCommand cmd = new MySqlCommand($@"Insert into connection_claim(id_claim, connection_address, mount_date, employees_id, client_id, claim_status_id, connection_creationDate, tariff_id, master_id)
@@ -209,13 +210,26 @@ namespace WpfApp1
                                                                 {tariffs.Where(pair => pair.Value == tariffComboBox.SelectedItem.ToString()).Select(pair => pair.Key).Single()},
                                                                 {MasterHolder.data[0]}
                                                                  );", conn);
+                            if (AdditionalServicesHolder.additionalServices.Count > 0)
+                            {
+                                cmd.CommandText += "Insert into additional_service_pack Values ";
+                                foreach (var el in AdditionalServicesHolder.additionalServices)
+                                {
+                                    cmd.CommandText += $"({claimNumber.Content}, {el.Value.Row.ItemArray[2]}),";
+                                }
+                                cmd.CommandText = cmd.CommandText.TrimEnd(new char[] { ',' });
+                                cmd.CommandText += ";";
+                            }
+                            cmd.Transaction = transaction;
                             cmd.ExecuteNonQuery();
+                            transaction.Commit();
                             MessageBox.Show($"Заявка успешно создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             RefreshData();
                             ClearSelected();
                         }
                         catch (Exception exc)
                         {
+                            transaction.Rollback();
                             MessageBox.Show($"Не удалось создать заявку\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
@@ -335,6 +349,7 @@ namespace WpfApp1
             masterTextBox.Clear();
             MasterHolder.data = null;
             searchByClaimNumAndFio.Clear();
+            AdditionalServicesHolder.additionalServices.Clear();
             if (!isEditing)
             {
                 clientTextBox.Clear();
@@ -411,6 +426,7 @@ namespace WpfApp1
             if (claimsDG.SelectedItem != null)
             {
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
+                AdditionalServicesHolder.additionalServices.Clear();
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
                 if (fieldValuesOfARecord[7].ToString() == "Закрыта" || fieldValuesOfARecord[7].ToString() == "В работе")
                 {
