@@ -29,5 +29,26 @@ namespace WpfApp1
                 return 0;
             }
         }
+
+        public static int CountRecords(string tableName, string condition)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"Select Count(*) from `{tableName}` {condition}", conn);
+                    object countRecords = cmd.ExecuteScalar();
+                    if (countRecords != null)
+                        return Convert.ToInt32(countRecords);
+                    else
+                        return 0;
+                }
+            }
+            catch
+            {
+                return 0;
+            }
+        }
     }
 }

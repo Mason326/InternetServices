@@ -117,6 +117,7 @@ namespace WpfApp1
                     cmd.ExecuteNonQuery();
                     da.Fill(dt);
                     servicesDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("services");
                 }
             }
             catch (Exception exc)

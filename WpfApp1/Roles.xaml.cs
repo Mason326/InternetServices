@@ -51,6 +51,7 @@ namespace WpfApp1
                     cmd.ExecuteNonQuery();
                     da.Fill(dt);
                     rolesDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("roles");
                 }
             }
             catch (Exception exc)

@@ -27,6 +27,8 @@
             <Button x:Name="endEditButton" Visibility="Collapsed" Content="Завершить редактирование" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="220" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="endEditButton_Click"/>
             <Button x:Name="cancelEditButton" Visibility="Collapsed" Content="Отменить изменения" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="220" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="cancelEditButton_Click"/>
         </StackPanel>
+        <Label Content="Количество доп. услуг:" HorizontalAlignment="Left" Margin="11,527,0,0" VerticalAlignment="Top" Width="180" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="193,527,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
 
     </Grid>
 </Window>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Создание клиента" Height="740.8" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Создание клиента" Height="774.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid Margin="0,4,-0.2,-4.4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="604*"/>
@@ -15,7 +15,7 @@
         <Label Content="ФИО" HorizontalAlignment="Left" Margin="28,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="46"/>
         <TextBox TabIndex="2" x:Name="phoneTextBox" HorizontalAlignment="Left" Margin="33,88,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28" PreviewKeyUp="phoneTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture" PreviewTextInput="phoneTextBox_PreviewTextInput" MaxLength="19"/>
         <Label Content="Телефон" HorizontalAlignment="Left" Margin="28,60,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="73"/>
-        <DataGrid IsReadOnly="True" x:Name="clientsDG" Margin="10,498,9.8,9.8" AutoGenerateColumns="False" SelectionChanged="clientsDG_SelectionChanged" Grid.ColumnSpan="2" SelectionMode="Single">
+        <DataGrid IsReadOnly="True" x:Name="clientsDG" Margin="10,498,9.8,46.4" AutoGenerateColumns="False" SelectionChanged="clientsDG_SelectionChanged" Grid.ColumnSpan="2" SelectionMode="Single">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="showClient_Click" />
@@ -110,5 +110,7 @@
             <Button x:Name="endEditingButton" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="EditClaim"/>
             <Button x:Name="cancelChangesButton" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="CancelEdit" />
         </StackPanel>
+        <Label Content="Количество активных клиентов:" HorizontalAlignment="Left" Margin="9,727,0,0" VerticalAlignment="Top" Width="247" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="257,727,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>

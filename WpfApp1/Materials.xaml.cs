@@ -159,6 +159,7 @@ namespace WpfApp1
                     cmd.ExecuteNonQuery();
                     da.Fill(dt);
                     materialsDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("materials");
                 }
             }
             catch (Exception exc)

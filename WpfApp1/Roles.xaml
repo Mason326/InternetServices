@@ -13,6 +13,8 @@
             </DataGrid.Columns>
         </DataGrid>
         <Button Content="На главную" HorizontalAlignment="Left" Margin="283,15,0,0" VerticalAlignment="Top" Width="210" Height="31" Click="Button_Click" FontSize="16" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White"/>
+        <Label Content="Количество ролей:" HorizontalAlignment="Left" Margin="15,334,0,0" VerticalAlignment="Top" Width="150" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="166,334,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
 
     </Grid>
 </Window>
