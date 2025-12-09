@@ -432,6 +432,7 @@ namespace WpfApp1
                     }
 
                     userDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("employees");
                 }
                 phoneTextBox.Text = "+7 (___) ___-__-__";
             }

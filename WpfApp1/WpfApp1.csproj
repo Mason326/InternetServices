@@ -108,6 +108,7 @@
     <Compile Include="PickAdditionalServices.xaml.cs">
       <DependentUpon>PickAdditionalServices.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RecordsCounter.cs" />
     <Compile Include="Services.xaml.cs">
       <DependentUpon>Services.xaml</DependentUpon>
     </Compile>

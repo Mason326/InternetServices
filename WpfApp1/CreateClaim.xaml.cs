@@ -307,6 +307,7 @@ namespace WpfApp1
                     }
 
                     claimsDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("connection_claim");
                 }
             }
             catch (Exception exc)

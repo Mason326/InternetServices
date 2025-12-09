@@ -712,6 +712,7 @@ namespace WpfApp1
                     }
                 }
                 clientsDG.ItemsSource = dt.AsDataView();
+                countRecordsLabel.Content = RecordsCounter.CountRecords("client", "where client_status_id = (Select idclient_status from client_status where status_name = 'Активный')");
             }
         }
 

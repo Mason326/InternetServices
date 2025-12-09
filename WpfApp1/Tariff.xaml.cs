@@ -158,6 +158,7 @@ namespace WpfApp1
                     cmd.ExecuteNonQuery();
                     da.Fill(dt);
                     tariffDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("tariff");
                 }
             }
             catch (Exception exc)
@@ -165,6 +166,8 @@ namespace WpfApp1
                 MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+
 
         private void ClearInputData()
         {

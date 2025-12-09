@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Пользователи" Height="544.4" Width="987" ResizeMode="NoResize" WindowStyle="None" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        Title="Пользователи" Height="570.8" Width="987" ResizeMode="NoResize" WindowStyle="None" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
@@ -32,7 +32,7 @@
             <Button x:Name="cancelChangesButton" Visibility="Collapsed" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="cancelChangesButton_Click"/>
         </StackPanel>
         <Button Content="Сгенерировать" HorizontalAlignment="Left" Height="38" Margin="500,160,0,0" VerticalAlignment="Top" Width="200" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
-        <DataGrid IsReadOnly="True" x:Name="userDG" Grid.ColumnSpan="2" Margin="25,237,287.2,33" AutoGenerateColumns="False" SelectionChanged="userDG_SelectionChanged" SelectionMode="Single">
+        <DataGrid IsReadOnly="True" x:Name="userDG" Grid.ColumnSpan="2" Margin="25,237,287.2,66.2" AutoGenerateColumns="False" SelectionChanged="userDG_SelectionChanged" SelectionMode="Single">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Код сотрудника" Binding="{Binding Path=idemployees}" Width="100" />
                 <DataGridTextColumn Header="ФИО" Binding="{Binding Path=full_name}" Width="70" />
@@ -53,5 +53,7 @@
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="330,88,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="552,20,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="556,89,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
+        <Label Content="Количество пользователей:" HorizontalAlignment="Left" Margin="25,528,0,0" VerticalAlignment="Top" Width="217" Grid.ColumnSpan="2" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="244,527,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>
