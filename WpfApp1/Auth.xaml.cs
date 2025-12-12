@@ -22,9 +22,11 @@ namespace WpfApp1
     /// </summary>
     public partial class Auth : Window
     {
+        int authAttempsCounter = 0;
         public Auth()
         {
             InitializeComponent();
+            ShowCaptcha(authAttempsCounter);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -116,11 +118,14 @@ namespace WpfApp1
                                 }
                                 LoginTextbox.Text = "";
                                 PasswordTextBox.Password = "";
+                                authAttempsCounter = 0;
                                 this.ShowDialog();
                             }
                             else
                             {
                                 MessageBox.Show("Неверные данные пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                ShowCaptcha(authAttempsCounter);
+                                authAttempsCounter++;
                             }
                         }
                     }
@@ -137,6 +142,24 @@ namespace WpfApp1
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             LoginTextbox.Focus();
+        }
+
+        private void ShowCaptcha(int attempsCount)
+        {
+            if (attempsCount > 0)
+            {
+                captchaImage.Visibility = Visibility.Visible;
+                refreshCaptchaImage.Visibility = Visibility.Visible;
+                captchaLabel.Visibility = Visibility.Visible;
+                captchaTextbox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                captchaImage.Visibility = Visibility.Hidden;
+                refreshCaptchaImage.Visibility = Visibility.Hidden;
+                captchaLabel.Visibility = Visibility.Hidden;
+                captchaTextbox.Visibility = Visibility.Hidden;
+            }
         }
     }
 }
