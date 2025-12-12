@@ -68,6 +68,7 @@ namespace WpfApp1
                 }
                 string userLogin = LoginTextbox.Text;
                 string userPassword = PasswordTextBox.Password;
+                //string userPassword = ;
                 if (userLogin == "" || userPassword == "")
                 {
                     MessageBox.Show($"Необходимо заполнить поля Логин и Пароль", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);

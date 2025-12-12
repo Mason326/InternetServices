@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Window9" Height="581.25" Width="719.2" WindowStartupLocation="CenterScreen" WindowStyle="None" PreviewKeyUp="Window_PreviewKeyUp" Loaded="Window_Loaded">
+        Title="Window9" Height="572.85" Width="719.2" WindowStartupLocation="CenterScreen" WindowStyle="None" PreviewKeyUp="Window_PreviewKeyUp" Loaded="Window_Loaded">
     <Grid Margin="0,0,25.6,-0.4">
         <DockPanel Height="570" LastChildFill="False" Margin="0,0,-31.8,0" VerticalAlignment="Top">
-            <Image HorizontalAlignment="Left" Height="562" VerticalAlignment="Top" Width="372" Source="Resources/Images/Inet.jpg"/>
+            <Image HorizontalAlignment="Left" Height="552" VerticalAlignment="Top" Width="372" Source="Resources/Images/Inet.jpg"/>
             <StackPanel Margin="15,20,0.4,9.6" Width="317" HorizontalAlignment="Left">
                 <Button Content="" HorizontalAlignment="Left" Margin="265,0,0,0" VerticalAlignment="Top" Width="47" Height="41" RenderTransformOrigin="0.796,-0.022" BorderThickness="0" Click="Button_Click_3">
                     <Button.Background>
@@ -40,8 +40,9 @@
                     <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-5,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 </DockPanel>
                 <TextBox x:Name="captchaTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
-                
-                <Button x:Name="AuthButton" Content="Авторизоваться" HorizontalAlignment="Left" Margin="5,20,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" Click="Button_Click_1" UseLayoutRounding="False"/>
+
+
+                <Button x:Name="AuthButton" Padding="10" Content="Авторизоваться" Template="{StaticResource ButtonTemplate}" HorizontalAlignment="Left" Margin="5,20,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Click="Button_Click_1" UseLayoutRounding="False" />
             </StackPanel>
         </DockPanel>
     </Grid>

@@ -4,6 +4,20 @@
              xmlns:local="clr-namespace:WpfApp1"
              StartupUri="Auth.xaml">
     <Application.Resources>
-         
+        <ControlTemplate x:Key="ButtonTemplate" TargetType="Button">
+            <Border x:Name="border" BorderThickness="1" CornerRadius="5" TextBlock.Foreground="White" Background="#FF4F6DD3">
+                <ContentPresenter RecognizesAccessKey="True" Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center"  />
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="#FF4B73FA" />
+                    <Setter Property="BorderThickness" TargetName="border" Value="1" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="#FF003AFF" />
+                    <Setter Property="BorderThickness" TargetName="border" Value="1" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
     </Application.Resources>
 </Application>
