@@ -35,5 +35,21 @@ namespace WpfApp1
             companyDirectorTextBox.Text = Properties.Settings.Default.companyDirector;
             companyDescriptionTextBox.Text = Properties.Settings.Default.companyDescription;
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (companyNameTextBox.Text.Length > 0 && companyDescriptionTextBox.Text.Length > 0 && companyDirectorTextBox.Text.Length > 0)
+            {
+                Properties.Settings.Default.companyName = companyNameTextBox.Text;
+                Properties.Settings.Default.companyDirector = companyDirectorTextBox.Text;
+                Properties.Settings.Default.companyDescription = companyDescriptionTextBox.Text;
+                Properties.Settings.Default.Save();
+                MessageBox.Show($"Изменения сохранены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
     }
 }

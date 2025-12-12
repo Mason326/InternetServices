@@ -9,15 +9,24 @@
     <Grid>
         <GroupBox Header="Организация" HorizontalAlignment="Left" Height="394" Margin="10,22,0,0" VerticalAlignment="Top" Width="503" FontFamily="Arial" FontSize="16">
             <StackPanel>
-                <Label Content="Название" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Normal"/>
+                <DockPanel>
+                    <Label Content="Название" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Normal"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,17,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="25"/>
+                </DockPanel>
                 <TextBox x:Name="companyNameTextBox" HorizontalAlignment="Left" Height="29" Margin="20,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="288" FontFamily="Arial" FontSize="16"/>
-                <Label Content="Директор" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Normal"/>
+                <DockPanel>
+                    <Label Content="Директор" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Normal"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,3,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="25"/>
+                </DockPanel>    
                 <TextBox x:Name="companyDirectorTextBox" HorizontalAlignment="Left" Height="29" Margin="20,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="396" FontFamily="Arial" FontSize="16"/>
-                <Label Content="Реквизиты " HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Normal"/>
+                <DockPanel>
+                    <Label Content="Реквизиты " HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Normal"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-10,3,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="25"/>
+                </DockPanel>
                 <TextBox x:Name="companyDescriptionTextBox" HorizontalAlignment="Left" Height="185" Margin="20,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="457" FontFamily="Arial" FontSize="16"/>
             </StackPanel>
         </GroupBox>
-        <Button Content="Редактировать" HorizontalAlignment="Left" Margin="530,35,0,0" VerticalAlignment="Top" Width="172" Height="30" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <Button Content="Редактировать" HorizontalAlignment="Left" Margin="530,35,0,0" VerticalAlignment="Top" Width="172" Height="30" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_1"/>
         <Button Content="На главную" HorizontalAlignment="Left" Margin="530,85,0,0" VerticalAlignment="Top" Width="172" Height="30" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
 
     </Grid>

@@ -16,5 +16,12 @@ namespace WpfApp1
             char patronymicInitial = string.IsNullOrEmpty(fullNameByParts[2]) ? ' ' : fullNameByParts[2][0];
             return $"{surname} {nameInitial}.{patronymicInitial}.";
         }
+
+        public static string HideClientName(string fullName)
+        {
+            string[] clientFio = fullName.Split(' ');
+            string hiddenName = $"{clientFio[1]} {clientFio[2]} {clientFio[0][0]}.";
+            return hiddenName;
+        }
     }
 }

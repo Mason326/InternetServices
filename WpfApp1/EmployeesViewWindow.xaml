@@ -1,0 +1,27 @@
+﻿<Window x:Class="WpfApp1.EmployeesViewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="EmployeesViewWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+    <Grid>
+        <Button x:Name="inClaimButton" Content="В заявку" HorizontalAlignment="Left" Margin="523,24,0,0" VerticalAlignment="Top" Width="248" Height="36" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="Button_Click_1"/>
+        <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="248" Height="36" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <DataGrid SelectionMode="Single" x:Name="employeesDG" HorizontalAlignment="Left" IsReadOnly="True" AutoGenerateColumns="False" Height="422" Margin="10,10,0,0" VerticalAlignment="Top" Width="486" SelectionChanged="employeesDG_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ФИО" Binding="{Binding full_name}" Width="200" />
+                <DataGridTextColumn Header="Номер Телефона" Binding="{Binding phoneNumber}" Width="150"/>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding UserPhoto}" Width="100" Height="100" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>

@@ -5,22 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Учет договоров" Height="438.104" Width="987.2" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Учет договоров" Height="512.001" Width="987.2" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <Button x:Name="showContractVerbose" Content="Просмотр договора" HorizontalAlignment="Left" Height="36" Margin="727,32,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
-        <DataGrid IsReadOnly="True" x:Name="contractsDG" Margin="10,195,9.8,9.8" AutoGenerateColumns="False" CanUserAddRows="False" SelectionChanged="contractsDG_SelectionChanged">
+        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="contractsDG" Margin="10,195,9.8,66.6" AutoGenerateColumns="False" CanUserAddRows="False" SelectionChanged="contractsDG_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="№ Договора" Binding="{Binding idcontract}" Width="100" />
                 <DataGridTextColumn Header="№ Заявки" Binding="{Binding connection_claim_id}" Width="100" />
                 <DataGridTextColumn Header="ФИО Клиента" Binding="{Binding client}" Width="100" />
                 <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="110" />
                 <DataGridTextColumn Header="Адрес" Binding="{Binding connection_address}" Width="90" />
-                <DataGridTextColumn Header="Статус" Binding="{Binding status}" Width="120" />
                 <DataGridTextColumn Header="Дата заключения" Binding="{Binding contract_date, StringFormat=\{0:dd.MM.yyyy\}}" Width="120" />
                 <DataGridTextColumn Header="Дата заявки" Binding="{Binding claimDate, StringFormat=\{0:dd.MM.yyyy\}}" Width="120" />
+                <DataGridTextColumn Header="Статус" Binding="{Binding status}" Width="120">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="Заключен">
+                                    <Setter Property="Background" Value="ForestGreen" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                                <Trigger Property="Text"  Value="Расторгнут">
+                                    <Setter Property="Background" Value="DarkRed" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Content="На главную" HorizontalAlignment="Left" Height="36" Margin="727,101,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
         <GroupBox Header="Фильтр по статусу" HorizontalAlignment="Left" Height="123" Margin="297,14,0,0" VerticalAlignment="Top" Width="162" FontSize="16">
             <StackPanel HorizontalAlignment="Left" Height="89" VerticalAlignment="Top" Width="147">
                 <RadioButton x:Name="allContracts" Content="Все" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,15,0,0" Checked="FilterByStatus_Checked"/>
@@ -50,6 +63,13 @@
             </StackPanel>
         </GroupBox>
         <Button Content="Очистить фильтры и поиск" HorizontalAlignment="Left" Margin="453,150,0,0" VerticalAlignment="Top" Width="242" Height="36" FontFamily="Arial" FontSize="16" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" Click="Button_Click_2"/>
+        <Label Content="Количество записей:" HorizontalAlignment="Left" Margin="12,457,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="recordsCountLabel" Content="" HorizontalAlignment="Left" Margin="176,457,0,0" VerticalAlignment="Top" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <StackPanel HorizontalAlignment="Left" Height="154" Margin="727,32,0,0" VerticalAlignment="Top" Width="226">
+            <Button x:Name="showContractVerbose" Content="Просмотр договора" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+            <Button x:Name="printAReportButton" Content="Печать отчета" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="printAReportButton_Click"/>
+            <Button Content="На главную" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        </StackPanel>
 
     </Grid>
 </Window>

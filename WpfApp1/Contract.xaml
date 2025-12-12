@@ -5,36 +5,55 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Договор" Height="588.6" Width="865.6" WindowStartupLocation="CenterScreen" WindowStyle="None">
+        Title="Договор" Height="499" Width="865.6" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <GroupBox Header="Заявка" HorizontalAlignment="Left" Height="263" Margin="50,152,0,0" VerticalAlignment="Top" Width="470" FontSize="16">
-            <StackPanel HorizontalAlignment="Left" Height="220" Margin="10,10,0,-35.6" VerticalAlignment="Top" Width="459">
-                <Label Content="Номер заявки: 12345" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="178"/>
-                <Label Content="Дата создания: 13.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="221"/>
-                <Label Content="Дата выполнения: 15.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="234"/>
-                <Label Content="Клиент: Иванов Иван Иванович" HorizontalAlignment="Left" Margin="0,0,-7.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="329"/>
-                <Label Content="Адрес монтирования: ул. Пушкина, д. X, кв. X" HorizontalAlignment="Left" Margin="0,0,-95.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="417"/>
-                <Label Content="Менеджер: Петров Пётр Петрович" HorizontalAlignment="Left" Margin="0,0,-138.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="460"/>
+        <GroupBox Header="Заявка" HorizontalAlignment="Left" Height="328" Margin="40,114,0,0" VerticalAlignment="Top" Width="470" FontSize="16">
+            <StackPanel HorizontalAlignment="Left" Height="283" Margin="10,10,-10.6,0" VerticalAlignment="Top" Width="459">
+                <DockPanel Margin="0,0,10.2,0">
+                    <Label Content="Номер заявки:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="117"/>
+                    <Label x:Name="claimNumberLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="5,0,0,0"/>
+                </DockPanel>
                 <DockPanel>
-                    <Label Content="Статус заявки: Закрыта" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="186"/>
+                    <Label Content="Дата создания:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="118"/>
+                    <Label x:Name="claimСreationDateLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="5,0,0,0"/>
+                </DockPanel>
+                <DockPanel Margin="0,0,0.2,0">
+                    <Label Content="Дата выполнения:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="144"/>
+                    <Label x:Name="claimExecutionDateLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="5,0,0,0"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Клиент:" HorizontalAlignment="Left" Margin="0,0,-7.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="66"/>
+                    <Label x:Name="claimClientLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="8,0,0,0"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Адрес монтирования:" HorizontalAlignment="Left" Margin="0,0,0.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="170"/>
+                    <TextBox IsReadOnly="True" TextWrapping="Wrap" AcceptsReturn="True" x:Name="claimAddressTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="79" Margin="5,0,0,0" Width="272"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Менеджер:" HorizontalAlignment="Left" Margin="0,0,0.4,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="95"/>
+                    <Label x:Name="claimManagerLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="5,0,0,0"/>
+                </DockPanel>
+                <DockPanel>
+                    <Label Content="Статус заявки:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="114"/>
+                    <Label x:Name="claimStatusLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="5,0,0,0"/>
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <Label Content="Номер договора: 543210" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="256" Margin="40,43,0,0"/>
-        <Label Content="Номер акта выполнненных работ: 543210" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="348" Margin="40,79,0,0"/>
+        <Label Content="Номер договора:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="136" Margin="40,43,0,0"/>
         <Label Content="Статус договора" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="257" Margin="544,43,0,0"/>
-        <Label Content="Тариф: 300 мбит/c 600 руб. / мес." HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="348" Margin="544,137,-32.8,0"/>
-        <Label Content="Логин учетной записи" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="193" Margin="544,184,0,0"/>
-        <Label Content="Пароль учетной записи" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="273" Margin="544,270,0,0"/>
-        <TextBox HorizontalAlignment="Left" Height="33" Margin="544,216,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="273"/>
-        <TextBox HorizontalAlignment="Left" Height="33" Margin="544,307,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="273"/>
-        <Button Content="Сгенерировать пароль и логин" HorizontalAlignment="Left" Margin="544,372,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Label Content="Номер пакета доп. услуг: xxxxx" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="348" Margin="42,434,0,0"/>
+        <Label Content="Тариф:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="59" Margin="544,144,0,0"/>
+        <Label Content="Логин учетной записи" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="193" Margin="544,180,0,0"/>
+        <Label Content="Пароль учетной записи" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="273" Margin="544,242,0,0"/>
+        <TextBox x:Name="abonentLoginTextBox" IsReadOnly="True" HorizontalAlignment="Left" Height="33" Margin="544,212,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="273"/>
+        <TextBox x:Name="abonentPasswordTextBox" IsReadOnly="True" HorizontalAlignment="Left" Height="33" Margin="544,279,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="273"/>
 
-        <Label Content="Дата заключения договора: 15.09.2025" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="384" Margin="42,115,0,0"/>
-        <Button Content="На главную" HorizontalAlignment="Left" Margin="544,498,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <ComboBox HorizontalAlignment="Left" Margin="544,78,0,0" VerticalAlignment="Top" Width="220" Height="44"/>
-        <Button Content="Печать договора" HorizontalAlignment="Left" Margin="544,434,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-
+        <Label Content="Дата заключения договора: " HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="214" Margin="38,74,0,0"/>
+        <Button Content="К заявке" HorizontalAlignment="Left" Margin="544,437,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click"/>
+        <ComboBox x:Name="contractStatusComboBox" IsEnabled="False"  HorizontalAlignment="Left" Margin="544,78,0,0" FontSize="16" VerticalAlignment="Top" Width="220" Height="44"/>
+        <Button Content="Печать договора" HorizontalAlignment="Left" Margin="544,383,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
+        <Label x:Name="contractNumberLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="181,43,0,0"/>
+        <Label x:Name="tariffLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="608,144,0,0"/>
+        <Label x:Name="contractDateLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="257,78,0,0"/>
+        <Button x:Name="formAContractButton" Content="Оформить договор" HorizontalAlignment="Left" Margin="546,333,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
     </Grid>
 </Window>

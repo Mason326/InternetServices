@@ -22,6 +22,7 @@ namespace WpfApp1
     /// </summary>
     public partial class AdditionalServices : Window
     {
+        int serviceId = -1;
         public AdditionalServices()
         {
             InitializeComponent();
@@ -34,29 +35,15 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `additional_services`", conn);
-                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-                    DataTable dt = new DataTable();
-                    cmd.ExecuteNonQuery();
-                    da.Fill(dt);
-                    addServicesDG.ItemsSource = dt.AsDataView();
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            RefreshDataGrid();
+            editServiceButton.IsEnabled = false;
+            deleteServiceButton.IsEnabled = false;
         }
 
         private void serviceTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             try
-            { 
+            {
                 Regex regex = new Regex(@"[0-9A-Za-zА-Яа-я-()\b\s]");
                 if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
                     e.Handled = false;
@@ -97,6 +84,241 @@ namespace WpfApp1
                         e.Handled = true;
                     else
                         e.Handled = false;
+                }
+            }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled = serviceTextBox.Text.Length > 0 && monthFee.Text.Length > 0;
+
+
+            if (requiredFieldsIsFilled)
+            {
+                if (!CheckDuplicateUtil.HasNoDuplicate("additional_services", "additional_service_name", serviceTextBox.Text))
+                {
+                    MessageBox.Show($"Не удалось добавить услугу. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand($@"Insert into additional_services(additional_service_name, monthly_fee) 
+                                                            value(
+                                                                '{serviceTextBox.Text}',
+                                                                 {monthFee.Text.Replace(',', '.')}
+                                                            );", conn);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Услуга создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        ClearInputData();
+                    }
+
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось создать услугу\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                RefreshDataGrid();
+            }
+            else
+                MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private void ClearInputData()
+        {
+            serviceTextBox.Text = "";
+            monthFee.Text = "";
+        }
+
+        private void RefreshDataGrid()
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(@"SELECT * FROM additional_services order by idadditional_service desc;", conn);
+                    MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    cmd.ExecuteNonQuery();
+                    da.Fill(dt);
+                    addServicesDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("additional_services");
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void TextBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command == ApplicationCommands.Paste)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void endEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            bool requiredFieldsIsFilled;
+            try
+            {
+                requiredFieldsIsFilled = serviceTextBox.Text.Length > 0
+                    && monthFee.Text.Length > 0;
+            }
+            catch
+            {
+                MessageBox.Show("Некорректно заполнены обязательные поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (requiredFieldsIsFilled)
+            {
+                int duplicateNameService = CheckDuplicateUtil.HasNoDuplicate("additional_services", "additional_service_name", serviceTextBox.Text, false);
+
+                if (duplicateNameService != serviceId && duplicateNameService != -1)
+                {
+                    MessageBox.Show($"Не удалось обновить данные услуги. Обнаружен дубликат наименования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string query = $@"Update `additional_services` 
+                                                set additional_service_name = '{serviceTextBox.Text.Trim()}',
+                                                monthly_fee = '{monthFee.Text.Trim()}'
+                                                where idadditional_service = {serviceId}";
+                            MySqlCommand cmd = new MySqlCommand(query, conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Данные услуги успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            CloseEdition();
+                            RefreshDataGrid();
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось обновить данные услуги\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+
+
+        private void PrepareToEdit()
+        {
+            if (addServicesDG.SelectedItem != null)
+            {
+                DataRowView drv = addServicesDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+
+                addServiceButton.Visibility = Visibility.Collapsed;
+                editServiceButton.Visibility = Visibility.Collapsed;
+                deleteServiceButton.Visibility = Visibility.Collapsed;
+                toMainButton.Visibility = Visibility.Collapsed;
+
+                serviceId = Convert.ToInt32(fieldValuesOfARecord[0]);
+                serviceTextBox.Text = fieldValuesOfARecord[1].ToString().Trim();
+                monthFee.Text = fieldValuesOfARecord[2].ToString().Trim();
+
+                addServicesDG.IsEnabled = false;
+
+                endEditButton.Visibility = Visibility.Visible;
+                cancelEditButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CloseEdition()
+        {
+            addServiceButton.Visibility = Visibility.Visible;
+            editServiceButton.Visibility = Visibility.Visible;
+            deleteServiceButton.Visibility = Visibility.Visible;
+            toMainButton.Visibility = Visibility.Visible;
+
+            endEditButton.Visibility = Visibility.Collapsed;
+            cancelEditButton.Visibility = Visibility.Collapsed;
+
+            ClearInputData();
+
+            addServicesDG.SelectedItem = null;
+            serviceId = -1;
+            editServiceButton.IsEnabled = false;
+            deleteServiceButton.IsEnabled = false;
+            addServicesDG.IsEnabled = true;
+        }
+
+        private void cancelEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            CloseEdition();
+        }
+
+        private void editServiceButton_Click(object sender, RoutedEventArgs e)
+        {
+            PrepareToEdit();
+        }
+
+        private void addServicesDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            editServiceButton.IsEnabled = true;
+            deleteServiceButton.IsEnabled = true;
+        }
+
+        private void deleteServiceButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult res = MessageBox.Show($"Вы уверены, что хотите удалить эту услугу?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes)
+                return;
+
+            if (addServicesDG.SelectedItem != null)
+            {
+                DataRowView drv = addServicesDG.SelectedItem as DataRowView;
+                object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            string query = $@"Delete from `additional_services`
+                                                where idadditional_service = {fieldValuesOfARecord[0]}";
+                            MySqlCommand cmd = new MySqlCommand(query, conn);
+                            cmd.ExecuteNonQuery();
+                            MessageBox.Show($"Данные услуги успешно удалены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            RefreshDataGrid();
+                            addServicesDG.SelectedItem = null;
+                            editServiceButton.IsEnabled = false;
+                            deleteServiceButton.IsEnabled = false;
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show($"Не удалось удалить услугу\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось установить подключение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

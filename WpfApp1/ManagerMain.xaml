@@ -14,7 +14,7 @@
         <Button Content="Выйти из учетной записи" HorizontalAlignment="Left" Height="36" Margin="36,488,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0,0" Click="Button_Click_4" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         <Button Content="Клиенты" HorizontalAlignment="Left" Height="36" Margin="36,430,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click_2" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         <Label Content="Менеджер:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Image HorizontalAlignment="Left" Height="188" Margin="41,47,0,0" VerticalAlignment="Top" Width="221" Source="user.png"/>
+        <Image HorizontalAlignment="Left" Height="188" Margin="41,47,0,0" VerticalAlignment="Top" Width="221" Source="Resources/Images/user.png"/>
         <Label Name="userName" Content="" HorizontalAlignment="Left" Margin="105,9,0,0" VerticalAlignment="Top" FontSize="16" Height="32" Width="175"/>
     </Grid>
 </Window>

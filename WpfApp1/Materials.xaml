@@ -11,42 +11,28 @@
         <Label Content="Материал" HorizontalAlignment="Left" Margin="486,28,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273"/>
         <Label Content="Цена" HorizontalAlignment="Left" Margin="486,138,0,0" VerticalAlignment="Top"/>
         <Label Content="Единицы измерения" HorizontalAlignment="Left" Margin="486,80,0,0" VerticalAlignment="Top"/>
-        <DataGrid x:Name="materialsDG" AutoGenerateColumns="False" HorizontalAlignment="Left" Height="428" Margin="14,19,0,0" VerticalAlignment="Top" Width="437">
+        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="materialsDG" AutoGenerateColumns="False" HorizontalAlignment="Left" Height="428" Margin="14,19,0,0" VerticalAlignment="Top" Width="437" SelectionChanged="materialsDG_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Материал" Binding="{Binding material_name}" Width="70" />
                 <DataGridTextColumn Header="Единицы измерения" Binding="{Binding units}" Width="150" />
                 <DataGridTextColumn Header="Цена" Binding="{Binding cost}" Width="70" />
             </DataGrid.Columns>
         </DataGrid>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <Button Content="Добавить материал" HorizontalAlignment="Left" Margin="486,215,0,0" VerticalAlignment="Top" Width="210" Height="31"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <Button Content="На главную" HorizontalAlignment="Left" Margin="486,416,0,0" VerticalAlignment="Top" Width="210" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <Button Content="Добавить материал" HorizontalAlignment="Left" Margin="486,215,0,0" VerticalAlignment="Top" Width="210" Height="31"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-        <Button Content="Редактировать материал" HorizontalAlignment="Left" Margin="486,270,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Grid>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <Button Content="Добавить материал" HorizontalAlignment="Left" Margin="486,215,0,0" VerticalAlignment="Top" Width="210" Height="31"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
-            <TextBox x:Name="cost" HorizontalAlignment="Left" Height="30" Margin="486,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput_2" PreviewKeyDown="TextBox_PreviewKeyDown"/>
-            <Button Content="Добавить материал" HorizontalAlignment="Left" Margin="486,215,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput_1"/>
-            <Button Content="Удалить материал" HorizontalAlignment="Left" Margin="486,322,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-
-        </Grid>
-
+            <TextBox CommandManager.PreviewExecuted="TextBox_PreviewExecuted" TabIndex="3" x:Name="materialCostTextBox" HorizontalAlignment="Left" Height="30" Margin="486,165,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput_2" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="12"/>
+            <TextBox TabIndex="1" x:Name="materialNameTextBox" HorizontalAlignment="Left" Height="30" Margin="486,54,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput"/>
+            <TextBox TabIndex="2" x:Name="materialUnitTextBox" HorizontalAlignment="Left" Height="30" Margin="486,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210" PreviewTextInput="TextBox_PreviewTextInput_1"/>
+            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="542,27,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="600,78,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="516,136,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+            <StackPanel HorizontalAlignment="Left" Height="233" Margin="486,215,0,0" VerticalAlignment="Top" Width="210">
+                <Button x:Name="addMaterialButton" Content="Добавить материал" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
+                <Button x:Name="editMaterialButton" Content="Редактировать материал" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="editMaterialButton_Click"/>
+                <Button x:Name="deleteMaterialButton" Content="Удалить материал" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="deleteMaterialButton_Click"/>
+                <Button x:Name="toMainButton" Content="На главную" HorizontalAlignment="Left" Margin="0,85,0,0" VerticalAlignment="Top" Width="210" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
+                <Button x:Name="endEditButton" Content="Завершить редактирование" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="endEditButton_Click"/>
+                <Button x:Name="cancelEditButton" Content="Отменить изменения" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="210" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="cancelEditButton_Click"/>
+            </StackPanel>
+            <Label Content="Количество материалов:" HorizontalAlignment="Left" Margin="17,461,0,0" VerticalAlignment="Top" Width="196" FontFamily="Arial" FontSize="16"/>
+            <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="216,461,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>

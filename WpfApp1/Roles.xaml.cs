@@ -34,38 +34,29 @@ namespace WpfApp1
 
         private void rolesDG_Loaded(object sender, RoutedEventArgs e)
         {
+            RefreshDataGrid();
+
+        }
+
+        private void RefreshDataGrid()
+        {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `roles`", conn);
+                    MySqlCommand cmd = new MySqlCommand("Select * from `roles` order by idroles desc", conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
                     da.Fill(dt);
                     rolesDG.ItemsSource = dt.AsDataView();
+                    countRecordsLabel.Content = RecordsCounter.CountRecords("roles");
                 }
             }
             catch (Exception exc)
             {
                 MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = new Regex(@"[А-Яа-я\b\s]");
-            try
-            {
-                if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
-                    e.Handled = false;
-                else
-                    e.Handled = true;
-            }
-            catch
-            {
-                ;
             }
         }
     }

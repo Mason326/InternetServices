@@ -26,50 +26,66 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new AdditionalServices();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new Services();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new Tariff();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new Materials();
             win.ShowDialog();
+            this.ShowDialog();
 
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new Company();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new Roles();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new CreateUser();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Button_Click_7(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            MessageBoxResult resDialog = MessageBox.Show("Вы действительно хотите выйти из учётной записи?", "Выход", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (resDialog == MessageBoxResult.Yes)
+                this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

@@ -34,10 +34,25 @@ namespace WpfApp1
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            MessageBoxResult resDialog = MessageBox.Show("Вы действительно хотите выйти из приложения?", "Выход", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (resDialog == MessageBoxResult.Yes)
+                this.Close();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            SendAuthАttempt();
+        }
+
+        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SendAuthАttempt();
+            }
+        }
+
+        private void SendAuthАttempt()
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
@@ -45,9 +60,9 @@ namespace WpfApp1
                 {
                     conn.Open();
                 }
-                catch
+                catch(Exception exc)
                 {
-                    MessageBox.Show($"Не удалось установить соединение", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"Не удалось установить соединение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 string userLogin = LoginTextbox.Text;
                 string userPassword = PasswordTextBox.Password;
@@ -69,7 +84,7 @@ namespace WpfApp1
                                 Sb.Append(b.ToString("x2"));
                         }
                         string hashedPassword = Sb.ToString();
-                        
+
                         MySqlCommand cmd = new MySqlCommand($"Select `idemployees`, `full_name`, `login`, `password`, `roles`.role_name from `employees` INNER JOIN `roles` on `employees`.roles_Id = `roles`.idroles WHERE `login` = '{userLogin}' AND `password` = '{hashedPassword}'", conn);
                         using (MySqlDataReader rdr = cmd.ExecuteReader())
                         {
@@ -83,7 +98,7 @@ namespace WpfApp1
                                 AccountHolder.UserLogin = (string)accountData[2];
                                 AccountHolder.UserPassword = (string)accountData[3];
                                 AccountHolder.UserRole = (string)accountData[4];
-
+                                this.Hide();
                                 switch (AccountHolder.UserRole)
                                 {
                                     case "Менеджер":
@@ -99,14 +114,17 @@ namespace WpfApp1
                                         new DirectorMain().ShowDialog();
                                         break;
                                 }
+                                LoginTextbox.Text = "";
+                                PasswordTextBox.Password = "";
+                                this.ShowDialog();
                             }
                             else
                             {
                                 MessageBox.Show("Неверные данные пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                           }
+                            }
                         }
                     }
-                    catch(Exception exc)
+                    catch (Exception exc)
                     {
                         MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
@@ -114,8 +132,11 @@ namespace WpfApp1
                 LoginTextbox.Text = "";
                 PasswordTextBox.Password = "";
             }
-
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoginTextbox.Focus();
+        }
     }
 }

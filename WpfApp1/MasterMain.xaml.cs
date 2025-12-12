@@ -26,13 +26,17 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            this.Hide();
             var win = new AccountingClaim();
             win.ShowDialog();
+            this.ShowDialog();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            MessageBoxResult resDialog = MessageBox.Show("Вы действительно хотите выйти из учётной записи?", "Выход", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (resDialog == MessageBoxResult.Yes)
+                this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
