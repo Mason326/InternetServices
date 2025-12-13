@@ -68,16 +68,18 @@ namespace WpfApp1
                 }
                 string userLogin = LoginTextbox.Text;
                 string userPassword = PasswordTextBox.Password;
-                //string userPassword = ;
-                if (userLogin == "" || userPassword == "")
+                string capchaInput = captchaTextbox.Text;
+                if (userLogin == "" || userPassword == "" || (authAttempsCounter > 1 && capchaInput == ""))
                 {
-                    MessageBox.Show($"Необходимо заполнить поля Логин и Пароль", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 else
                 {
                     try
                     {
+                        // проверка капчи
+
                         StringBuilder Sb = new StringBuilder();
                         using (SHA256 hash = SHA256Managed.Create())
                         {
@@ -120,6 +122,7 @@ namespace WpfApp1
                                 LoginTextbox.Text = "";
                                 PasswordTextBox.Password = "";
                                 authAttempsCounter = 0;
+                                ShowCaptcha(authAttempsCounter);
                                 this.ShowDialog();
                             }
                             else
@@ -153,6 +156,7 @@ namespace WpfApp1
                 refreshCaptchaImage.Visibility = Visibility.Visible;
                 captchaLabel.Visibility = Visibility.Visible;
                 captchaTextbox.Visibility = Visibility.Visible;
+                captchaTextbox.Text = GenerateCaptchaText();
             }
             else
             {
@@ -161,6 +165,16 @@ namespace WpfApp1
                 captchaLabel.Visibility = Visibility.Hidden;
                 captchaTextbox.Visibility = Visibility.Hidden;
             }
+        }
+
+        private string GenerateCaptchaText()
+        {
+            string targetSymbols = "qwertyuiopasdfghjkl1234567890zxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+            StringBuilder sb = new StringBuilder();
+            Random random = new Random();
+            for (int i = 0; i < 4; i++)
+                sb.Append(targetSymbols[random.Next(0, targetSymbols.Length - 1)]);
+            return sb.ToString();
         }
     }
 }

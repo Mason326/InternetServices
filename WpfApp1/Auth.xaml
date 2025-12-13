@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Window9" Height="572.85" Width="719.2" WindowStartupLocation="CenterScreen" WindowStyle="None" PreviewKeyUp="Window_PreviewKeyUp" Loaded="Window_Loaded">
+        Title="Window9" Height="576.45" Width="719.2" WindowStartupLocation="CenterScreen" WindowStyle="None" PreviewKeyUp="Window_PreviewKeyUp" Loaded="Window_Loaded">
     <Grid Margin="0,0,25.6,-0.4">
         <DockPanel Height="570" LastChildFill="False" Margin="0,0,-31.8,0" VerticalAlignment="Top">
             <Image HorizontalAlignment="Left" Height="552" VerticalAlignment="Top" Width="372" Source="Resources/Images/Inet.jpg"/>
@@ -40,8 +40,6 @@
                     <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-5,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 </DockPanel>
                 <TextBox x:Name="captchaTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
-
-
                 <Button x:Name="AuthButton" Padding="10" Content="Авторизоваться" Template="{StaticResource ButtonTemplate}" HorizontalAlignment="Left" Margin="5,20,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Click="Button_Click_1" UseLayoutRounding="False" />
             </StackPanel>
         </DockPanel>
