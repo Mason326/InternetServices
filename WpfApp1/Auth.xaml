@@ -11,11 +11,18 @@
         <DockPanel Height="502" LastChildFill="False" Margin="0,0,-31.8,0" VerticalAlignment="Top">
             <Image HorizontalAlignment="Left" Height="487" VerticalAlignment="Top" Width="372" Source="Resources/Images/Inet.jpg"/>
             <StackPanel Margin="5,20,0.4,9.6" Width="326" HorizontalAlignment="Left">
-                <Button Content="" HorizontalAlignment="Left" Margin="265,0,0,0" VerticalAlignment="Top" Width="47" Height="41" RenderTransformOrigin="0.796,-0.022" BorderThickness="0" Click="Button_Click_3">
-                    <Button.Background>
-                        <ImageBrush ImageSource="Resources/Images/exit.png"/>
-                    </Button.Background>
-                </Button>
+                <DockPanel>
+                    <Button Content="" Width="55" Height="46" Margin="185,0,0,0" BorderBrush="White" Click="Button_Click_2">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Resources/Images/GearIcon.png"/>
+                        </Button.Background>
+                    </Button>
+                    <Button Content="" HorizontalAlignment="Left" Margin="15,0,0,0" VerticalAlignment="Top" Width="47" Height="45" RenderTransformOrigin="0.796,-0.022" BorderThickness="0" Click="Button_Click_3">
+                        <Button.Background>
+                            <ImageBrush ImageSource="Resources/Images/exit.png"/>
+                        </Button.Background>
+                    </Button>
+                </DockPanel>
                 <Label Content="Логин" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
                 <TextBox x:Name="LoginTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
                 <Label Content="Пароль" HorizontalAlignment="Left" Margin="5,20,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial" Width="94"/>
