@@ -45,17 +45,60 @@ namespace WpfApp1
 
             try
             {
-                using (MySqlConnection conn = new MySqlConnection($"server={server};user={user};password={password};database={db}"))
-                {
-                    var taskConnect = conn.OpenAsync();
-                    await taskConnect;
-                    MessageBox.Show("Соединение установлено успешно", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                var connectWithDB = ConnectToMySqlAsync($"server={server};user={user};password={password};database={db}");
+                (string responseMessage, bool isEstablished) = await connectWithDB;
+                string title = isEstablished ? "Успех" : "Внимание";
+                var messageImage = isEstablished ? MessageBoxImage.Information : MessageBoxImage.Warning;
+                MessageBox.Show(responseMessage, title, MessageBoxButton.OK, messageImage);
             }
             catch (Exception exc)
             {
                 MessageBox.Show($"Ошибка подключения: {exc.Message}", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private async Task<(string, bool)> ConnectToMySqlAsync(string connectionString)
+        {
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                var taskConnect = conn.OpenAsync();
+                string message = "";
+                try
+                {
+                    await taskConnect;
+                }
+                catch(MySqlException exc)
+                {
+                    switch (exc.Number)
+                    {
+                        case 0:
+                            message = "Указанный сервер недоступен";
+                            break;
+                        case 1042:
+                            message = "Адрес сервера не удалось разрешить";
+                            break;
+                        case 1045:
+                            message = $"Некорректные данные пользователя";
+                            break;
+                        case 1049:
+                            message = $"База данных не найдена. Авторизуйтесь администратором системы для создания базы данных и импорта данных";
+                            break;
+                        default:
+                            message = $"Ошибка подключения: {exc.Message}";
+                            break;
+                    }
+                    return (message, false);
+                }
+                message = "Подключение установлено успешно";
+                return (message, true);
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            ServerTextbox.Text = Properties.Settings.Default.server;
+            UserTextbox.Text = Properties.Settings.Default.user;
+            PasswordTextbox.Password = Properties.Settings.Default.password;
         }
     }
 }
