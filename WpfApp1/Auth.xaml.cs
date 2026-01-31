@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -142,9 +143,18 @@ namespace WpfApp1
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             this.Hide();
-            var win = new Settings();
+            object[] needShutdown = new object[1];
+            var win = new Settings(needShutdown);
             win.ShowDialog();
-            this.ShowDialog();
+            if(Convert.ToBoolean(needShutdown[0]))
+            {
+                this.Close();
+                Application.Current.Shutdown();
+                Process.Start(Application.ResourceAssembly.Location);
+            }
+            else
+                this.ShowDialog();
+
         }
     }
 }

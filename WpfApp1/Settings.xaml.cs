@@ -20,8 +20,10 @@ namespace WpfApp1
     /// </summary>
     public partial class Settings : Window
     {
-        public Settings()
+        object[] closeApp;
+        public Settings(object[] closeAppSignal)
         {
+            closeApp = closeAppSignal;
             InitializeComponent();
         }
 
@@ -99,6 +101,28 @@ namespace WpfApp1
             ServerTextbox.Text = Properties.Settings.Default.server;
             UserTextbox.Text = Properties.Settings.Default.user;
             PasswordTextbox.Password = Properties.Settings.Default.password;
+        }
+
+        private void SaveChangesButton_Click(object sender, RoutedEventArgs e)
+        {
+            string server = ServerTextbox.Text.Trim();
+            string user = UserTextbox.Text.Trim();
+            string password = PasswordTextbox.Password.Trim();
+
+            if (string.IsNullOrEmpty(server) || string.IsNullOrEmpty(user))
+            {
+                MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            Properties.Settings.Default.server = server;
+            Properties.Settings.Default.user = user;
+            Properties.Settings.Default.password = password;
+            Properties.Settings.Default.Save();
+
+            MessageBox.Show($"Изменения успешно сохранены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            closeApp[0] = true;
+            this.Close();
         }
     }
 }

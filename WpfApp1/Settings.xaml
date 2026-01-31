@@ -23,7 +23,7 @@
             </DockPanel>
             <PasswordBox x:Name="PasswordTextbox" HorizontalAlignment="Left" Height="36" Margin="34,0,0,0" VerticalAlignment="Top" Width="293" FontSize="18"/>
             <Button x:Name="TestConnectionButton" Content="Тест соединения" HorizontalAlignment="Left" Margin="34,25,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" UseLayoutRounding="False" Click="TestConnectionButton_Click"/>
-            <Button x:Name="SaveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="34,15,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" UseLayoutRounding="False"/>
+            <Button x:Name="SaveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="34,15,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" UseLayoutRounding="False" Click="SaveChangesButton_Click"/>
             <Button x:Name="ToAuthButton" Content="К авторизации" HorizontalAlignment="Left" Margin="34,15,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" Click="Button_Click_1" UseLayoutRounding="False"/>
         </StackPanel>
     </Grid>
