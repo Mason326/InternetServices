@@ -1,0 +1,30 @@
+﻿<Window x:Class="WpfApp1.Settings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Settings" Height="486.8" Width="368" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+    <Grid>
+        <StackPanel>
+            <DockPanel Height="57" Margin="0,0,-0.4,0">
+                <Label Content="Сервер" HorizontalAlignment="Left" Margin="34,28,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,28,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+            </DockPanel>
+            <TextBox x:Name="ServerTextbox" HorizontalAlignment="Left" Height="36" Margin="34,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
+            <DockPanel>
+                <Label Content="Пользователь" HorizontalAlignment="Left" Margin="34,10,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="29"/>
+            </DockPanel>
+            <TextBox x:Name="UserTextbox" HorizontalAlignment="Left" Height="36" Margin="34,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
+            <DockPanel>
+                <Label Content="Пароль" HorizontalAlignment="Left" Margin="34,10,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+            </DockPanel>
+            <PasswordBox x:Name="PasswordTextbox" HorizontalAlignment="Left" Height="36" Margin="34,0,0,0" VerticalAlignment="Top" Width="293" FontSize="18"/>
+            <Button x:Name="TestConnectionButton" Content="Тест соединения" HorizontalAlignment="Left" Margin="34,25,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" UseLayoutRounding="False" Click="TestConnectionButton_Click"/>
+            <Button x:Name="SaveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="34,15,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" UseLayoutRounding="False" Click="SaveChangesButton_Click"/>
+            <Button x:Name="ToAuthButton" Content="К авторизации" HorizontalAlignment="Left" Margin="34,15,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" Click="Button_Click_1" UseLayoutRounding="False"/>
+        </StackPanel>
+    </Grid>
+</Window>
