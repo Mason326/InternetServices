@@ -61,9 +61,12 @@ namespace WpfApp1
                 {
                     conn.Open();
                 }
-                catch(Exception exc)
+                catch(Exception)
                 {
-                    MessageBox.Show($"Не удалось установить соединение\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBoxResult result = MessageBox.Show($"Ошибка подключения к базе данных. Хотите настроить параметры подключения?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                        OpenSettingsForm();
+                    return;
                 }
                 string userLogin = LoginTextbox.Text;
                 string userPassword = PasswordTextBox.Password;
@@ -137,16 +140,22 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            TestConnection();
             LoginTextbox.Focus();
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            OpenSettingsForm();
+        }
+
+        private void OpenSettingsForm()
+        {
             this.Hide();
             object[] needShutdown = new object[1];
             var win = new Settings(needShutdown);
             win.ShowDialog();
-            if(Convert.ToBoolean(needShutdown[0]))
+            if (Convert.ToBoolean(needShutdown[0]))
             {
                 this.Close();
                 Application.Current.Shutdown();
@@ -154,7 +163,25 @@ namespace WpfApp1
             }
             else
                 this.ShowDialog();
+        }
 
+        private async void TestConnection()
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                try
+                {
+                    var taskOpen = conn.OpenAsync();
+                    await taskOpen;
+                }
+                catch (Exception)
+                {
+                    MessageBoxResult result = MessageBox.Show($"Ошибка подключения к базе данных. Хотите настроить параметры подключения?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                        OpenSettingsForm();
+                    return;
+                }
+            }
         }
     }
 }

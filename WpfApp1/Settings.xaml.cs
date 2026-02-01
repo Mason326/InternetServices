@@ -120,7 +120,7 @@ namespace WpfApp1
             Properties.Settings.Default.password = password;
             Properties.Settings.Default.Save();
 
-            MessageBox.Show($"Изменения успешно сохранены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Изменения успешно сохранены. Необходима перезагрузка", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             closeApp[0] = true;
             this.Close();
         }
