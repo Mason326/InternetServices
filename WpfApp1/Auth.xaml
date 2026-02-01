@@ -23,14 +23,28 @@
                         </Button.Background>
                     </Button>
                 </DockPanel>
-                <Label Content="Логин" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                <DockPanel Margin="5,0,0.4,0" Height="31">
+                    <Label Content="Логин" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                </DockPanel>
                 <TextBox x:Name="LoginTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
-                <Label Content="Пароль" HorizontalAlignment="Left" Margin="5,20,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial" Width="94"/>
-                <PasswordBox x:Name="PasswordTextBox" HorizontalAlignment="Left" Height="36" Margin="10,0,0,0" VerticalAlignment="Top" Width="288" FontSize="18" />
-                <Button x:Name="AuthButton" Content="Авторизоваться" HorizontalAlignment="Left" Margin="5,223,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" Click="Button_Click_1" UseLayoutRounding="False"/>
+                <DockPanel Margin="5,0,0.4,0" Height="31">
+                    <Label Content="Пароль" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-9,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                </DockPanel>
+                <PasswordBox x:Name="PasswordTextBox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" VerticalAlignment="Top" Width="293" FontSize="18" />
+                <DockPanel Margin="5,0,0.4,0" Height="31">
+                    <Label Content="Капча" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-9,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                </DockPanel>
+                <Image x:Name="captchaImage" Height="133" Margin="10,5,28.4,5" />
+                <Button x:Name="refreshButton" Margin="110.4,0,130.4,0" Click="RefreshButton_Click" Height="56" BorderBrush="White" >
+                    <Button.Background>
+                        <ImageBrush Stretch="Uniform" ImageSource="Resources/Images/refreshIcon.png"/>
+                    </Button.Background>
+                </Button>
+                <Button x:Name="AuthButton" Content="Авторизоваться" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" Click="Button_Click_1" UseLayoutRounding="False"/>
             </StackPanel>
         </DockPanel>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="431,61,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="445,147,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
     </Grid>
 </Window>

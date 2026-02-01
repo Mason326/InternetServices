@@ -183,5 +183,10 @@ namespace WpfApp1
                 }
             }
         }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
