@@ -355,6 +355,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Dump\backup.sql" />
+    <Resource Include="Resources\Images\refreshIcon.png" />
     <Resource Include="Resources\Images\GearIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

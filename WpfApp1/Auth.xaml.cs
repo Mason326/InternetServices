@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -186,7 +187,55 @@ namespace WpfApp1
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                string captchaText = GenerateCaptchaText(6);
+                RefreshCaptchaImage(captchaText);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Не удалось обновить картинку капчи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
+        private void RefreshCaptchaImage(string text)
+        {
+            DrawingVisual visual = new DrawingVisual();
+            using (DrawingContext dc = visual.RenderOpen())
+            {
+                Pen drawingpen = new Pen(Brushes.Gray, 0.7);
+                Random random = new Random();
+                int coordX = random.Next(0, 90);
+                int coordY = random.Next(0, 40);
+                int angle = random.Next(0, 70);
+                dc.PushTransform(new RotateTransform(angle, coordX, coordY));
+                dc.DrawText(new FormattedText($"{text}", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Comic Sans MS"), 9, Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(coordX, coordY));
+                dc.Pop();
+                for (int i = 0; i <= 100; i++)
+                {
+                    dc.DrawEllipse(Brushes.Black, drawingpen, new Point(random.Next(0, 140), random.Next(0, 70)), 0.5, 0.5);
+                }
+
+                for (int i = 0; i <= 10; i++)
+                {
+                    dc.DrawLine(drawingpen, new Point(random.Next(0, 140), random.Next(0, 70)), new Point(random.Next(0, 70), random.Next(0, 70)));
+                }
+            }
+            DrawingImage drawingImage = new DrawingImage(visual.Drawing);
+            drawingImage.Freeze();
+            captchaImage.Source = drawingImage;
+        }
+
+        private string GenerateCaptchaText(int lettersCount)
+        {
+            const string sourceLetters = "qwertyuiopasdfghjklzxcvbnm1234567890!@#$%&*()QWERTYUIOPASDFGHJKLZXCVBNM";
+            StringBuilder sb = new StringBuilder();
+            Random random = new Random();
+            for (int i = 0; i < lettersCount; i++)
+            {
+                sb.Append(sourceLetters[random.Next(0, sourceLetters.Length - 1)]);                
+            }
+            return sb.ToString();
         }
     }
 }
