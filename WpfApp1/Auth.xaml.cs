@@ -82,14 +82,17 @@ namespace WpfApp1
                 }
                 else
                 {
-                    if (captchaInput != captchaCompare) 
+                    if (captchaInput != captchaCompare && authAttempsCounter > 1) 
                     {
-                        MessageBox.Show($"Капча заполнена неверно", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show($"Капча заполнена неверно. Возможность авторизации заблокируется на 10 секунд", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         authAttempsCounter++;
+                        if (authAttempsCounter > 2)
+                            FrezeForm();
                         captchaTextbox.Clear();
                         ShowCaptcha(authAttempsCounter);
                         return;
                     }
+                    captchaTextbox.Clear();
                     try
                     {
                         StringBuilder Sb = new StringBuilder();
@@ -205,8 +208,8 @@ namespace WpfApp1
         {
             try
             {
-                string captchaText = GenerateCaptchaText(6);
-                RefreshCaptchaImage(captchaText);
+                captchaCompare = GenerateCaptchaText(6);
+                RefreshCaptchaImage(captchaCompare);
             }
             catch (Exception)
             {
@@ -275,6 +278,20 @@ namespace WpfApp1
                 sb.Append(sourceLetters[random.Next(0, sourceLetters.Length - 1)]);         
             }
             return sb.ToString();
+        }
+
+        private async void FrezeForm()
+        {
+            AuthButton.IsEnabled = false;
+            for (int i = 10; i >= 0; i--)
+            {
+                await Task.Delay(1000);
+                AuthButton.Content = $"{i}";
+                AuthButton.Foreground = Brushes.Black;
+            }
+            AuthButton.Foreground = Brushes.White;
+            AuthButton.IsEnabled = true;
+            AuthButton.Content = "Авторизоваться";
         }
     }
 }
