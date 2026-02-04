@@ -33,11 +33,11 @@
                 </DockPanel>
                 <PasswordBox x:Name="PasswordTextBox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" VerticalAlignment="Top" Width="293" FontSize="18" />
                 <DockPanel Margin="5,0,0.4,0" Height="31">
-                    <Label Content="Капча" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-9,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                    <Label Content="Капча" Name="captchaLabel" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                    <Label Foreground="Red" Name="captchaAsterisk" Content="*" HorizontalAlignment="Left" Margin="-9,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 </DockPanel>
                 <Image x:Name="captchaImage" Height="133" Margin="5,5,28.4,10" />
-                <TextBox x:Name="CaptchaTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
+                <TextBox x:Name="captchaTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
                 <Button x:Name="refreshButton" Margin="110.4,10,130.4,0" Click="RefreshButton_Click" Height="56" BorderBrush="White" >
                     <Button.Background>
                         <ImageBrush Stretch="Uniform" ImageSource="Resources/Images/refreshIcon.png"/>

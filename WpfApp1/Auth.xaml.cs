@@ -24,9 +24,12 @@ namespace WpfApp1
     /// </summary>
     public partial class Auth : Window
     {
+        int authAttempsCounter = 0;
+        string captchaCompare = "";
         public Auth()
         {
             InitializeComponent();
+            ShowCaptcha(authAttempsCounter);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -71,13 +74,22 @@ namespace WpfApp1
                 }
                 string userLogin = LoginTextbox.Text;
                 string userPassword = PasswordTextBox.Password;
-                if (userLogin == "" || userPassword == "")
+                string captchaInput = captchaTextbox.Text;
+                if (userLogin == "" || userPassword == "" || (authAttempsCounter > 1 && captchaInput == ""))
                 {
-                    MessageBox.Show($"Необходимо заполнить поля Логин и Пароль", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 else
                 {
+                    if (captchaInput != captchaCompare) 
+                    {
+                        MessageBox.Show($"Капча заполнена неверно", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        authAttempsCounter++;
+                        captchaTextbox.Clear();
+                        ShowCaptcha(authAttempsCounter);
+                        return;
+                    }
                     try
                     {
                         StringBuilder Sb = new StringBuilder();
@@ -95,6 +107,8 @@ namespace WpfApp1
                         {
                             if (rdr.HasRows)
                             {
+                                authAttempsCounter = 0;
+                                ShowCaptcha(authAttempsCounter);
                                 rdr.Read();
                                 object[] accountData = new object[rdr.FieldCount];
                                 rdr.GetValues(accountData);
@@ -126,6 +140,8 @@ namespace WpfApp1
                             else
                             {
                                 MessageBox.Show("Неверные данные пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                ShowCaptcha(authAttempsCounter);
+                                authAttempsCounter++;
                             }
                         }
                     }
@@ -198,6 +214,29 @@ namespace WpfApp1
             }
         }
 
+        private void ShowCaptcha(int attempsCount)
+        {
+            if (attempsCount > 0)
+            {
+                captchaImage.Visibility = Visibility.Visible;
+                refreshButton.Visibility = Visibility.Visible;
+                captchaLabel.Visibility = Visibility.Visible;
+                captchaTextbox.Visibility = Visibility.Visible;
+                captchaAsterisk.Visibility = Visibility.Visible;
+                captchaCompare = GenerateCaptchaText(6);
+                RefreshCaptchaImage(captchaCompare);
+            }
+            else
+            {
+                captchaImage.Visibility = Visibility.Hidden;
+                refreshButton.Visibility = Visibility.Hidden;
+                captchaLabel.Visibility = Visibility.Hidden;
+                captchaTextbox.Visibility = Visibility.Hidden;
+                captchaAsterisk.Visibility = Visibility.Hidden;
+                captchaCompare = "";
+            }
+        }
+
         private void RefreshCaptchaImage(string text)
         {
             DrawingVisual visual = new DrawingVisual();
@@ -209,7 +248,7 @@ namespace WpfApp1
                 int coordY = random.Next(0, 40);
                 int angle = random.Next(0, 70);
                 dc.PushTransform(new RotateTransform(angle, coordX, coordY));
-                dc.DrawText(new FormattedText($"{text}", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Comic Sans MS"), 9, Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(coordX, coordY));
+                dc.DrawText(new FormattedText($"{text}", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Consolas"), 11, Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(coordX, coordY));
                 dc.Pop();
                 for (int i = 0; i <= 100; i++)
                 {
@@ -233,7 +272,7 @@ namespace WpfApp1
             Random random = new Random();
             for (int i = 0; i < lettersCount; i++)
             {
-                sb.Append(sourceLetters[random.Next(0, sourceLetters.Length - 1)]);                
+                sb.Append(sourceLetters[random.Next(0, sourceLetters.Length - 1)]);         
             }
             return sb.ToString();
         }
