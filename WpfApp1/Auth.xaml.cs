@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -23,9 +24,12 @@ namespace WpfApp1
     /// </summary>
     public partial class Auth : Window
     {
+        int authAttempsCounter = 0;
+        string captchaCompare = "";
         public Auth()
         {
             InitializeComponent();
+            ShowCaptcha(authAttempsCounter);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -70,13 +74,25 @@ namespace WpfApp1
                 }
                 string userLogin = LoginTextbox.Text;
                 string userPassword = PasswordTextBox.Password;
-                if (userLogin == "" || userPassword == "")
+                string captchaInput = captchaTextbox.Text;
+                if (userLogin == "" || userPassword == "" || (authAttempsCounter > 1 && captchaInput == ""))
                 {
-                    MessageBox.Show($"Необходимо заполнить поля Логин и Пароль", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 else
                 {
+                    if (captchaInput != captchaCompare && authAttempsCounter > 1) 
+                    {
+                        MessageBox.Show($"Капча заполнена неверно. Возможность авторизации заблокируется на 10 секунд", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        authAttempsCounter++;
+                        if (authAttempsCounter > 2)
+                            FrezeForm();
+                        captchaTextbox.Clear();
+                        ShowCaptcha(authAttempsCounter);
+                        return;
+                    }
+                    captchaTextbox.Clear();
                     try
                     {
                         StringBuilder Sb = new StringBuilder();
@@ -94,6 +110,8 @@ namespace WpfApp1
                         {
                             if (rdr.HasRows)
                             {
+                                authAttempsCounter = 0;
+                                ShowCaptcha(authAttempsCounter);
                                 rdr.Read();
                                 object[] accountData = new object[rdr.FieldCount];
                                 rdr.GetValues(accountData);
@@ -125,6 +143,8 @@ namespace WpfApp1
                             else
                             {
                                 MessageBox.Show("Неверные данные пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                ShowCaptcha(authAttempsCounter);
+                                authAttempsCounter++;
                             }
                         }
                     }
@@ -182,6 +202,96 @@ namespace WpfApp1
                     return;
                 }
             }
+        }
+
+        private void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                captchaCompare = GenerateCaptchaText(6);
+                RefreshCaptchaImage(captchaCompare);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Не удалось обновить картинку капчи", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ShowCaptcha(int attempsCount)
+        {
+            if (attempsCount > 0)
+            {
+                captchaImage.Visibility = Visibility.Visible;
+                refreshButton.Visibility = Visibility.Visible;
+                captchaLabel.Visibility = Visibility.Visible;
+                captchaTextbox.Visibility = Visibility.Visible;
+                captchaAsterisk.Visibility = Visibility.Visible;
+                captchaCompare = GenerateCaptchaText(6);
+                RefreshCaptchaImage(captchaCompare);
+            }
+            else
+            {
+                captchaImage.Visibility = Visibility.Hidden;
+                refreshButton.Visibility = Visibility.Hidden;
+                captchaLabel.Visibility = Visibility.Hidden;
+                captchaTextbox.Visibility = Visibility.Hidden;
+                captchaAsterisk.Visibility = Visibility.Hidden;
+                captchaCompare = "";
+            }
+        }
+
+        private void RefreshCaptchaImage(string text)
+        {
+            DrawingVisual visual = new DrawingVisual();
+            using (DrawingContext dc = visual.RenderOpen())
+            {
+                Pen drawingpen = new Pen(Brushes.Gray, 0.7);
+                Random random = new Random();
+                int coordX = random.Next(0, 90);
+                int coordY = random.Next(0, 40);
+                int angle = random.Next(0, 70);
+                dc.PushTransform(new RotateTransform(angle, coordX, coordY));
+                dc.DrawText(new FormattedText($"{text}", CultureInfo.GetCultureInfo("en-us"), FlowDirection.LeftToRight, new Typeface("Consolas"), 11, Brushes.Black, VisualTreeHelper.GetDpi(this).PixelsPerDip), new Point(coordX, coordY));
+                dc.Pop();
+                for (int i = 0; i <= 100; i++)
+                {
+                    dc.DrawEllipse(Brushes.Black, drawingpen, new Point(random.Next(0, 140), random.Next(0, 70)), 0.5, 0.5);
+                }
+
+                for (int i = 0; i <= 10; i++)
+                {
+                    dc.DrawLine(drawingpen, new Point(random.Next(0, 140), random.Next(0, 70)), new Point(random.Next(0, 70), random.Next(0, 70)));
+                }
+            }
+            DrawingImage drawingImage = new DrawingImage(visual.Drawing);
+            drawingImage.Freeze();
+            captchaImage.Source = drawingImage;
+        }
+
+        private string GenerateCaptchaText(int lettersCount)
+        {
+            const string sourceLetters = "qwertyuiopasdfghjklzxcvbnm1234567890!@#$%&*()QWERTYUIOPASDFGHJKLZXCVBNM";
+            StringBuilder sb = new StringBuilder();
+            Random random = new Random();
+            for (int i = 0; i < lettersCount; i++)
+            {
+                sb.Append(sourceLetters[random.Next(0, sourceLetters.Length - 1)]);         
+            }
+            return sb.ToString();
+        }
+
+        private async void FrezeForm()
+        {
+            AuthButton.IsEnabled = false;
+            for (int i = 10; i >= 0; i--)
+            {
+                await Task.Delay(1000);
+                AuthButton.Content = $"{i}";
+                AuthButton.Foreground = Brushes.Black;
+            }
+            AuthButton.Foreground = Brushes.White;
+            AuthButton.IsEnabled = true;
+            AuthButton.Content = "Авторизоваться";
         }
     }
 }
