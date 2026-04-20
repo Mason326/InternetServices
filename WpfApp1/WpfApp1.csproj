@@ -82,33 +82,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AccountHolder.cs" />
+    <Compile Include="Utils\AccountHolder.cs" />
     <Compile Include="AdditionalServices.xaml.cs">
       <DependentUpon>AdditionalServices.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AdditionalServicesHolder.cs" />
-    <Compile Include="CheckDuplicateUtil.cs" />
-    <Compile Include="ClientHolder.cs" />
+    <Compile Include="Utils\AdditionalServicesHolder.cs" />
+    <Compile Include="Utils\CheckDuplicateUtil.cs" />
+    <Compile Include="Utils\ClientHolder.cs" />
     <Compile Include="ClientVerbose.xaml.cs">
       <DependentUpon>ClientVerbose.xaml</DependentUpon>
     </Compile>
     <Compile Include="Company.xaml.cs">
       <DependentUpon>Company.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Connection.cs" />
+    <Compile Include="Utils\Connection.cs" />
     <Compile Include="ContractVerbose.xaml.cs">
       <DependentUpon>ContractVerbose.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CredentialsGenerator.cs" />
+    <Compile Include="Utils\CredentialsGenerator.cs" />
     <Compile Include="EmployeesViewWindow.xaml.cs">
       <DependentUpon>EmployeesViewWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="FullNameSplitter.cs" />
-    <Compile Include="MasterHolder.cs" />
+    <Compile Include="Utils\FullNameSplitter.cs" />
+    <Compile Include="Utils\ImageUtils.cs" />
+    <Compile Include="Utils\MasterHolder.cs" />
     <Compile Include="PickAdditionalServices.xaml.cs">
       <DependentUpon>PickAdditionalServices.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RecordsCounter.cs" />
+    <Compile Include="Utils\RecordsCounter.cs" />
     <Compile Include="Services.xaml.cs">
       <DependentUpon>Services.xaml</DependentUpon>
     </Compile>

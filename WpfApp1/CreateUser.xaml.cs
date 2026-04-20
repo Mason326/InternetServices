@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -426,7 +427,7 @@ namespace WpfApp1
                         {
                             dr.GetValues(record);
                             byte[] imageBytes = record[6] as byte[];
-                            record[7] = LoadImage(imageBytes);
+                            record[7] = ImageUtils.LoadImage(imageBytes);
                             dt.LoadDataRow(record, true);
                         }
                     }
@@ -568,7 +569,7 @@ namespace WpfApp1
 
             endEditingButton.Visibility = Visibility.Collapsed;
             cancelChangesButton.Visibility = Visibility.Collapsed;
-            userImage.Source = LoadImage(null);
+            userImage.Source = ImageUtils.LoadImage(null);
             filePath = null;
 
             ClearInputData();
@@ -686,24 +687,6 @@ namespace WpfApp1
                 filePath = dialog.FileName;
                 userImage.Source = new BitmapImage(new Uri(filePath));
             }
-        }
-
-        private static BitmapImage LoadImage(byte[] imageData)
-        {
-            if (imageData == null || imageData.Length == 0) return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/user.png"));
-            var image = new BitmapImage();
-            using (var mem = new MemoryStream(imageData))
-            {
-                mem.Position = 0;
-                image.BeginInit();
-                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.UriSource = null;
-                image.StreamSource = mem;
-                image.EndInit();
-            }
-            image.Freeze();
-            return image;
         }
 
         private bool ImageIsTooLarge(byte[] imageBytes)

@@ -40,6 +40,11 @@ namespace WpfApp1
             if (!isSelectClient)
             {
                 inClaimButton.Visibility = Visibility.Collapsed;
+                editClientButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                editClientButton.Visibility = Visibility.Collapsed;
             }
         }
 

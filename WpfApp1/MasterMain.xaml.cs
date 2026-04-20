@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -41,7 +42,22 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            userName.Content = FullNameSplitter.MakeShortName(AccountHolder.FIO);
+            try
+            {
+                userName.Content = FullNameSplitter.MakeShortName(AccountHolder.FIO);
+            }
+            catch
+            {
+                userName.Content = AccountHolder.FIO;
+            }
+            try
+            {
+                ImageUtils.LoadUserImage(userImage);
+            }
+            catch
+            {
+                MessageBox.Show("Не удалось загрузить картинку", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
     }
 }

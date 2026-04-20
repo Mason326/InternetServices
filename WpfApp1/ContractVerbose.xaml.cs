@@ -38,6 +38,13 @@ namespace WpfApp1
             AddressTextBox.Text += address;
             currentStatus = selectedItems[4].ToString();
             RefreshDG += refresh;
+            statusComboBox.IsEnabled = true;
+            saveChangesButton.Visibility = Visibility.Visible;
+            if (AccountHolder.UserRole == "Директор")
+            {
+                statusComboBox.IsEnabled = false;
+                saveChangesButton.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
