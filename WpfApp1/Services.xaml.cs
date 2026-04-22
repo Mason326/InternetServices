@@ -35,7 +35,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            RefreshDataGrid();
+            RefreshDataGrid(true);
             editServiceButton.IsEnabled = false;
             deleteServiceButton.IsEnabled = false;
         }
@@ -104,14 +104,20 @@ namespace WpfApp1
             }
         }
 
-        private void RefreshDataGrid()
+        private void RefreshDataGrid(bool isInitial)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `services` order by idservice desc", conn);
+                    string cmdText = "Select idservice, service_name, units, service_cost from `services` order by idservice desc";
+                    if (isInitial)
+                    {
+                        cmdText = "Select idservice, service_name, units, service_cost from `services` order by service_name";
+                    }
+
+                    MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
@@ -167,7 +173,7 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось создать услугу\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                RefreshDataGrid();
+                RefreshDataGrid(false);
             }
             else
                 MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -274,7 +280,7 @@ namespace WpfApp1
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Данные услуги успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
-                            RefreshDataGrid();
+                            RefreshDataGrid(false);
                         }
                         catch (Exception exc)
                         {
@@ -322,7 +328,7 @@ namespace WpfApp1
                             MySqlCommand cmd = new MySqlCommand(query, conn);
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Данные услуги успешно удалены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                            RefreshDataGrid();
+                            RefreshDataGrid(false);
                             servicesDG.SelectedItem = null;
                             editServiceButton.IsEnabled = false;
                             deleteServiceButton.IsEnabled = false;

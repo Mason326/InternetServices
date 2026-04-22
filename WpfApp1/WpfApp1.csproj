@@ -155,9 +155,6 @@
     <Compile Include="MasterMain.xaml.cs">
       <DependentUpon>MasterMain.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Roles.xaml.cs">
-      <DependentUpon>Roles.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Auth.xaml.cs">
       <DependentUpon>Auth.xaml</DependentUpon>
     </Compile>
@@ -254,10 +251,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MasterMain.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Roles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

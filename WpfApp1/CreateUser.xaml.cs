@@ -46,7 +46,7 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            RefreshDataGrid();
+            RefreshDataGrid(true);
             editUserButton.IsEnabled = false;
             try
             {
@@ -384,7 +384,7 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось создать нового пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                RefreshDataGrid();
+                RefreshDataGrid(false);
             }
             else
                 MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -399,16 +399,23 @@ namespace WpfApp1
             passwordTextBox.Text = "";
         }
 
-        private void RefreshDataGrid()
+        private void RefreshDataGrid(bool isInitial)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(@"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo
+                    string cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo
                                                           FROM employees
-                                                          inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;", conn);
+                                                          inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;";
+                    if(isInitial)
+                    {
+                        cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo
+                                                          FROM employees
+                                                          inner join `roles` on employees.roles_id = roles.idroles order by idemployees;";
+                    }
+                    MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     DataTable dt = new DataTable();
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
@@ -491,7 +498,7 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Не удалось удалить пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            RefreshDataGrid();
+            RefreshDataGrid(false);
         }
 
         private void userDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -651,7 +658,7 @@ namespace WpfApp1
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Данные пользователя успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
-                            RefreshDataGrid();
+                            RefreshDataGrid(false);
                         }
                         catch (Exception exc)
                         {

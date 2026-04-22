@@ -20,10 +20,9 @@
         <Image x:Name="userImage" HorizontalAlignment="Left" Height="188" Margin="167,51,0,0" VerticalAlignment="Top" Width="187" Source="Resources/Images/user.png" Grid.Column="1" Grid.ColumnSpan="3"/>
         <Label Name="userName" Content="" HorizontalAlignment="Left" Margin="134,9,0,0" VerticalAlignment="Top" FontSize="16" Height="32" Width="254" Grid.Column="1" Grid.ColumnSpan="3"/>
         <Button Content="Материалы" HorizontalAlignment="Left" Height="36" Margin="282,314,0,0" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="Button_Click_2" Grid.Column="1" Grid.ColumnSpan="3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
-        <Button Content="Организация" HorizontalAlignment="Left" Margin="32,369,0,0" VerticalAlignment="Top" Width="226" Height="42" Click="Button_Click_4" Grid.Column="1" Grid.ColumnSpan="3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
-        <Button Content="Роли" HorizontalAlignment="Left" Margin="282,369,0,0" VerticalAlignment="Top" Width="226" Height="42" Click="Button_Click_5" Grid.Column="1" Grid.ColumnSpan="3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
-        <Button Content="Пользователи" HorizontalAlignment="Left" Margin="32,428,0,0" VerticalAlignment="Top" Width="226" Height="40" Click="Button_Click_6" Grid.Column="1" Grid.ColumnSpan="3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
-        <Button Content="Выйти из учетной записи" HorizontalAlignment="Left" Margin="282,428,0,0" VerticalAlignment="Top" Width="226" Height="40" Grid.Column="1" Grid.ColumnSpan="3" Click="Button_Click_7" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
+        <Button Content="Организация" HorizontalAlignment="Left" Margin="282,370,0,0" VerticalAlignment="Top" Width="226" Height="40" Click="Button_Click_4" Grid.Column="1" Grid.ColumnSpan="3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
+        <Button Content="Пользователи" HorizontalAlignment="Left" Margin="32,370,0,0" VerticalAlignment="Top" Width="226" Height="40" Click="Button_Click_6" Grid.Column="1" Grid.ColumnSpan="3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
+        <Button Content="Выйти из учетной записи" HorizontalAlignment="Left" Margin="32,428,0,0" VerticalAlignment="Top" Width="476" Height="40" Grid.Column="1" Grid.ColumnSpan="3" Click="Button_Click_7" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
 
     </Grid>
 </Window>

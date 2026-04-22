@@ -23,8 +23,8 @@ namespace WpfApp1
     {
         int clientId;
         string currStatus;
-        Action RefreshDG;
-        public ClientVerbose(object[] selectedItems, Action refresh)
+        Action<bool> RefreshDG;
+        public ClientVerbose(object[] selectedItems, Action<bool> refresh)
         {
             InitializeComponent();
             clientId = Convert.ToInt32(selectedItems[0]);
@@ -97,7 +97,7 @@ namespace WpfApp1
                     MySqlCommand cmd = new MySqlCommand($"Update `client` set `client_status_id` = (select idclient_status from client_status where status_name = '{statusComboBox.SelectedItem}') where idclient = {clientId};", conn);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    RefreshDG();
+                    RefreshDG(false);
                     this.Close();
                 }
                 catch (Exception exc)

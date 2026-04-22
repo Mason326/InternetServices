@@ -68,14 +68,6 @@ namespace WpfApp1
             this.ShowDialog();
         }
 
-        private void Button_Click_5(object sender, RoutedEventArgs e)
-        {
-            this.Hide();
-            var win = new Roles();
-            win.ShowDialog();
-            this.ShowDialog();
-        }
-
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
             this.Hide();
