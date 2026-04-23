@@ -406,12 +406,12 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    string cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo
+                    string cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
                                                           FROM employees
                                                           inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;";
                     if(isInitial)
                     {
-                        cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo
+                        cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
                                                           FROM employees
                                                           inner join `roles` on employees.roles_id = roles.idroles order by idemployees;";
                     }
@@ -434,7 +434,7 @@ namespace WpfApp1
                         {
                             dr.GetValues(record);
                             byte[] imageBytes = record[6] as byte[];
-                            record[7] = ImageUtils.LoadImage(imageBytes);
+                            record[8] = ImageUtils.LoadImage(imageBytes);
                             dt.LoadDataRow(record, true);
                         }
                     }
@@ -543,7 +543,7 @@ namespace WpfApp1
                 editUserButton.Visibility = Visibility.Collapsed;
                 deleteUserButton.Visibility = Visibility.Collapsed;
                 toMainButton.Visibility = Visibility.Collapsed;
-                userImage.Source = fieldValuesOfARecord[7] as BitmapImage;
+                userImage.Source = fieldValuesOfARecord[8] as BitmapImage;
 
                 passwordTextBox.Clear();
 
