@@ -75,7 +75,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTemplateColumn Header="Статус" Width="100">
+                <DataGridTemplateColumn Header="Статус" Width="95">
                     <DataGridTemplateColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Setter Property="Padding" Value="0"/>
@@ -161,7 +161,7 @@
         <TextBox x:Name="searchByClaimNumAndFio" HorizontalAlignment="Left" Height="36" Margin="644,321,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="384" TextChanged="searchByClaimNumAndFio_TextChanged"/>
         <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="291,691,0,0" VerticalAlignment="Top" Width="31"/>
         <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="328,690,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Button Content="Доп. услуги" HorizontalAlignment="Left" Margin="361,350,0,0" VerticalAlignment="Top" Width="151" Click="Button_Click_5" Height="30" FontFamily="Arial" FontSize="16" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold"/>
+        <Button x:Name="additServiceButton" Content="Доп. услуги" HorizontalAlignment="Left" Margin="361,350,0,0" VerticalAlignment="Top" Width="151" Click="Button_Click_5" Height="30" FontFamily="Arial" FontSize="16" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold"/>
         <Label Content="Количество заявок:" HorizontalAlignment="Left" Margin="10,693,0,0" VerticalAlignment="Top" Width="154" FontFamily="Arial" FontSize="16"/>
         <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="165,693,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
     </Grid>

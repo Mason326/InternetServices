@@ -37,8 +37,8 @@ namespace WpfApp1
             claimNumberLabel.Content = fieldVals[0];
             var clientDescription = GetClientData(Convert.ToInt32(fieldVals[0]));
             clientVerbose = clientDescription;
-            claimСreationDateLabel.Content = fieldVals[1];
-            claimExecutionDateLabel.Content = fieldVals[2];
+            claimСreationDateLabel.Content = DateTime.Parse(fieldVals[1].ToString()).ToString("dd.MM.yyyy");
+            claimExecutionDateLabel.Content = DateTime.Parse(fieldVals[2].ToString()).ToString("dd.MM.yyyy");
             claimAddressTextBox.Text = fieldVals[3].ToString();
             tariffLabel.Content = fieldVals[4];
             claimClientLabel.Content = fieldVals[5];
@@ -198,6 +198,19 @@ namespace WpfApp1
         {
             Word.Range range = doc.Content;
             range.Find.Execute(FindText: src, ReplaceWith: dest);
+        }
+
+        private void contractStatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            switch (contractStatusComboBox.SelectedItem)
+            {
+                case "Заключен":
+                    exportAContractButton.IsEnabled = true;
+                    break;
+                case "Не заключен":
+                    exportAContractButton.IsEnabled = false;
+                    break;
+            }
         }
     }
 }

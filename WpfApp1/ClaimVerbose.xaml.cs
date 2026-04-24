@@ -44,6 +44,14 @@ namespace WpfApp1
             isEdit = isEditStatus;
             Refresh = RefreshDG;
             isExpired = Convert.ToBoolean(selectedItems[10]);
+            if (isExpired)
+            {
+                formAContractButton.IsEnabled = false;
+            }
+            else
+            {
+                formAContractButton.IsEnabled = true;
+            }
             fieldValuesOfARecord = selectedItems;
             claimId = Convert.ToInt32(selectedItems[0]);
         }
@@ -61,6 +69,15 @@ namespace WpfApp1
             isEdit = isEditStatus;
             Refresh = RefreshDG;
             isAccounting = false;
+            isExpired = Convert.ToBoolean(selectedItems[10]);
+            if (isExpired)
+            {
+                formAContractButton.IsEnabled = false;
+            }
+            else
+            {
+                formAContractButton.IsEnabled = true;
+            }
             formAContractButton.Visibility = Visibility.Collapsed;
             ReReleaseClaim = RereleaseClaim;
             claimId = Convert.ToInt32(selectedItems[0]);
@@ -233,6 +250,18 @@ namespace WpfApp1
             var win = new Contract(fieldValuesOfARecord);
             win.ShowDialog();
             this.ShowDialog();
+        }
+
+        private void statusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (statusComboBox.SelectedItem != null && statusComboBox.SelectedItem.ToString() == "Отменена")
+            {
+                formAContractButton.IsEnabled = false;
+            }
+            else
+            {
+                formAContractButton.IsEnabled = true;
+            }
         }
     }
 }

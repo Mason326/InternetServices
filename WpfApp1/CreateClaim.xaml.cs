@@ -347,7 +347,6 @@ namespace WpfApp1
             recordsCount = 0;
             masterTextBox.Clear();
             MasterHolder.data = null;
-            searchByClaimNumAndFio.Clear();
             AdditionalServicesHolder.additionalServices.Clear();
             if (!isEditing)
             {
@@ -765,6 +764,7 @@ namespace WpfApp1
                 chooseAMasterButton.IsEnabled = false;
                 tariffComboBox.IsEnabled = false;
                 clearFieldsButton.IsEnabled = false;
+                additServiceButton.IsEnabled = false;
             }
             else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && isExpired)
             {
@@ -774,6 +774,7 @@ namespace WpfApp1
                 chooseAMasterButton.IsEnabled = true;
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
+                additServiceButton.IsEnabled = true;
             }
             else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && !isExpired)
             {
@@ -787,13 +788,15 @@ namespace WpfApp1
                 chooseAMasterButton.IsEnabled = true;
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
+                additServiceButton.IsEnabled = true;
             }
             else
             { 
-                dateOfExecution.IsEnabled = true;
+                //dateOfExecution.IsEnabled = true;
                 chooseAMasterButton.IsEnabled = true;
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
+                additServiceButton.IsEnabled = true;
             }
         }
 
