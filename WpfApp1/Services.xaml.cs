@@ -273,7 +273,7 @@ namespace WpfApp1
                         {
                             string query = $@"Update `services` 
                                                 set service_name = '{serviceTextBox.Text.Trim()}',
-                                                service_cost = '{costTextBox.Text.Trim()}',
+                                                service_cost = '{costTextBox.Text.Trim().Replace(',', '.')}',
                                                 units = '{unitsTextBox.Text.Trim()}'
                                                 where idservice = {serviceId}";
                             MySqlCommand cmd = new MySqlCommand(query, conn);

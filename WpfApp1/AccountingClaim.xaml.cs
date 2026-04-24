@@ -155,7 +155,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    string cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost
+                    string cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost, concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
                                                     from `connection_claim`
                                                     inner join `client` on client.idclient = connection_claim.client_id
                                                     inner join `employees` on employees.idemployees = connection_claim.employees_id
@@ -163,7 +163,7 @@ namespace WpfApp1
                                                     left join `order` on `order`.idorder = connection_claim.order_id
                                                     inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterParams}{additionalSortParams};";
                     if (masterId != -1)
-                        cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost
+                        cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost, concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
                                                     from `connection_claim`
                                                     inner join `client` on client.idclient = connection_claim.client_id
                                                     inner join `employees` on employees.idemployees = connection_claim.employees_id
@@ -204,12 +204,6 @@ namespace WpfApp1
                     {
                         MySqlCommand cmd2 = new MySqlCommand(cmdUpdateExpired, conn);
                         cmd2.ExecuteNonQuery();
-                    }
-
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        string fio = row.ItemArray[5].ToString();
-                        row.SetField<string>(5, HideName(fio));
                     }
 
                     claimsDG.ItemsSource = dt.AsDataView();

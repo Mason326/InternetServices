@@ -8,7 +8,7 @@
         Title="Window24" Height="563.49" Width="332.4" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
         <Label Content="Директор:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Image HorizontalAlignment="Left" Height="188" Margin="55,82,0,0" VerticalAlignment="Top" Width="221" Source="user.png"/>
+        <Image HorizontalAlignment="Left" Height="188" Margin="55,82,0,0" VerticalAlignment="Top" Width="221" Source="Resources/Images/user.png" />
         <Label Name="userName" Content="" HorizontalAlignment="Left" Margin="94,11,0,0" VerticalAlignment="Top" FontSize="16" Height="32" Width="209"/>
         <Button Content="Учёт заявок" HorizontalAlignment="Left" Margin="55,314,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
         <Button Content="Учёт договоров" HorizontalAlignment="Left" Margin="55,369,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_1" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>

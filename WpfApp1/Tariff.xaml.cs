@@ -265,7 +265,7 @@ namespace WpfApp1
                         {
                             string query = $@"Update `tariff` 
                                                 set tariff_name = '{tariffNameTextBox.Text.Trim()}',
-                                                monthly_fee = {monthFeeTextBox.Text.Trim()},
+                                                monthly_fee = {monthFeeTextBox.Text.Trim().Replace(',', '.')},
                                                 tariff_details = '{tariffDescriptionTextBox.Text.Trim()}'
                                                 where idtariff = {tariffId}";
                             MySqlCommand cmd = new MySqlCommand(query, conn);
