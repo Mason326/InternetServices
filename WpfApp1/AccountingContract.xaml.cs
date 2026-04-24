@@ -112,7 +112,9 @@ namespace WpfApp1
                                                         connection_claim_id, `contract_status`.`status` as 'status',
                                                         (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id) as 'tariff',
                                                         `connection_claim`.connection_creationDate as 'claimDate',
-                                                        `connection_claim`.connection_address as 'connection_address'
+                                                        `connection_claim`.connection_address as 'connection_address',
+                                                        concat('№ Заявки: ', connection_claim_id, '\nКлиент: ', (Select full_name from `client`
+                                                        where idclient = connection_claim.client_id), '\nТариф: ', (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id), '\nАдрес: ', `connection_claim`.connection_address, '\nДата заявки: ', `connection_claim`.connection_creationDate) as contractDetails
                                                         FROM contract
                                                         inner join `connection_claim` on contract.connection_claim_id = connection_claim.id_claim
                                                         inner join contract_status on contract_status.idcontract_status = contract.contract_status_id

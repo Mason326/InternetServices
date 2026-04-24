@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Учет заявок" Height="617" Width="1118" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Учет заявок" Height="636.2" Width="1118" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
     <Grid>
-        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,252,10,46.4" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged" FontSize="16">
+        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,224,10,46.4" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged" FontSize="16">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="Button_Click_1" />
@@ -125,18 +125,20 @@
             </DataGrid.Columns>
         </DataGrid>
         <Label Content="Поиск по номеру заявки и ФИО клиента" HorizontalAlignment="Left" Margin="26,11,0,0" VerticalAlignment="Top" FontSize="16" Height="30" Width="346"/>
-        <TextBox x:Name="searchByContractNumAndFio" HorizontalAlignment="Left" Height="36" Margin="28,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="391" TextChanged="searchByContractNumAndFio_TextChanged" PreviewTextInput="searchByContractNumAndFio_PreviewTextInput"/>
-        <GroupBox Header="Фильтр по статусу" HorizontalAlignment="Left" Height="151" Margin="28,89,0,0" VerticalAlignment="Top" Width="162" FontSize="16">
-            <StackPanel HorizontalAlignment="Left" Height="134" Margin="0,0,-2.2,-7.6" VerticalAlignment="Top" Width="147">
-                <RadioButton x:Name="allStatuses" Content="Все" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,10,0.0,0" Checked="FilterByStatus_Checked"/>
-                <RadioButton x:Name="incoming" Content="Входящая" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
-                <RadioButton x:Name="inProgress" Content="В работе" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
-                <RadioButton x:Name="closed" Content="Закрыта" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
-                <RadioButton x:Name="canceled" Content="Отменена" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,5,0.0,0" Checked="FilterByStatus_Checked"/>
-            </StackPanel>
+        <TextBox x:Name="searchByContractNumAndFio" HorizontalAlignment="Left" Height="36" Margin="28,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="485" TextChanged="searchByContractNumAndFio_TextChanged" PreviewTextInput="searchByContractNumAndFio_PreviewTextInput"/>
+        <GroupBox Header="Фильтр по статусу" HorizontalAlignment="Left" Height="116" Margin="26,89,0,0" VerticalAlignment="Top" Width="255" FontSize="16">
+            <DockPanel HorizontalAlignment="Left" Height="89" Margin="0,0,-1.8,0" VerticalAlignment="Top" Width="245">
+                <Grid>
+                    <RadioButton x:Name="allStatuses" Content="Все" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,11,0,0" Checked="FilterByStatus_Checked"/>
+                    <RadioButton x:Name="incoming" Content="Входящая" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,35,0,0" Checked="FilterByStatus_Checked"/>
+                    <RadioButton x:Name="inProgress" Content="В работе" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="10,60,0,0" Checked="FilterByStatus_Checked"/>
+                    <RadioButton x:Name="closed" Content="Закрыта" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="133,33,0,0" Checked="FilterByStatus_Checked" Width="83"/>
+                    <RadioButton x:Name="canceled" Content="Отменена" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="14" Margin="133,10,0,0" Checked="FilterByStatus_Checked"/>
+                </Grid>
+            </DockPanel>
         </GroupBox>
-        <GroupBox Header="Фильтр по дате создания" HorizontalAlignment="Left" Height="150" Margin="201,90,0,0" VerticalAlignment="Top" Width="212" FontSize="16">
-            <StackPanel>
+        <GroupBox Header="Фильтр по дате создания" HorizontalAlignment="Left" Height="115" Margin="301,90,0,0" VerticalAlignment="Top" Width="212" FontSize="16">
+            <StackPanel Margin="0,0,0,5.2">
                 <DockPanel Margin="0,5,0,0">
                     <Label Content="С"/>
                     <DatePicker x:Name="fromDate" Margin="10,0,0,0" SelectedDateChanged="dates_SelectedDateChanged" PreviewTextInput="Dates_PreviewTextInput"/>
@@ -147,13 +149,13 @@
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <Button Content="Очистить фильтры и поиск" HorizontalAlignment="Left" Margin="434,45,0,0" VerticalAlignment="Top" Width="243" Height="32" Click="Button_Click_3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <Button Content="Очистить фильтры и поиск" HorizontalAlignment="Left" Margin="534,45,0,0" VerticalAlignment="Top" Width="243" Height="32" Click="Button_Click_3" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
         <StackPanel HorizontalAlignment="Left" Height="212" Margin="821,40,0,0" VerticalAlignment="Top" Width="267">
             <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="33" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
             <Button x:Name="orderButton" Content="Заказ-наряд" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
             <Button Content="На главную" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
         </StackPanel>
-        <DockPanel Margin="13,548,0,-13.6">
+        <DockPanel Margin="13,555,0,-20.4">
             <Label Content="Количество записей:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" FontSize="16"/>
             <Label x:Name="recordsCountLabel" Content="" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
             <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="100,3,0,0" VerticalAlignment="Center" Width="31"/>
@@ -161,7 +163,7 @@
             <Label x:Name="incomesLabel" Content="Общий доход от заявок:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" Margin="50, 0, 0, 0" FontSize="16"/>
             <Label x:Name="totalSumLabel" Content="" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
         </DockPanel>
-        <ComboBox x:Name="reportVariantsComboBox" HorizontalAlignment="Left" Margin="434,103,0,0" VerticalAlignment="Top" Width="243" Height="35" FontSize="14" SelectionChanged="reportVariantsComboBox_SelectionChanged"/>
-        <Button x:Name="printAReport" Content="Печать отчета" HorizontalAlignment="Left" Margin="434,153,0,0" VerticalAlignment="Top" Width="243" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16" Click="printClaimButton_Click"/>
+        <ComboBox x:Name="reportVariantsComboBox" HorizontalAlignment="Left" Margin="534,103,0,0" VerticalAlignment="Top" Width="243" Height="35" FontSize="14" SelectionChanged="reportVariantsComboBox_SelectionChanged"/>
+        <Button x:Name="printAReport" Content="Печать отчета" HorizontalAlignment="Left" Margin="534,153,0,0" VerticalAlignment="Top" Width="243" Height="31" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16" Click="printClaimButton_Click"/>
     </Grid>
 </Window>

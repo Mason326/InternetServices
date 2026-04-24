@@ -43,7 +43,7 @@ namespace WpfApp1
             formAContractButton.Visibility = Visibility.Collapsed;
             isEdit = isEditStatus;
             Refresh = RefreshDG;
-            isExpired = Convert.ToBoolean(selectedItems[10]);
+            isExpired = Convert.ToBoolean(selectedItems[11]);
             if (isExpired)
             {
                 formAContractButton.IsEnabled = false;
