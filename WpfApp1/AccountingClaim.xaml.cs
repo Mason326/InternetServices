@@ -30,6 +30,9 @@ namespace WpfApp1
         private string additionalSearchParams = "";
         private int masterId = -1;
         DispatcherTimer timerRef;
+        private List<DataRow> _allRows = new List<DataRow>();
+        private int _currentPage = 1;
+        private int _pageSize = 3;
         public AccountingClaim()
         {
             InitializeComponent();
@@ -161,24 +164,27 @@ namespace WpfApp1
                     string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
                     filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
                 }
+
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
                     string cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost, concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
-                                                    from `connection_claim`
-                                                    inner join `client` on client.idclient = connection_claim.client_id
-                                                    inner join `employees` on employees.idemployees = connection_claim.employees_id
-                                                    inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
-                                                    left join `order` on `order`.idorder = connection_claim.order_id
-                                                    inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterParams}{additionalSortParams};";
+                                                from `connection_claim`
+                                                inner join `client` on client.idclient = connection_claim.client_id
+                                                inner join `employees` on employees.idemployees = connection_claim.employees_id
+                                                inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                left join `order` on `order`.idorder = connection_claim.order_id
+                                                inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterParams}{additionalSortParams};";
+
                     if (masterId != -1)
                         cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost, concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
-                                                    from `connection_claim`
-                                                    inner join `client` on client.idclient = connection_claim.client_id
-                                                    inner join `employees` on employees.idemployees = connection_claim.employees_id
-                                                    inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
-                                                    left join `order` on `order`.idorder = connection_claim.order_id
-                                                    inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id where master_id = {masterId}{filterParams}{additionalSortParams};";
+                                                from `connection_claim`
+                                                inner join `client` on client.idclient = connection_claim.client_id
+                                                inner join `employees` on employees.idemployees = connection_claim.employees_id
+                                                inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                left join `order` on `order`.idorder = connection_claim.order_id
+                                                inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id where master_id = {masterId}{filterParams}{additionalSortParams};";
+
                     MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     DataTable dt = new DataTable();
                     using (MySqlDataReader dr = cmd.ExecuteReader())
@@ -215,10 +221,24 @@ namespace WpfApp1
                         cmd2.ExecuteNonQuery();
                     }
 
-                    claimsDG.ItemsSource = dt.AsDataView();
+                    // Сохраняем все строки для пагинации
+                    _allRows.Clear();
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        _allRows.Add(row);
+                    }
+
+                    // Показываем общее количество записей
                     ShowRecordsCount(cmdText);
+
+                    // Показываем общий доход (для директора)
                     if (AccountHolder.UserRole == "Директор")
                         ShowTotalSum(cmdText);
+                    else
+                        totalSumDock.Visibility = Visibility.Collapsed;
+
+                    // Обновляем пагинацию
+                    UpdatePagination();
                 }
             }
             catch (Exception exc)
@@ -226,6 +246,100 @@ namespace WpfApp1
                 MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void UpdatePagination()
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            lblTotalPages.Text = totalPages.ToString();
+
+            if (_currentPage > totalPages && totalPages > 0)
+                _currentPage = totalPages;
+            if (_currentPage < 1)
+                _currentPage = 1;
+
+            txtPageNum.Text = _currentPage.ToString();
+
+            btnPrev.IsEnabled = _currentPage > 1;
+            btnNext.IsEnabled = _currentPage < totalPages;
+
+            DisplayCurrentPage();
+        }
+
+        private void DisplayCurrentPage()
+        {
+            if (_allRows.Count == 0)
+            {
+                claimsDG.ItemsSource = null;
+                return;
+            }
+
+            int startIndex = (_currentPage - 1) * _pageSize;
+            int endIndex = Math.Min(startIndex + _pageSize, _allRows.Count);
+
+            DataTable pageTable = new DataTable();
+
+            if (_allRows.Count > 0)
+            {
+                foreach (DataColumn col in _allRows[0].Table.Columns)
+                {
+                    pageTable.Columns.Add(col.ColumnName, col.DataType);
+                }
+
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    pageTable.ImportRow(_allRows[i]);
+                }
+            }
+
+            claimsDG.ItemsSource = pageTable.AsDataView();
+        }
+
+        private void PrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                UpdatePagination();
+            }
+        }
+
+        private void NextPage_Click(object sender, RoutedEventArgs e)
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            if (_currentPage < totalPages)
+            {
+                _currentPage++;
+                UpdatePagination();
+            }
+        }
+
+        private void txtPageNum_LostFocus(object sender, RoutedEventArgs e)
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            if (int.TryParse(txtPageNum.Text, out int newPage))
+            {
+                if (newPage >= 1 && newPage <= totalPages)
+                {
+                    _currentPage = newPage;
+                    UpdatePagination();
+                }
+                else
+                {
+                    txtPageNum.Text = _currentPage.ToString();
+                }
+            }
+            else
+            {
+                txtPageNum.Text = _currentPage.ToString();
+            }
+        }
+
+        private void OnlyNumbers_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
 
         private void FilterByStatus_Checked(object sender, RoutedEventArgs e)
         {
@@ -314,6 +428,10 @@ namespace WpfApp1
             allStatuses.IsChecked = true;
             searchByContractNumAndFio.Text = "";
             reportVariantsComboBox.SelectedItem = null;
+
+            // Сброс пагинации
+            _currentPage = 1;
+            _pageSize = 3;
         }
 
         private void claimsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -342,6 +460,7 @@ namespace WpfApp1
                     MySqlCommand cmd = new MySqlCommand($@"Select sum(`claim_cost`) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
                     int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
                     totalSumLabel.Content = recordsCount.ToString();
+                    totalSumDock.Visibility = Visibility.Visible;
                 }
                 catch
                 {

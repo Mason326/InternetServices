@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Учет заявок" Height="650.6" Width="1118" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
+        Title="Учет заявок" Height="676.2" Width="1118" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
-        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,224,10,46.4" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged" FontSize="16">
+        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,210,10,83.4" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged" FontSize="15">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="Button_Click_1" />
@@ -31,7 +31,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Описание" Binding="{Binding claimDetails}" Width="297">
+                <DataGridTextColumn Header="Описание" Binding="{Binding claimDetails}" Width="375">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -42,7 +42,7 @@
                 <DataGridTextColumn Header="Дата выполнения" Binding="{Binding mount_date, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Width="120" Visibility="Collapsed"/>
                 <DataGridTextColumn Header="Адрес монтирования" Binding="{Binding connection_address}" Width="140" Visibility="Collapsed"/>
                 <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="120" Visibility="Collapsed"/>
-                <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}"  Width="160">
+                <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}"  Width="140">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -52,7 +52,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="160">
+                <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="140">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -62,7 +62,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="160">
+                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="140">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -155,13 +155,27 @@
             <Button x:Name="orderButton" Content="Заказ-наряд" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
             <Button Content="На главную" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
         </StackPanel>
-        <DockPanel Margin="13,551,0,-16.2">
+        <Border BorderBrush="#D0D0D0" BorderThickness="0,1,0,0" Background="#F9F9F9" VerticalAlignment="Bottom" Height="48" Margin="13,0,10,43.4">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button x:Name="btnPrev" Content="◀" Width="80" Height="28" Margin="5" Click="PrevPage_Click" FontSize="13" IsEnabled="False"/>
+
+                <TextBlock Text="Страница" VerticalAlignment="Center" Margin="10,0,5,0" FontSize="13"/>
+                <TextBox x:Name="txtPageNum" Text="1" Width="40" Height="25" TextAlignment="Center" FontSize="12" 
+                         PreviewTextInput="OnlyNumbers_PreviewTextInput" LostFocus="txtPageNum_LostFocus"/>
+                <TextBlock Text="из" VerticalAlignment="Center" Margin="5,0" FontSize="13"/>
+                <TextBlock x:Name="lblTotalPages" Text="0" VerticalAlignment="Center" FontSize="13" FontWeight="SemiBold"/>
+
+                <Button x:Name="btnNext" Content="▶" Width="80" Height="28" Margin="15, 5, 5, 5" Click="NextPage_Click" FontSize="13" IsEnabled="False"/>
+            </StackPanel>
+        
+        </Border>
+        <DockPanel Margin="13,603,10,3.4">
             <Label Content="Количество записей:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" FontSize="16"/>
             <Label x:Name="recordsCountLabel" Content="" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
             <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="100,3,0,0" VerticalAlignment="Center" Width="31"/>
             <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontSize="16"/>
-            <Label x:Name="incomesLabel" Content="Общий доход от заявок:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" Margin="50, 0, 0, 0" FontSize="16"/>
-            <DockPanel Margin="5,30,0,26.4" Width="386" VerticalAlignment="Center">
+            <Label x:Name="incomesLabel" Content="Общий доход от заявок:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" Margin="50,0,0,0" FontSize="16"/>
+            <DockPanel x:Name="totalSumDock" Margin="5,5,0,0" Width="386" VerticalAlignment="Center">
                 <Label x:Name="totalSumLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold" Margin="0,0,0,-0.2" Height="33" RenderTransformOrigin="0.449,0.727"/>
                 <Label Content="руб." FontSize="16" VerticalAlignment="Center" Height="38" />
             </DockPanel>

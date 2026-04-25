@@ -18,6 +18,9 @@ namespace WpfApp1
         private string additionalDateFilterParams = "";
         private string additionalSortParams = "";
         private string additionalSearchParams = "";
+        private List<DataRow> _allRows = new List<DataRow>();
+        private int _currentPage = 1;
+        private int _pageSize = 3;
         public AccountingContract()
         {
             InitializeComponent();
@@ -115,30 +118,133 @@ namespace WpfApp1
                         string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
                         filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
                     }
+
                     MySqlCommand cmd = new MySqlCommand($@"SELECT idcontract, contract_date, (Select full_name from `client`
-                                                        where idclient = connection_claim.client_id) as 'client',
-                                                        connection_claim_id, `contract_status`.`status` as 'status',
-                                                        (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id) as 'tariff',
-                                                        `connection_claim`.connection_creationDate as 'claimDate',
-                                                        `connection_claim`.connection_address as 'connection_address',
-                                                        concat('№ Заявки: ', connection_claim_id, '\nКлиент: ', (Select full_name from `client`
-                                                        where idclient = connection_claim.client_id), '\nТариф: ', (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id), '\nАдрес: ', `connection_claim`.connection_address, '\nДата заявки: ', `connection_claim`.connection_creationDate) as contractDetails
-                                                        FROM contract
-                                                        inner join `connection_claim` on contract.connection_claim_id = connection_claim.id_claim
-                                                        inner join contract_status on contract_status.idcontract_status = contract.contract_status_id
-                                                        {filterParams}{additionalSortParams};", conn);
+                                                    where idclient = connection_claim.client_id) as 'client',
+                                                    connection_claim_id, `contract_status`.`status` as 'status',
+                                                    (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id) as 'tariff',
+                                                    `connection_claim`.connection_creationDate as 'claimDate',
+                                                    `connection_claim`.connection_address as 'connection_address',
+                                                    concat('№ Заявки: ', connection_claim_id, '\nКлиент: ', (Select full_name from `client`
+                                                    where idclient = connection_claim.client_id), '\nТариф: ', (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id), '\nАдрес: ', `connection_claim`.connection_address, '\nДата заявки: ', `connection_claim`.connection_creationDate) as contractDetails
+                                                    FROM contract
+                                                    inner join `connection_claim` on contract.connection_claim_id = connection_claim.id_claim
+                                                    inner join contract_status on contract_status.idcontract_status = contract.contract_status_id
+                                                    {filterParams}{additionalSortParams};", conn);
+
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     await cmd.ExecuteNonQueryAsync();
                     da.Fill(dt);
-                    contractsDG.ItemsSource = dt.AsDataView();
+
+                    _allRows.Clear();
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        _allRows.Add(row);
+                    }
+
                     ShowRecordsCount(cmd.CommandText);
+
+                    UpdatePagination();
                 }
             }
             catch (Exception exc)
             {
                 MessageBox.Show($"Ошибка подключения\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void UpdatePagination()
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            lblTotalPages.Text = totalPages.ToString();
+
+            if (_currentPage > totalPages && totalPages > 0)
+                _currentPage = totalPages;
+            if (_currentPage < 1)
+                _currentPage = 1;
+
+            txtPageNum.Text = _currentPage.ToString();
+
+            btnPrev.IsEnabled = _currentPage > 1;
+            btnNext.IsEnabled = _currentPage < totalPages;
+
+            DisplayCurrentPage();
+        }
+
+        private void DisplayCurrentPage()
+        {
+            if (_allRows.Count == 0)
+            {
+                contractsDG.ItemsSource = null;
+                return;
+            }
+
+            int startIndex = (_currentPage - 1) * _pageSize;
+            int endIndex = Math.Min(startIndex + _pageSize, _allRows.Count);
+
+            DataTable pageTable = new DataTable();
+
+            if (_allRows.Count > 0)
+            {
+                foreach (DataColumn col in _allRows[0].Table.Columns)
+                {
+                    pageTable.Columns.Add(col.ColumnName, col.DataType);
+                }
+
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    pageTable.ImportRow(_allRows[i]);
+                }
+            }
+
+            contractsDG.ItemsSource = pageTable.AsDataView();
+        }
+
+        private void PrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                UpdatePagination();
+            }
+        }
+
+        private void NextPage_Click(object sender, RoutedEventArgs e)
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            if (_currentPage < totalPages)
+            {
+                _currentPage++;
+                UpdatePagination();
+            }
+        }
+
+        private void txtPageNum_LostFocus(object sender, RoutedEventArgs e)
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            if (int.TryParse(txtPageNum.Text, out int newPage))
+            {
+                if (newPage >= 1 && newPage <= totalPages)
+                {
+                    _currentPage = newPage;
+                    UpdatePagination();
+                }
+                else
+                {
+                    txtPageNum.Text = _currentPage.ToString();
+                }
+            }
+            else
+            {
+                txtPageNum.Text = _currentPage.ToString();
+            }
+        }
+
+        private void OnlyNumbers_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]");
+            e.Handled = regex.IsMatch(e.Text);
         }
 
         private void searchByContractNumAndFio_TextChanged(object sender, TextChangedEventArgs e)
@@ -196,6 +302,9 @@ namespace WpfApp1
             noSort.IsChecked = true;
             allContracts.IsChecked = true;
             searchByContractNumAndFio.Text = "";
+
+            _currentPage = 1;
+            _pageSize = 3;
         }
 
         private void searchByContractNumAndFio_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
