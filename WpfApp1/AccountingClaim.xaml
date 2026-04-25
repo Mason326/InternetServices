@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Учет заявок" Height="650.6" Width="1118" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
-        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,224,10,46.4" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged" FontSize="16">
+        <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,218,10,46.8" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged" FontSize="15">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="Button_Click_1" />
@@ -31,7 +31,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Описание" Binding="{Binding claimDetails}" Width="297">
+                <DataGridTextColumn Header="Описание" Binding="{Binding claimDetails}" Width="357">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -42,7 +42,7 @@
                 <DataGridTextColumn Header="Дата выполнения" Binding="{Binding mount_date, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Width="120" Visibility="Collapsed"/>
                 <DataGridTextColumn Header="Адрес монтирования" Binding="{Binding connection_address}" Width="140" Visibility="Collapsed"/>
                 <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="120" Visibility="Collapsed"/>
-                <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}"  Width="160">
+                <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}"  Width="140">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -52,7 +52,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="160">
+                <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="140">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -62,7 +62,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="160">
+                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="140">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
@@ -161,7 +161,7 @@
             <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="100,3,0,0" VerticalAlignment="Center" Width="31"/>
             <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontSize="16"/>
             <Label x:Name="incomesLabel" Content="Общий доход от заявок:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" Margin="50, 0, 0, 0" FontSize="16"/>
-            <DockPanel Margin="5,30,0,26.4" Width="386" VerticalAlignment="Center">
+            <DockPanel x:Name="totalSumDock" Margin="5,30,0,26.4" Width="386" VerticalAlignment="Center">
                 <Label x:Name="totalSumLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold" Margin="0,0,0,-0.2" Height="33" RenderTransformOrigin="0.449,0.727"/>
                 <Label Content="руб." FontSize="16" VerticalAlignment="Center" Height="38" />
             </DockPanel>

@@ -219,6 +219,8 @@ namespace WpfApp1
                     ShowRecordsCount(cmdText);
                     if (AccountHolder.UserRole == "Директор")
                         ShowTotalSum(cmdText);
+                    else
+                        totalSumDock.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception exc)
@@ -342,6 +344,7 @@ namespace WpfApp1
                     MySqlCommand cmd = new MySqlCommand($@"Select sum(`claim_cost`) from ({strCmd.Replace(";", "")}) as counter_table;", conn);
                     int recordsCount = Convert.ToInt32(cmd.ExecuteScalar());
                     totalSumLabel.Content = recordsCount.ToString();
+                    totalSumDock.Visibility = Visibility.Visible;
                 }
                 catch
                 {
