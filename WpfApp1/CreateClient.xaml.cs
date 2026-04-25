@@ -33,7 +33,9 @@ namespace WpfApp1
         Regex regexForPassportNumber = new Regex(@"^[0-9]{6}$");
         Regex regexForDepartmentCode = new Regex(@"^\d{3}-\d{3}$");
         string filterOption = "";
-
+        private List<DataRow> _allRows = new List<DataRow>();
+        private int _currentPage = 1;
+        private int _pageSize = 2;
         public CreateClient(bool isSelectClient)
         {
             InitializeComponent();
@@ -633,6 +635,9 @@ namespace WpfApp1
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             ClearInputData();
+
+            _currentPage = 1;
+            _pageSize = 2;
         }
 
         private void passportSeriesTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
@@ -708,10 +713,10 @@ namespace WpfApp1
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
-                string cmdText = $@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, concat('ФИО: ', full_name, '\nEmail: ', IFNULL(email, ''), '\nТелефон: ', concat('+7 (***) ***', substring(phone_number, 13)), '\nАдрес проживания: ', place_of_residence, '\nДата рождения: ', REPEAT('*', CHAR_LENGTH(birthdate)), '\nСерия паспорта: ', concat('**', substring(passport_series, 3)), '\nНомер паспорта: ', concat('****', substring(passport_number, 5))) as clientDetails, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status {filterOption} order by idclient desc;";
+                string cmdText = $@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, concat('ФИО: ', full_name, '\nТелефон: ', concat('+7 (***) ***', substring(phone_number, 13)),'  |  ', 'Email: ', IFNULL(email, ''), '\nАдрес проживания: ', place_of_residence, '\nДата рождения: ', REPEAT('*', CHAR_LENGTH(birthdate)), '\nСерия паспорта: ', concat('**', substring(passport_series, 3)), '  |  ', 'Номер паспорта: ', concat('****', substring(passport_number, 5))) as clientDetails, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status {filterOption} order by idclient desc;";
                 if (isInitial)
                 {
-                    cmdText = $@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, concat('ФИО: ', full_name, '\nEmail: ', IFNULL(email, ''), '\nТелефон: ', concat('+7 (***) ***', substring(phone_number, 13)), '\nАдрес проживания: ', place_of_residence, '\nДата рождения: ', REPEAT('*', CHAR_LENGTH(birthdate)), '\nСерия паспорта: ', concat('**', substring(passport_series, 3)), '\nНомер паспорта: ', concat('****', substring(passport_number, 5))) as clientDetails, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status order by full_name;";
+                    cmdText = $@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, concat('ФИО: ', full_name, '\nТелефон: ', concat('+7 (***) ***', substring(phone_number, 13)),'  |  ', 'Email: ', IFNULL(email, ''), '\nАдрес проживания: ', place_of_residence, '\nДата рождения: ', REPEAT('*', CHAR_LENGTH(birthdate)), '\nСерия паспорта: ', concat('**', substring(passport_series, 3)), '  |  ', 'Номер паспорта: ', concat('****', substring(passport_number, 5))) as clientDetails, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status order by full_name;";
                 }
                 MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
@@ -730,11 +735,111 @@ namespace WpfApp1
                         ;
                     }
                 }
-                clientsDG.ItemsSource = dt.AsDataView();
+
+                _allRows.Clear();
+                foreach (DataRow row in dt.Rows)
+                {
+                    _allRows.Add(row);
+                }
+
+                UpdatePagination();
+
                 countRecordsLabel.Content = RecordsCounter.CountRecords("client", "where client_status_id = (Select idclient_status from client_status where status_name = 'Активный')");
             }
         }
 
+        private void UpdatePagination()
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            lblTotalPages.Text = totalPages.ToString();
+
+            if (_currentPage > totalPages && totalPages > 0)
+                _currentPage = totalPages;
+            if (_currentPage < 1)
+                _currentPage = 1;
+
+            txtPageNum.Text = _currentPage.ToString();
+
+            btnPrev.IsEnabled = _currentPage > 1;
+            btnNext.IsEnabled = _currentPage < totalPages;
+
+            DisplayCurrentPage();
+        }
+
+        private void DisplayCurrentPage()
+        {
+            if (_allRows.Count == 0)
+            {
+                clientsDG.ItemsSource = null;
+                return;
+            }
+
+            int startIndex = (_currentPage - 1) * _pageSize;
+            int endIndex = Math.Min(startIndex + _pageSize, _allRows.Count);
+
+            DataTable pageTable = new DataTable();
+
+            if (_allRows.Count > 0)
+            {
+                foreach (DataColumn col in _allRows[0].Table.Columns)
+                {
+                    pageTable.Columns.Add(col.ColumnName, col.DataType);
+                }
+
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    pageTable.ImportRow(_allRows[i]);
+                }
+            }
+
+            clientsDG.ItemsSource = pageTable.AsDataView();
+        }
+
+        private void PrevPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPage > 1)
+            {
+                _currentPage--;
+                UpdatePagination();
+            }
+        }
+
+        private void NextPage_Click(object sender, RoutedEventArgs e)
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            if (_currentPage < totalPages)
+            {
+                _currentPage++;
+                UpdatePagination();
+            }
+        }
+
+        private void txtPageNum_LostFocus(object sender, RoutedEventArgs e)
+        {
+            int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+            if (int.TryParse(txtPageNum.Text, out int newPage))
+            {
+                if (newPage >= 1 && newPage <= totalPages)
+                {
+                    _currentPage = newPage;
+                    UpdatePagination();
+                }
+                else
+                {
+                    txtPageNum.Text = _currentPage.ToString();
+                }
+            }
+            else
+            {
+                txtPageNum.Text = _currentPage.ToString();
+            }
+        }
+
+        private void OnlyNumbers_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]");
+            e.Handled = regex.IsMatch(e.Text);
+        }
         private void searchByPassportSeriesAndNumber_TextChanged(object sender, TextChangedEventArgs e)
         {
             int passportNum;
