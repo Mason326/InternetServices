@@ -73,7 +73,7 @@ namespace WpfApp1
                 var drv = claimsDG.SelectedItem as DataRowView;
                 object[] claimDescription = drv.Row.ItemArray;
                 string currStatus = claimDescription[7].ToString();
-                bool isExpired = Convert.ToBoolean(claimDescription[10]);
+                bool isExpired = Convert.ToBoolean(claimDescription[11]);
                 string message = "";
                 switch(currStatus)
                 {

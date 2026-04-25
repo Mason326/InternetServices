@@ -226,95 +226,105 @@ namespace WpfApp1
 
         private void printAReportButton_Click(object sender, RoutedEventArgs e)
         {
-            if (contractsDG.Items.Count < 1)
+            try
             {
-                MessageBox.Show($"В отчете отсутствуют записи", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            var application = new Excel.Application();
-            var workbook = application.Workbooks.Add();
-            var worksheet = workbook.Worksheets[1] as Excel.Worksheet;
-
-            int rowCount = contractsDG.Items.Count;
-            int colCount = contractsDG.Columns.Count;
-
-            var data = new List<object[]>();
-            var cols = new List<object>();
-            foreach (var col in contractsDG.Columns)
-                cols.Add(col.Header);
-            data.Add(cols.ToArray());
-            foreach (DataRowView row in contractsDG.Items)
-            { 
-                object[] values = row.Row.ItemArray;
-
-                values[1] = ((DateTime)values[1]).ToString("dd.MM.yyyy");
-                values[6] = ((DateTime)values[6]).ToString("dd.MM.yyyy");
-                object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[5], values[7], values[6], values[1], values[4] };
-                data.Add(valuesRightOrder);
-            }
-            Excel.Range startCell = worksheet.Range["A1"];
-            Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
-
-            Excel.Range writeRange = worksheet.Range[startCell, endCell];
-            object[,] dataArray = new object[rowCount + 1, colCount];
-
-            for (int i = 0; i < rowCount + 1; i++)
-            {
-                for (int j = 0; j < colCount; j++)
+                if (contractsDG.Items.Count < 1)
                 {
-                    dataArray[i, j] = data[i][j];
+                    MessageBox.Show($"В отчете отсутствуют записи", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
                 }
+                var application = new Excel.Application();
+                var workbook = application.Workbooks.Add();
+                var worksheet = workbook.Worksheets[1] as Excel.Worksheet;
+
+                int rowCount = contractsDG.Items.Count;
+                int colCount = contractsDG.Columns.Count - 1;
+
+                var data = new List<object[]>();
+                var cols = new List<object>();
+                foreach (var col in contractsDG.Columns)
+                {
+                    if(col.Header != null && col.Header.ToString() != "Описание")
+                        cols.Add(col.Header);
+                }
+                data.Add(cols.ToArray());
+                foreach (DataRowView row in contractsDG.Items)
+                {
+                    object[] values = row.Row.ItemArray;
+
+                    values[1] = ((DateTime)values[1]).ToString("dd.MM.yyyy");
+                    values[6] = ((DateTime)values[6]).ToString("dd.MM.yyyy");
+                    object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[5], values[7], values[6], values[1], values[4] };
+                    data.Add(valuesRightOrder);
+                }
+                Excel.Range startCell = worksheet.Range["A1"];
+                Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
+
+                Excel.Range writeRange = worksheet.Range[startCell, endCell];
+                object[,] dataArray = new object[rowCount + 1, colCount];
+
+                for (int i = 0; i < rowCount + 1; i++)
+                {
+                    for (int j = 0; j < colCount; j++)
+                    {
+                        dataArray[i, j] = data[i][j];
+                    }
+                }
+
+                writeRange.Value2 = dataArray;
+                writeRange.Columns.AutoFit();
+
+                for (int i = 2; i <= rowCount + 1; i++)
+                {
+                    Excel.Range cell = writeRange.Cells[colCount][i];
+                    cell.Font.Bold = true;
+                    cell.Font.Color = Excel.XlRgbColor.rgbWhite;
+                    if (cell.Text == "Заключен")
+                        cell.Interior.Color = Excel.XlRgbColor.rgbDarkGreen;
+                    else
+                        cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;
+                }
+
+                Excel.ListObject table = worksheet.ListObjects.Add(
+                    Excel.XlListObjectSourceType.xlSrcRange,
+                    worksheet.Range[startCell, endCell],
+                    Type.Missing,
+                    Excel.XlYesNoGuess.xlYes,
+                    Type.Missing);
+                table.Name = "Contracts";
+
+                Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
+                recordCount.Value = $"Количество договоров: {recordsCountLabel.Content}";
+                recordCount.Font.Bold = true;
+                recordCount.Font.Size = 16;
+
+                if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
+                {
+                    Excel.Range period = worksheet.Cells[1][rowCount + 5];
+                    period.Value = $"За период: {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
+                    period.Font.Bold = true;
+                    period.Font.Size = 12;
+                }
+                else if (fromDate.SelectedDate != null && toDate.SelectedDate == null)
+                {
+                    Excel.Range period = worksheet.Cells[1][rowCount + 5];
+                    period.Value = $"За период {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {DateTime.Now.ToString("dd.MM.yyyy")}";
+                    period.Font.Bold = true;
+                    period.Font.Size = 12;
+                }
+                else if (fromDate.SelectedDate == null && toDate.SelectedDate != null)
+                {
+                    Excel.Range period = worksheet.Cells[1][rowCount + 5];
+                    period.Value = $"За период до {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
+                    period.Font.Bold = true;
+                    period.Font.Size = 12;
+                }
+                application.Visible = true;
             }
-
-            writeRange.Value2 = dataArray;
-            writeRange.Columns.AutoFit();
-
-            for (int i = 2; i <= rowCount + 1; i++)
+            catch(Exception exc)
             {
-                Excel.Range cell = writeRange.Cells[colCount][i];
-                cell.Font.Bold = true;
-                cell.Font.Color = Excel.XlRgbColor.rgbWhite;
-                if (cell.Text == "Заключен")
-                    cell.Interior.Color = Excel.XlRgbColor.rgbDarkGreen;
-                else
-                    cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;
+                MessageBox.Show($"Не удалось распечатать акт\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            Excel.ListObject table = worksheet.ListObjects.Add(
-                Excel.XlListObjectSourceType.xlSrcRange,
-                worksheet.Range[startCell, endCell],
-                Type.Missing,
-                Excel.XlYesNoGuess.xlYes,
-                Type.Missing);
-            table.Name = "Contracts";
-
-            Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
-            recordCount.Value = $"Количество договоров: {recordsCountLabel.Content}";
-            recordCount.Font.Bold = true;
-            recordCount.Font.Size = 16;
-
-            if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
-            {
-                Excel.Range period = worksheet.Cells[1][rowCount + 5];
-                period.Value = $"За период: {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
-                period.Font.Bold = true;
-                period.Font.Size = 12;
-            }
-            else if (fromDate.SelectedDate != null && toDate.SelectedDate == null)
-            {
-                Excel.Range period = worksheet.Cells[1][rowCount + 5];
-                period.Value = $"За период {fromDate.SelectedDate.Value.ToString("dd.MM.yyyy")} - {DateTime.Now.ToString("dd.MM.yyyy")}";
-                period.Font.Bold = true;
-                period.Font.Size = 12;
-            }
-            else if (fromDate.SelectedDate == null && toDate.SelectedDate != null)
-            {
-                Excel.Range period = worksheet.Cells[1][rowCount + 5];
-                period.Value = $"За период до {toDate.SelectedDate.Value.ToString("dd.MM.yyyy")}";
-                period.Font.Bold = true;
-                period.Font.Size = 12;
-            }
-            application.Visible = true;
         }
     }
 }

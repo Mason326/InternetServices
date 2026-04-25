@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Пользователи" Height="588.8" Width="1013.4" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Icon="internet_102151.ico">
+        Title="Пользователи" Height="592.4" Width="1013.4" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Icon="internet_102151.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
@@ -54,7 +54,7 @@
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="330,88,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="564,22,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="568,91,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
-        <Label Content="Количество пользователей:" HorizontalAlignment="Left" Margin="25,528,0,0" VerticalAlignment="Top" Width="217" Grid.ColumnSpan="2" FontFamily="Arial" FontSize="16"/>
-        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="244,527,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold"/>
+        <Label Content="Количество пользователей:" HorizontalAlignment="Left" Margin="25,524,0,0" VerticalAlignment="Top" Width="217" Grid.ColumnSpan="2" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="244,523,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>
