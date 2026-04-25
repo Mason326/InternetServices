@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Создание клиента" Height="774.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Клиенты" Height="790.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid Margin="0,4,-0.2,-4.4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="604*"/>
@@ -133,7 +133,7 @@
             <Button x:Name="endEditingButton" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="EditClaim"/>
             <Button x:Name="cancelChangesButton" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="CancelEdit" />
         </StackPanel>
-        <Label Content="Количество активных клиентов:" HorizontalAlignment="Left" Margin="9,727,0,0" VerticalAlignment="Top" Width="247" FontFamily="Arial" FontSize="16"/>
-        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="257,727,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <Label Content="Количество активных клиентов:" HorizontalAlignment="Left" Margin="9,721,0,0" VerticalAlignment="Top" Width="247" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="257,721,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>

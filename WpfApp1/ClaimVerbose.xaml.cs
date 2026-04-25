@@ -91,6 +91,14 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
             rereleaseClaimButton.Visibility = Visibility.Collapsed;
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Window10" Height="586.4" Width="903.6" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded" >
+        Title="Дополнительне услуги" Height="592.4" Width="903.6" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico" >
     <Grid>
         <TextBox TabIndex="1" x:Name="serviceTextBox" HorizontalAlignment="Left" Height="77" Margin="626,53,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="248" PreviewTextInput="serviceTextBox_PreviewTextInput" FontSize="14"/>
         <Label Content="Услуга" HorizontalAlignment="Left" Margin="622,27,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273" FontSize="14"/>

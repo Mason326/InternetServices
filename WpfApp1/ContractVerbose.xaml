@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="ContractVerbose" Height="375.6" Width="682" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Договор" Height="375.6" Width="682" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid Margin="0,0,16.8,0">
         <GroupBox x:Name="ContractGroupBox" Header="Договор № " HorizontalAlignment="Left" Height="304" Margin="38,27,0,0" VerticalAlignment="Top" Width="398" FontSize="16" FontFamily="Arial">
             <StackPanel Margin="0,0,15,0">

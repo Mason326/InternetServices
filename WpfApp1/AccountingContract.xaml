@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Учет договоров" Height="590.001" Width="987.2" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Учет договоров" Height="614.001" Width="987.2" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
         <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="contractsDG" Margin="10,195,9.8,44" AutoGenerateColumns="False" CanUserAddRows="False" SelectionChanged="contractsDG_SelectionChanged" FontSize="16">
             <DataGrid.Columns>

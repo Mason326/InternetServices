@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Window13" Height="508.7" Width="913.2" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Материалы" Height="527.9" Width="913.2" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
         <TextBox HorizontalAlignment="Left" Height="30" Margin="608,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
         <Label Content="Материал" HorizontalAlignment="Left" Margin="608,12,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273" FontSize="14"/>

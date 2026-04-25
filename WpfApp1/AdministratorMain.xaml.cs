@@ -87,11 +87,11 @@ namespace WpfApp1
         {
             try
             {
-                userName.Content = FullNameSplitter.MakeShortName(AccountHolder.FIO);
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
             }
             catch
             {
-                userName.Content = AccountHolder.FIO;
+                ;
             }
 
             try
@@ -102,6 +102,11 @@ namespace WpfApp1
             {
                 MessageBox.Show("Не удалось загрузить картинку", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
         }
     }
 }

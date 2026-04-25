@@ -68,11 +68,11 @@ namespace WpfApp1
         {
             try
             {
-                userName.Content = FullNameSplitter.MakeShortName(AccountHolder.FIO);
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
             }
             catch
             {
-                userName.Content = AccountHolder.FIO;
+                ;
             }
             try
             {

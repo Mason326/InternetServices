@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Учет заявок" Height="636.2" Width="1118" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Учет заявок" Height="650.6" Width="1118" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
         <DataGrid IsReadOnly="True" SelectionMode="Single" x:Name="claimsDG" Margin="13,224,10,46.4" AutoGenerateColumns="False" SelectionChanged="claimsDG_SelectionChanged" FontSize="16">
             <DataGrid.ContextMenu>
@@ -155,7 +155,7 @@
             <Button x:Name="orderButton" Content="Заказ-наряд" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
             <Button Content="На главную" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" Width="267" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
         </StackPanel>
-        <DockPanel Margin="13,555,0,-20.4">
+        <DockPanel Margin="13,551,0,-16.2">
             <Label Content="Количество записей:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" FontSize="16"/>
             <Label x:Name="recordsCountLabel" Content="" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
             <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="100,3,0,0" VerticalAlignment="Center" Width="31"/>

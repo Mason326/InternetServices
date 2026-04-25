@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="ClientVerbose" Height="497.711" Width="1040.723" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Клиент" Height="497.711" Width="1040.723" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
         <GroupBox x:Name="ClaimGroupBox" Header="Клиент" HorizontalAlignment="Left" Height="422" Margin="10,10,0,0" VerticalAlignment="Top" Width="791" FontSize="16">
             <StackPanel>

@@ -31,6 +31,14 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
             companyNameTextBox.Text = Properties.Settings.Default.companyName;
             companyDirectorTextBox.Text = Properties.Settings.Default.companyDirector;
             companyDescriptionTextBox.Text = Properties.Settings.Default.companyDescription;

@@ -349,7 +349,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="internet_102151.ico" />
     <Content Include="Resources\Dump\backup.sql" />
+    <None Include="Resources\internet_102151.ico" />
     <Resource Include="user.png" />
     <Resource Include="Resources\Images\refreshIcon.png" />
     <Resource Include="Resources\Images\GearIcon.png" />

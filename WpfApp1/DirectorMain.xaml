@@ -5,18 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Window24" Height="563.49" Width="332.4" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Главная форма" Height="409.89" Width="513.6" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
-        <Label Content="Директор:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Image HorizontalAlignment="Left" Height="188" Margin="55,82,0,0" VerticalAlignment="Top" Width="221" Source="Resources/Images/user.png" />
-        <Label Name="userName" Content="" HorizontalAlignment="Left" Margin="94,11,0,0" VerticalAlignment="Top" FontSize="16" Height="32" Width="209"/>
-        <Button Content="Учёт заявок" HorizontalAlignment="Left" Margin="55,314,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
-        <Button Content="Учёт договоров" HorizontalAlignment="Left" Margin="55,369,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_1" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
-        <Grid>
-            <Image x:Name="userImage" HorizontalAlignment="Left" Height="188" Margin="55,82,0,0" VerticalAlignment="Top" Width="221" Source="Resources/Images/user.png"/>
-            <Button Content="Выйти из учётной записи" HorizontalAlignment="Left" Margin="55,431,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_3" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
-
-        </Grid>
-
+        <Image x:Name="userImage" HorizontalAlignment="Left" Height="188" Margin="155,29,0,0" VerticalAlignment="Top" Width="199" Source="Resources/Images/user.png" />
+        <Button Content="Учёт заявок" HorizontalAlignment="Left" Margin="23,255,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <Button Content="Учёт договоров" HorizontalAlignment="Left" Margin="268,255,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_1" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <Button Content="Выйти из учётной записи" HorizontalAlignment="Left" Margin="23,312,0,0" VerticalAlignment="Top" Width="466" Height="33" Click="Button_Click_3" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
     </Grid>
 </Window>

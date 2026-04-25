@@ -57,6 +57,14 @@ namespace WpfApp1
         {
             try
             {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
+            try
+            {
                 RefreshDataGrid(true);
                 LoadClientStatuses();
                 phoneTextBox.Text = "+7 (___) ___-__-__";
@@ -695,7 +703,8 @@ namespace WpfApp1
             }
         }
 
-        private void RefreshDataGrid(bool isInitial) {
+        private void RefreshDataGrid(bool isInitial)
+        {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();

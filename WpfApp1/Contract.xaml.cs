@@ -32,6 +32,14 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
             contractNumberLabel.Content = GetContractNumber();
             contractDateLabel.Content = DateTime.Now.ToString("dd.MM.yyyy");
             claimNumberLabel.Content = fieldVals[0];

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Company" Height="450" Width="726.265" Loaded="Window_Loaded" FontFamily="Arial" FontSize="16" WindowStartupLocation="CenterScreen" WindowStyle="None">
+        Title="Организация" Height="450" Width="726.265" Loaded="Window_Loaded" FontFamily="Arial" FontSize="16" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Icon="internet_102151.ico">
     <Grid>
         <GroupBox Header="Организация" HorizontalAlignment="Left" Height="394" Margin="10,22,0,0" VerticalAlignment="Top" Width="503" FontFamily="Arial" FontSize="16">
             <StackPanel>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="EmployeesViewWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Сотрудники" Height="475.6" Width="800" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
         <Button x:Name="inClaimButton" Content="В заявку" HorizontalAlignment="Left" Margin="523,24,0,0" VerticalAlignment="Top" Width="248" Height="36" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="Button_Click_1"/>
         <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="523,86,0,0" VerticalAlignment="Top" Width="248" Height="36" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Window12" Height="598.8" Width="1016" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Тарифы" Height="618" Width="1016" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
         <Label Content="Название тарифа" HorizontalAlignment="Left" Margin="714,39,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273" FontSize="14"/>
         <Label Content="Ежемесячная плата" HorizontalAlignment="Left" Margin="714,252,0,0" VerticalAlignment="Top" FontSize="14"/>

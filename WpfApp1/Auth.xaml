@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Window9" Height="567.8" Width="719.2" WindowStartupLocation="CenterScreen" WindowStyle="None" PreviewKeyUp="Window_PreviewKeyUp" Loaded="Window_Loaded">
+        Title="Авторизация" Height="587" Width="719.2" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" PreviewKeyUp="Window_PreviewKeyUp" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid Margin="0,0,25.6,-0.4">
         <DockPanel Height="579" LastChildFill="False" Margin="0,0,-31.8,0" VerticalAlignment="Top">
             <Image HorizontalAlignment="Left" Height="539" VerticalAlignment="Top" Width="372" Source="Resources/Images/Inet.jpg"/>
@@ -24,17 +24,17 @@
                 </DockPanel>
                 <DockPanel Margin="5,0,0.4,0" Height="31">
                     <Label Content="Логин" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,-3,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 </DockPanel>
                 <TextBox x:Name="LoginTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
                 <DockPanel Margin="5,0,0.4,0" Height="31">
                     <Label Content="Пароль" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-9,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-9,-3,0,-0.8" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 </DockPanel>
                 <PasswordBox x:Name="PasswordTextBox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" VerticalAlignment="Top" Width="293" FontSize="18" />
                 <DockPanel Margin="5,0,0.4,0" Height="31">
                     <Label Content="Капча" Name="captchaLabel" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
-                    <Label Foreground="Red" Name="captchaAsterisk" Content="*" HorizontalAlignment="Left" Margin="-9,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                    <Label Foreground="Red" Name="captchaAsterisk" Content="*" HorizontalAlignment="Left" Margin="-9,-3,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 </DockPanel>
                 <Image x:Name="captchaImage" Height="133" Margin="5,5,28.4,10" />
                 <TextBox x:Name="captchaTextbox" HorizontalAlignment="Left" Height="36" Margin="5,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
