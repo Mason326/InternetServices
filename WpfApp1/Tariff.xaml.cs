@@ -343,9 +343,9 @@ namespace WpfApp1
                             editTariffButton.IsEnabled = false;
                             deleteTariffButton.IsEnabled = false;
                         }
-                        catch (Exception exc)
+                        catch
                         {
-                            MessageBox.Show($"Не удалось удалить тариф\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show($"Не удалось удалить тариф\nОшибка: Тариф используется в заявках", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
                     }

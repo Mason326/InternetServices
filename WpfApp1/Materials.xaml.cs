@@ -342,9 +342,9 @@ namespace WpfApp1
                             editMaterialButton.IsEnabled = false;
                             deleteMaterialButton.IsEnabled = false;
                         }
-                        catch (Exception exc)
+                        catch
                         {
-                            MessageBox.Show($"Не удалось удалить материал\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show($"Не удалось удалить материал\nОшибка: Материал используется в заказ-нарядах", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
                     }

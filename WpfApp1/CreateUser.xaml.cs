@@ -502,9 +502,9 @@ namespace WpfApp1
                 MessageBox.Show("Пользователь удален", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 ClearInputData();
             }
-            catch (Exception exc)
+            catch
             {
-                MessageBox.Show($"Не удалось удалить пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Не удалось удалить пользователя\nОшибка: Пользователь используется в связанных таблицах", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             RefreshDataGrid(false);
         }

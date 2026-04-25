@@ -341,9 +341,9 @@ namespace WpfApp1
                             editServiceButton.IsEnabled = false;
                             deleteServiceButton.IsEnabled = false;
                         }
-                        catch (Exception exc)
+                        catch
                         {
-                            MessageBox.Show($"Не удалось удалить услугу\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show($"Не удалось удалить услугу\nОшибка: Услуга используется в заказ-нарядах", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
                     }
