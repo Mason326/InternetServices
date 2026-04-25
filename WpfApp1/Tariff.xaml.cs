@@ -35,7 +35,15 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            RefreshDataGrid();
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
+            RefreshDataGrid(true);
             editTariffButton.IsEnabled = false;
             deleteTariffButton.IsEnabled = false;
         }
@@ -138,21 +146,26 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось добавить тариф\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                RefreshDataGrid();
+                RefreshDataGrid(false);
             }
             else
                 MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
 
         }
 
-        private void RefreshDataGrid()
+        private void RefreshDataGrid(bool isInitial)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("Select * from `tariff` order by idtariff desc", conn);
+                    string cmdText = "Select idtariff, monthly_fee, tariff_name, tariff_details from `tariff` order by idtariff desc";
+                    if (isInitial)
+                    {
+                        cmdText = "Select idtariff, monthly_fee, tariff_name, tariff_details from `tariff` order by tariff_name";
+                    }
+                    MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     cmd.ExecuteNonQuery();
@@ -260,14 +273,14 @@ namespace WpfApp1
                         {
                             string query = $@"Update `tariff` 
                                                 set tariff_name = '{tariffNameTextBox.Text.Trim()}',
-                                                monthly_fee = {monthFeeTextBox.Text.Trim()},
+                                                monthly_fee = {monthFeeTextBox.Text.Trim().Replace(',', '.')},
                                                 tariff_details = '{tariffDescriptionTextBox.Text.Trim()}'
                                                 where idtariff = {tariffId}";
                             MySqlCommand cmd = new MySqlCommand(query, conn);
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Данные тарифа успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
-                            RefreshDataGrid();
+                            RefreshDataGrid(false);
                         }
                         catch (Exception exc)
                         {
@@ -325,14 +338,14 @@ namespace WpfApp1
                             MySqlCommand cmd = new MySqlCommand(query, conn);
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Тариф успешно удален", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                            RefreshDataGrid();
+                            RefreshDataGrid(false);
                             tariffDG.SelectedItem = null;
                             editTariffButton.IsEnabled = false;
                             deleteTariffButton.IsEnabled = false;
                         }
-                        catch (Exception exc)
+                        catch
                         {
-                            MessageBox.Show($"Не удалось удалить тариф\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            MessageBox.Show($"Не удалось удалить тариф\nОшибка: Тариф используется в заявках", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
                     }

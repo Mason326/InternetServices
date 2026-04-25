@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Создание заявки" Height="741.55" Width="987.2" WindowStartupLocation="CenterScreen" WindowStyle="None" Loaded="Window_Loaded">
+        Title="Создание заявки" Height="760.75" Width="1110.4" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
     <Grid>
-        <Label Content="Дата и время выполнения" HorizontalAlignment="Left" Margin="463,15,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="209"/>
+        <Label Content="Дата и время выполнения" HorizontalAlignment="Left" Margin="515,15,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="209"/>
         <Label Content="Статус" HorizontalAlignment="Left" Margin="255,35,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <DataGrid x:Name="claimsDG" SelectionMode="Single" Margin="10,395,9.8,57.2" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="claimsDG_SelectionChanged" MouseDoubleClick="claimsDG_MouseDoubleClick">
+        <DataGrid x:Name="claimsDG" SelectionMode="Single" Margin="10,393,10,57.2" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="claimsDG_SelectionChanged" MouseDoubleClick="claimsDG_MouseDoubleClick" FontSize="16">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="ShowClaimVerbose" />
@@ -26,41 +26,98 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="№ Заявки" Binding="{Binding id_claim}" Width="70" />
-                <DataGridTextColumn Header="Дата создания" Binding="{Binding connection_creationDate, StringFormat=\{0:dd.MM.yy\}}" Width="100" />
-                <DataGridTextColumn Header="Дата выполнения" Binding="{Binding mount_date, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Width="110" />
-                <DataGridTextColumn Header="Адрес монтирования" Binding="{Binding connection_address}" Width="140" />
-                <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="75" />
-                <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}" Width="90" />
-                <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="120" />
-                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="120" />
-                <DataGridTextColumn Header="Статус" Binding="{Binding claim_status}" Width="70">
+                <DataGridTextColumn Header="№ Заявки" Binding="{Binding id_claim}" Width="88">
                     <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="{x:Type TextBlock}">
-                            <Style.Triggers>
-                                <Trigger Property="Text" Value="Входящая">
-                                    <Setter Property="Background" Value="ForestGreen" />
-                                    <Setter Property="Foreground" Value="White" />
-                                </Trigger>
-                                <Trigger Property="Text"  Value="Отменена">
-                                    <Setter Property="Background" Value="DarkRed" />
-                                    <Setter Property="Foreground" Value="White" />
-                                </Trigger>
-                                <Trigger Property="Text"  Value="В работе">
-                                    <Setter Property="Background" Value="Coral" />
-                                    <Setter Property="Foreground" Value="White" />
-                                </Trigger>
-                                <Trigger Property="Text"  Value="Закрыта">
-                                    <Setter Property="Background" Value="Magenta"  />
-                                    <Setter Property="Foreground" Value="White" />
-                                </Trigger>
-                            </Style.Triggers>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+                <DataGridTextColumn Header="Описание" Binding="{Binding claimDetails}" Width="320">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"></Setter>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Дата создания" Binding="{Binding connection_creationDate, StringFormat=\{0:dd.MM.yy\}}" Width="100" Visibility="Collapsed" />
+                <DataGridTextColumn Header="Дата выполнения" Binding="{Binding mount_date, StringFormat=\{0:dd.MM.yy HH:mm:ss\}}" Width="110" Visibility="Collapsed" />
+                <DataGridTextColumn Header="Адрес монтирования" Binding="{Binding connection_address}" Width="140" Visibility="Collapsed"  />
+                <DataGridTextColumn Header="Тариф" Binding="{Binding tariff}" Width="75" Visibility="Collapsed"  />
+                <DataGridTextColumn Header="Фио Клиента" Binding="{Binding client_fio}"  Width="177">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"></Setter>
+                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                            <Setter Property="TextAlignment" Value="Center"></Setter>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="ФИО менеджера" Binding="{Binding employee_fio}" Width="185">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"></Setter>
+                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                            <Setter Property="TextAlignment" Value="Center"></Setter>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="ФИО мастера" Binding="{Binding master_fio}" Width="185">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextWrapping" Value="Wrap"></Setter>
+                            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                            <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                            <Setter Property="TextAlignment" Value="Center"></Setter>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn Header="Статус" Width="95">
+                    <DataGridTemplateColumn.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding claim_status}" Value="Входящая">
+                                    <Setter Property="Background" Value="ForestGreen" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding claim_status}" Value="Отменена">
+                                    <Setter Property="Background" Value="DarkRed" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding claim_status}" Value="В работе">
+                                    <Setter Property="Background" Value="Coral" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding claim_status}" Value="Закрыта">
+                                    <Setter Property="Background" Value="Magenta" />
+                                    <Setter Property="Foreground" Value="White" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTemplateColumn.CellStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding claim_status}" 
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontWeight="Bold"
+                       Margin="0"
+                       Padding="0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <DatePicker x:Name="dateOfExecution" HorizontalAlignment="Left" Margin="464,64,0,0" VerticalAlignment="Top" Height="36" Width="135" FontSize="16" SelectedDateChanged="dateOfExecution_SelectedDateChanged" PreviewTextInput="dateOfExecution_PreviewTextInput"/>
+        <DatePicker x:Name="dateOfExecution" HorizontalAlignment="Left" Margin="513,64,0,0" VerticalAlignment="Top" Height="36" Width="138" FontSize="16" SelectedDateChanged="dateOfExecution_SelectedDateChanged" PreviewTextInput="dateOfExecution_PreviewTextInput"/>
         <ComboBox IsEnabled="False" x:Name="claimStatusComboBox" HorizontalAlignment="Left" Margin="255,64,0,0" VerticalAlignment="Top" Width="184" Height="38" FontSize="16" SelectionChanged="claimStatusComboBox_SelectionChanged"/>
         <Label Content="Дата создания:" HorizontalAlignment="Left" Margin="25,69,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="120"/>
         <Label Content="Номер заявки:" HorizontalAlignment="Left" Margin="29,25,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="117"/>
@@ -71,7 +128,7 @@
         <Label Name="creationDate" Content="" HorizontalAlignment="Left" Margin="142,71,0,0" VerticalAlignment="Top" FontSize="16"/>
         <TextBox Name="mountAddressTextBox" HorizontalAlignment="Left" Height="44" Margin="30,146,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="409" PreviewTextInput="TextBox_PreviewTextInput" MaxLength="150"/>
         <Label Content="Адрес монтирования" HorizontalAlignment="Left" Margin="25,115,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="165"/>
-        <ComboBox x:Name="timeOfExecution" HorizontalAlignment="Left" Margin="599,64,0,0" VerticalAlignment="Top" Width="82" Height="36" FontSize="16">
+        <ComboBox x:Name="timeOfExecution" HorizontalAlignment="Left" Margin="651,64,0,0" VerticalAlignment="Top" Width="95" Height="36" FontSize="16">
             <ComboBox.Background>
                 <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                     <GradientStop Color="#FFF0F0F0" Offset="0"/>
@@ -81,18 +138,18 @@
         </ComboBox>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="81,190,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="182,116,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="658,16,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <ComboBox x:Name="tariffComboBox" HorizontalAlignment="Left" Margin="464,146,0,0" VerticalAlignment="Top" Width="217" Height="32"/>
-        <Label Content="Тариф" HorizontalAlignment="Left" Margin="461,117,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="508,119,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Button x:Name="clearFieldsButton" Content="Очистить поля" HorizontalAlignment="Left" Margin="546,221,0,0" VerticalAlignment="Top" Width="135" Height="39" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_3"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="710,16,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+        <ComboBox x:Name="tariffComboBox" HorizontalAlignment="Left" Margin="513,146,0,0" VerticalAlignment="Top" Width="233" Height="32"/>
+        <Label Content="Тариф" HorizontalAlignment="Left" Margin="507,117,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="560,119,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+        <Button x:Name="clearFieldsButton" Content="Очистить поля" HorizontalAlignment="Left" Margin="547,220,0,0" VerticalAlignment="Top" Width="199" Height="35" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_3"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="304,35,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" RenderTransformOrigin="-16.708,0.598"/>
-        <Label Content="Мастер" HorizontalAlignment="Left" Margin="28,263,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
-        <Button x:Name="chooseAMasterButton" Content="Выбрать мастера" HorizontalAlignment="Left" Margin="361,291,0,0" VerticalAlignment="Top" Width="151" Height="38" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_4"/>
-        <TextBox x:Name="masterTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,294,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310" TextChanged="masterTextBox_TextChanged"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="85,264,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Content="(доступны после выбора мастера)" HorizontalAlignment="Left" Margin="463,35,0,0" VerticalAlignment="Top" FontSize="13" Height="31" Width="231"/>
-        <StackPanel HorizontalAlignment="Left" Height="229" Margin="694,29,0,0"  VerticalAlignment="Top" Width="263">
+        <Label Content="Мастер" HorizontalAlignment="Left" Margin="28,257,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="85"/>
+        <Button x:Name="chooseAMasterButton" Content="Выбрать мастера" HorizontalAlignment="Left" Margin="361,285,0,0" VerticalAlignment="Top" Width="151" Height="38" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_4"/>
+        <TextBox x:Name="masterTextBox" IsEnabled="False" HorizontalAlignment="Left" Height="33" Margin="30,288,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="310" TextChanged="masterTextBox_TextChanged"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="85,258,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+        <Label Content="(доступны после выбора мастера)" HorizontalAlignment="Left" Margin="515,35,0,0" VerticalAlignment="Top" FontSize="13" Height="31" Width="231"/>
+        <StackPanel HorizontalAlignment="Left" Height="229" Margin="787,31,0,0"  VerticalAlignment="Top" Width="263">
             <Button x:Name="createClaimButton" Content="Создать заявку" HorizontalAlignment="Left" Height="36" Margin="20,30,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
             <Button x:Name="showClaimButton" IsEnabled="False" Content="Просмотр заявки" HorizontalAlignment="Left" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" Height="37" Background="#FF4F6DD3" Foreground="White" FontSize="16" FontFamily="Arial" FontWeight="Bold" Click="ShowClaimVerbose"/>
             <Button x:Name="editButton" Content="Редактировать заявку" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="PrepareToEditClaim"/>
@@ -100,12 +157,12 @@
             <Button x:Name="endEditingButton" Visibility="Collapsed" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="20,30,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="EditClaim" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
             <Button x:Name="cancelChangesButton" Visibility="Collapsed" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="20,5,0,5" VerticalAlignment="Top" Width="226" RenderTransformOrigin="0.458,-0.148" Click="CancelEdit" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
         </StackPanel>
-        <Label Content="Поиск по номеру заявки и ФИО клиента" HorizontalAlignment="Left" Margin="544,291,0,0" VerticalAlignment="Top" FontSize="16" Height="30" Width="315"/>
-        <TextBox x:Name="searchByClaimNumAndFio" HorizontalAlignment="Left" Height="36" Margin="546,321,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="391" TextChanged="searchByClaimNumAndFio_TextChanged"/>
-        <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="291,691,0,0" VerticalAlignment="Top" Width="31"/>
-        <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="328,690,0,0" VerticalAlignment="Top" FontSize="16"/>
-        <Button Content="Доп. услуги" HorizontalAlignment="Left" Margin="361,350,0,0" VerticalAlignment="Top" Width="151" Click="Button_Click_5" Height="30" FontFamily="Arial" FontSize="16" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold"/>
-        <Label Content="Количество заявок:" HorizontalAlignment="Left" Margin="10,693,0,0" VerticalAlignment="Top" Width="154" FontFamily="Arial" FontSize="16"/>
-        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="165,693,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <Label Content="Поиск по номеру заявки и ФИО клиента" HorizontalAlignment="Left" Margin="642,285,0,0" VerticalAlignment="Top" FontSize="16" Height="30" Width="315"/>
+        <TextBox x:Name="searchByClaimNumAndFio" HorizontalAlignment="Left" Height="36" Margin="644,315,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="384" TextChanged="searchByClaimNumAndFio_TextChanged"/>
+        <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="291,687,0,0" VerticalAlignment="Top" Width="31"/>
+        <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="328,686,0,0" VerticalAlignment="Top" FontSize="16"/>
+        <Button x:Name="additServiceButton" Content="Доп. услуги" HorizontalAlignment="Left" Margin="361,344,0,0" VerticalAlignment="Top" Width="151" Click="Button_Click_5" Height="30" FontFamily="Arial" FontSize="16" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold"/>
+        <Label Content="Количество заявок:" HorizontalAlignment="Left" Margin="10,689,0,0" VerticalAlignment="Top" Width="154" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="165,689,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>

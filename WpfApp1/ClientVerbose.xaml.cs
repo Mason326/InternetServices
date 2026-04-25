@@ -23,24 +23,12 @@ namespace WpfApp1
     {
         int clientId;
         string currStatus;
-        Action RefreshDG;
-        public ClientVerbose(object[] selectedItems, Action refresh)
+        Action<bool> RefreshDG;
+        public ClientVerbose(object[] selectedItems, Action<bool> refresh)
         {
             InitializeComponent();
             clientId = Convert.ToInt32(selectedItems[0]);
-            if (selectedItems[2] != null)
-                emailLabel.Content = selectedItems[2].ToString();
-            phoneLabel.Content = selectedItems[3].ToString();
-            placeOfResidenceLabel.Text = selectedItems[4].ToString();
-            dateOfBirthLabel.Content = selectedItems[5].ToString();
-            abonentLoginLabel.Content = selectedItems[6].ToString();
-            abonentPasswordLabel.Content = selectedItems[7].ToString();
-            passportSeriesLabel.Content = selectedItems[8].ToString();
-            passportNumberLabel.Content = selectedItems[9].ToString();
-            issuedByLabel.Text = selectedItems[10].ToString();
-            issueDateLabel.Content = selectedItems[11].ToString();
-            departmentCodeLabel.Content = selectedItems[12].ToString();
-            currStatus = selectedItems[13].ToString();
+            LoadClientData(clientId);
             RefreshDG += refresh;
         }
 
@@ -51,6 +39,14 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
@@ -97,12 +93,49 @@ namespace WpfApp1
                     MySqlCommand cmd = new MySqlCommand($"Update `client` set `client_status_id` = (select idclient_status from client_status where status_name = '{statusComboBox.SelectedItem}') where idclient = {clientId};", conn);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    RefreshDG();
+                    RefreshDG(false);
                     this.Close();
                 }
                 catch (Exception exc)
                 {
                     MessageBox.Show($"Не удалось обновить статус\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void LoadClientData(int clientId)
+        {
+            using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand($"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status where idclient = {clientId};", conn);
+                    using (MySqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            if (dr.GetValue(2) != null)
+                            {
+                                emailLabel.Content = dr.GetValue(2).ToString();
+                            }
+                            phoneLabel.Content = dr.GetString("phone_number");
+                            placeOfResidenceLabel.Text = dr.GetString("place_of_residence");
+                            dateOfBirthLabel.Content = dr.GetDateTime("birthdate").ToString("dd.MM.yyyy");
+                            abonentLoginLabel.Content = dr.GetString("subscriber_login");
+                            abonentPasswordLabel.Content = dr.GetString("subscriber_password");
+                            passportSeriesLabel.Content = dr.GetString("passport_series");
+                            passportNumberLabel.Content = dr.GetString("passport_number");
+                            issuedByLabel.Text = dr.GetString("issued_by");
+                            issueDateLabel.Content = dr.GetDateTime("issue_date").ToString("dd.MM.yyyy");
+                            departmentCodeLabel.Content = dr.GetString("department_code");
+                            currStatus = dr.GetString("client_status");
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось загрузить данные клиента\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

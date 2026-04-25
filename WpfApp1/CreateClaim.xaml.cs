@@ -71,6 +71,14 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
             RefreshData();
             dateOfExecution.IsEnabled = false;
             timeOfExecution.IsEnabled = false;
@@ -258,7 +266,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio'
+                    MySqlCommand cmd = new MySqlCommand($@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
                                                         from `connection_claim`
                                                         inner join `client` on client.idclient = connection_claim.client_id
                                                         inner join `employees` on employees.idemployees = connection_claim.employees_id
@@ -298,12 +306,6 @@ namespace WpfApp1
                     { 
                         MySqlCommand cmd2 = new MySqlCommand(cmdUpdateExpired, conn);
                         cmd2.ExecuteNonQuery();
-                    }
-
-                    foreach (DataRow row in dt.Rows)
-                    {
-                        string fio = row.ItemArray[5].ToString();
-                        row.SetField<string>(5, HideName(fio));
                     }
 
                     claimsDG.ItemsSource = dt.AsDataView();
@@ -353,7 +355,6 @@ namespace WpfApp1
             recordsCount = 0;
             masterTextBox.Clear();
             MasterHolder.data = null;
-            searchByClaimNumAndFio.Clear();
             AdditionalServicesHolder.additionalServices.Clear();
             if (!isEditing)
             {
@@ -771,6 +772,7 @@ namespace WpfApp1
                 chooseAMasterButton.IsEnabled = false;
                 tariffComboBox.IsEnabled = false;
                 clearFieldsButton.IsEnabled = false;
+                additServiceButton.IsEnabled = false;
             }
             else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && isExpired)
             {
@@ -780,6 +782,7 @@ namespace WpfApp1
                 chooseAMasterButton.IsEnabled = true;
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
+                additServiceButton.IsEnabled = true;
             }
             else if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Входящая" && !isExpired)
             {
@@ -793,13 +796,15 @@ namespace WpfApp1
                 chooseAMasterButton.IsEnabled = true;
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
+                additServiceButton.IsEnabled = true;
             }
             else
             { 
-                dateOfExecution.IsEnabled = true;
+                //dateOfExecution.IsEnabled = true;
                 chooseAMasterButton.IsEnabled = true;
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
+                additServiceButton.IsEnabled = true;
             }
         }
 

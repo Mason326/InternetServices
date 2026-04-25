@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -45,7 +46,15 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            RefreshDataGrid();
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
+            RefreshDataGrid(true);
             editUserButton.IsEnabled = false;
             try
             {
@@ -383,7 +392,7 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось создать нового пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                RefreshDataGrid();
+                RefreshDataGrid(false);
             }
             else
                 MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -398,16 +407,23 @@ namespace WpfApp1
             passwordTextBox.Text = "";
         }
 
-        private void RefreshDataGrid()
+        private void RefreshDataGrid(bool isInitial)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(@"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo
+                    string cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
                                                           FROM employees
-                                                          inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;", conn);
+                                                          inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;";
+                    if(isInitial)
+                    {
+                        cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
+                                                          FROM employees
+                                                          inner join `roles` on employees.roles_id = roles.idroles order by idemployees;";
+                    }
+                    MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     DataTable dt = new DataTable();
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
@@ -426,7 +442,7 @@ namespace WpfApp1
                         {
                             dr.GetValues(record);
                             byte[] imageBytes = record[6] as byte[];
-                            record[7] = LoadImage(imageBytes);
+                            record[8] = ImageUtils.LoadImage(imageBytes);
                             dt.LoadDataRow(record, true);
                         }
                     }
@@ -486,11 +502,11 @@ namespace WpfApp1
                 MessageBox.Show("Пользователь удален", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 ClearInputData();
             }
-            catch (Exception exc)
+            catch
             {
-                MessageBox.Show($"Не удалось удалить пользователя\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Не удалось удалить пользователя\nОшибка: Пользователь используется в связанных таблицах", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            RefreshDataGrid();
+            RefreshDataGrid(false);
         }
 
         private void userDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -535,7 +551,7 @@ namespace WpfApp1
                 editUserButton.Visibility = Visibility.Collapsed;
                 deleteUserButton.Visibility = Visibility.Collapsed;
                 toMainButton.Visibility = Visibility.Collapsed;
-                userImage.Source = fieldValuesOfARecord[7] as BitmapImage;
+                userImage.Source = fieldValuesOfARecord[8] as BitmapImage;
 
                 passwordTextBox.Clear();
 
@@ -568,7 +584,7 @@ namespace WpfApp1
 
             endEditingButton.Visibility = Visibility.Collapsed;
             cancelChangesButton.Visibility = Visibility.Collapsed;
-            userImage.Source = LoadImage(null);
+            userImage.Source = ImageUtils.LoadImage(null);
             filePath = null;
 
             ClearInputData();
@@ -650,7 +666,7 @@ namespace WpfApp1
                             cmd.ExecuteNonQuery();
                             MessageBox.Show($"Данные пользователя успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
-                            RefreshDataGrid();
+                            RefreshDataGrid(false);
                         }
                         catch (Exception exc)
                         {
@@ -686,24 +702,6 @@ namespace WpfApp1
                 filePath = dialog.FileName;
                 userImage.Source = new BitmapImage(new Uri(filePath));
             }
-        }
-
-        private static BitmapImage LoadImage(byte[] imageData)
-        {
-            if (imageData == null || imageData.Length == 0) return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/user.png"));
-            var image = new BitmapImage();
-            using (var mem = new MemoryStream(imageData))
-            {
-                mem.Position = 0;
-                image.BeginInit();
-                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.UriSource = null;
-                image.StreamSource = mem;
-                image.EndInit();
-            }
-            image.Freeze();
-            return image;
         }
 
         private bool ImageIsTooLarge(byte[] imageBytes)

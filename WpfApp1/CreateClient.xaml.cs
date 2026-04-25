@@ -40,6 +40,11 @@ namespace WpfApp1
             if (!isSelectClient)
             {
                 inClaimButton.Visibility = Visibility.Collapsed;
+                editClientButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                editClientButton.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -52,7 +57,15 @@ namespace WpfApp1
         {
             try
             {
-                RefreshDataGrid();
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
+            try
+            {
+                RefreshDataGrid(true);
                 LoadClientStatuses();
                 phoneTextBox.Text = "+7 (___) ___-__-__";
                 dateOfBirthDatePicker.DisplayDateEnd = DateTime.Now;
@@ -588,7 +601,7 @@ namespace WpfApp1
                 }
                 try
                 {
-                    RefreshDataGrid();
+                    RefreshDataGrid(false);
                 }
                 catch (Exception exc)
                 {
@@ -690,11 +703,17 @@ namespace WpfApp1
             }
         }
 
-        private void RefreshDataGrid() {
+        private void RefreshDataGrid(bool isInitial)
+        {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
-                MySqlCommand cmd = new MySqlCommand($@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status  {filterOption} order by idclient desc;", conn);
+                string cmdText = $@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, concat('ФИО: ', full_name, '\nEmail: ', IFNULL(email, ''), '\nТелефон: ', concat('+7 (***) ***', substring(phone_number, 13)), '\nАдрес проживания: ', place_of_residence, '\nДата рождения: ', REPEAT('*', CHAR_LENGTH(birthdate)), '\nСерия паспорта: ', concat('**', substring(passport_series, 3)), '\nНомер паспорта: ', concat('****', substring(passport_number, 5))) as clientDetails, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status {filterOption} order by idclient desc;";
+                if (isInitial)
+                {
+                    cmdText = $@"Select idclient, full_name, email, phone_number, place_of_residence, birthdate, subscriber_login, subscriber_password, passport_series, passport_number, issued_by, issue_date, department_code, concat('ФИО: ', full_name, '\nEmail: ', IFNULL(email, ''), '\nТелефон: ', concat('+7 (***) ***', substring(phone_number, 13)), '\nАдрес проживания: ', place_of_residence, '\nДата рождения: ', REPEAT('*', CHAR_LENGTH(birthdate)), '\nСерия паспорта: ', concat('**', substring(passport_series, 3)), '\nНомер паспорта: ', concat('****', substring(passport_number, 5))) as clientDetails, client_status.status_name as 'client_status' from `client` inner join `client_status` on `client`.client_status_id = client_status.idclient_status order by full_name;";
+                }
+                MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                 MySqlDataAdapter da = new MySqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 cmd.ExecuteNonQuery();
@@ -726,7 +745,7 @@ namespace WpfApp1
             }
             else
                 filterOption = "";
-            RefreshDataGrid();
+            RefreshDataGrid(false);
         }
 
         private void showClient_Click(object sender, RoutedEventArgs e)
@@ -778,7 +797,7 @@ namespace WpfApp1
                 issuedByTextBox.Text = fieldValuesOfARecord[10].ToString().Trim();
                 issueDate.SelectedDate = DateTime.Parse(((DateTime)fieldValuesOfARecord[11]).ToString("dd.MM.yyyy"));
                 departmentCodeTextBox.Text = fieldValuesOfARecord[12].ToString().Trim();
-                clientStatusCombobox.Text = fieldValuesOfARecord[13].ToString().Trim();
+                clientStatusCombobox.Text = fieldValuesOfARecord[14].ToString().Trim();
 
                 searchByPassportSeriesAndNumber.IsEnabled = false;
                 clientStatusCombobox.IsEnabled = true;
@@ -875,7 +894,7 @@ namespace WpfApp1
                             cmd2.ExecuteNonQuery();
                             MessageBox.Show($"Данные клента успешно обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
-                            RefreshDataGrid();
+                            RefreshDataGrid(false);
                         }
                         catch (Exception exc)
                         {

@@ -98,6 +98,15 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
+
             ServerTextbox.Text = Properties.Settings.Default.server;
             UserTextbox.Text = Properties.Settings.Default.user;
             PasswordTextbox.Password = Properties.Settings.Default.password;

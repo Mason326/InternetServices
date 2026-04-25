@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MySql.Data.MySqlClient;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -65,14 +68,6 @@ namespace WpfApp1
             this.ShowDialog();
         }
 
-        private void Button_Click_5(object sender, RoutedEventArgs e)
-        {
-            this.Hide();
-            var win = new Roles();
-            win.ShowDialog();
-            this.ShowDialog();
-        }
-
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
             this.Hide();
@@ -90,7 +85,28 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            userName.Content = FullNameSplitter.MakeShortName(AccountHolder.FIO);
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
+
+            try
+            {
+                ImageUtils.LoadUserImage(userImage);
+            }
+            catch
+            {
+                MessageBox.Show("Не удалось загрузить картинку", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
         }
     }
 }

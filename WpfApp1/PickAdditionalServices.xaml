@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="PickAdditionalServices" Height="387.668" Width="869.891" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" WindowStyle="None">
+        Title="Выбор доп. услуг" Height="421.268" Width="869.891" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Icon="internet_102151.ico">
     <Grid>
         <DataGrid SelectionMode="Single" IsReadOnly="True" AutoGenerateColumns="False" x:Name="additionalServicesDG" HorizontalAlignment="Left" Height="130" Margin="29,126,0,0" VerticalAlignment="Top" Width="403">
             <DataGrid.Columns>

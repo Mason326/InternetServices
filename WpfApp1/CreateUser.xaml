@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Пользователи" Height="570.8" Width="987" ResizeMode="NoResize" WindowStyle="None" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        Title="Пользователи" Height="592.4" Width="1013.4" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" Icon="internet_102151.ico">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
@@ -15,15 +15,15 @@
         <Label Content="ФИО" HorizontalAlignment="Left" Margin="38,21,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Grid.Column="1" Width="46"/>
         <Label Content="Роль" HorizontalAlignment="Left" Margin="37,81,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.48,1.355" FontSize="16" Grid.Column="1" Height="31" Width="45"/>
         <ComboBox x:Name="rolesComboBox" HorizontalAlignment="Left" Margin="37,117,0,0" VerticalAlignment="Top" Width="195" Height="26" Grid.Column="1" />
-        <TextBox Name="loginTextBox" HorizontalAlignment="Left" Margin="506,49,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="193" Height="27" Grid.Column="1"/>
-        <Label Content="Логин" HorizontalAlignment="Left" Margin="506,18,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Grid.Column="1" Width="55"/>
-        <TextBox Name="passwordTextBox" HorizontalAlignment="Left" Margin="506,117,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="193" Height="26" Grid.Column="1" TextChanged="passwordTextBox_TextChanged"/>
-        <Label Content="Пароль" HorizontalAlignment="Left" Margin="500,86,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.031,0.48" Grid.Column="1" Width="66"/>
+        <TextBox Name="loginTextBox" HorizontalAlignment="Left" Margin="512,51,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="199" Height="27" Grid.Column="1" MaxLength="20"/>
+        <Label Content="Логин" HorizontalAlignment="Left" Margin="510,20,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Grid.Column="1" Width="55"/>
+        <TextBox Name="passwordTextBox" HorizontalAlignment="Left" Margin="512,119,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="199" Height="26" Grid.Column="1" TextChanged="passwordTextBox_TextChanged"  MaxLength="20"/>
+        <Label Content="Пароль" HorizontalAlignment="Left" Margin="510,88,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.031,0.48" Grid.Column="1" Width="66"/>
         <TextBox x:Name="phoneTextBox" HorizontalAlignment="Left" Margin="265,117,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="195" Height="28" Grid.Column="1" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture" PreviewKeyUp="phoneTextBox_PreviewKeyUp" MaxLength="19" PreviewTextInput="phoneTextBox_PreviewTextInput"/>
         <Label Content="Телефон" HorizontalAlignment="Left" Margin="266,86,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Grid.Column="1" Width="73"/>
-        <Image x:Name="userImage" HorizontalAlignment="Left" Height="188" Margin="742,21,0,0" VerticalAlignment="Top" Width="221" Source="Resources/Images/user.png" Grid.Column="1"/>
-        <Button Content="Загрузить изображение" HorizontalAlignment="Left" Height="36" Margin="723,237,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_3"/>
-        <StackPanel Margin="723,325,24.2,18" Grid.ColumnSpan="2">
+        <Image x:Name="userImage" HorizontalAlignment="Left" Height="188" Margin="758,16,0,0" VerticalAlignment="Top" Width="221" Source="Resources/Images/user.png" Grid.Column="1"/>
+        <Button Content="Загрузить изображение" HorizontalAlignment="Left" Height="36" Margin="739,232,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_3"/>
+        <StackPanel Margin="739,320,7.6,23.2" Grid.ColumnSpan="2">
             <Button x:Name="createUserButton" Content="Создать пользователя" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
             <Button x:Name="editUserButton" Content="Редактировать пользователя" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="editUserButton_Click"/>
             <Button x:Name="deleteUserButton" Content=" Удалить пользователя" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="deleteUserButton_Click"/>
@@ -31,18 +31,19 @@
             <Button Name="endEditingButton" Visibility="Collapsed" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="endEditingButton_Click"/>
             <Button x:Name="cancelChangesButton" Visibility="Collapsed" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,10,0,0" VerticalAlignment="Top" Width="240" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="cancelChangesButton_Click"/>
         </StackPanel>
-        <Button Content="Сгенерировать" HorizontalAlignment="Left" Height="38" Margin="500,160,0,0" VerticalAlignment="Top" Width="200" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
-        <DataGrid IsReadOnly="True" x:Name="userDG" Grid.ColumnSpan="2" Margin="25,237,287.2,66.2" AutoGenerateColumns="False" SelectionChanged="userDG_SelectionChanged" SelectionMode="Single">
+        <Button Content="Сгенерировать" HorizontalAlignment="Left" Height="38" Margin="512,162,0,0" VerticalAlignment="Top" Width="200" RenderTransformOrigin="0.458,-0.148" Grid.Column="1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
+        <DataGrid FontSize="16" IsReadOnly="True" x:Name="userDG" Grid.ColumnSpan="2" Margin="25,237,295.2,40.6" AutoGenerateColumns="False" SelectionChanged="userDG_SelectionChanged" SelectionMode="Single">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Код сотрудника" Binding="{Binding Path=idemployees}" Width="100" />
-                <DataGridTextColumn Header="ФИО" Binding="{Binding Path=full_name}" Width="70" />
-                <DataGridTextColumn Header="Телефон" Binding="{Binding Path=phoneNumber}" Width="70" />
-                <DataGridTextColumn Header="Роль" Binding="{Binding Path=role_name}" Width="70" />
-                <DataGridTextColumn Header="Логин" Binding="{Binding Path=login}" Width="70" />
-                <DataGridTemplateColumn>
+                <DataGridTextColumn Header="Код" Binding="{Binding Path=idemployees}" Width="50" />
+                <DataGridTextColumn Header="ФИО" Binding="{Binding Path=full_name}" Width="200" Visibility="Collapsed" />
+                <DataGridTextColumn Header="Телефон" Binding="{Binding Path=phoneNumber}" Width="130"  Visibility="Collapsed"  />
+                <DataGridTextColumn Header="Роль" Binding="{Binding Path=role_name}" Width="100"  Visibility="Collapsed"  />
+                <DataGridTextColumn Header="Логин" Binding="{Binding Path=login}" Width="100"  Visibility="Collapsed"  />
+                <DataGridTextColumn Header="Информация о сотруднике" Binding="{Binding userData}" Width="350" />
+                <DataGridTemplateColumn Width="265">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image Source="{Binding UserPhoto}" Width="100" Height="100" />
+                            <Image Source="{Binding UserPhoto}" Width="120" Height="120" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -51,9 +52,9 @@
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="75,21,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="73,83,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="330,88,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="552,20,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="556,89,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
-        <Label Content="Количество пользователей:" HorizontalAlignment="Left" Margin="25,528,0,0" VerticalAlignment="Top" Width="217" Grid.ColumnSpan="2" FontFamily="Arial" FontSize="16"/>
-        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="244,527,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="564,22,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
+        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="568,91,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2"/>
+        <Label Content="Количество пользователей:" HorizontalAlignment="Left" Margin="25,524,0,0" VerticalAlignment="Top" Width="217" Grid.ColumnSpan="2" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="244,523,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>

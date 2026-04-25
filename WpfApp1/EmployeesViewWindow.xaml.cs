@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -29,6 +30,14 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -53,7 +62,7 @@ namespace WpfApp1
                         {
                             dr.GetValues(record);
                             byte[] imageBytes = record[6] as byte[];
-                            record[7] = LoadImage(imageBytes);
+                            record[7] = ImageUtils.LoadImage(imageBytes);
                             dt.LoadDataRow(record, true);
                         }
                     }
@@ -86,24 +95,6 @@ namespace WpfApp1
         private void employeesDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             inClaimButton.IsEnabled = true;
-        }
-
-        private static BitmapImage LoadImage(byte[] imageData)
-        {
-            if (imageData == null || imageData.Length == 0) return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/user.png"));
-            var image = new BitmapImage();
-            using (var mem = new MemoryStream(imageData))
-            {
-                mem.Position = 0;
-                image.BeginInit();
-                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.UriSource = null;
-                image.StreamSource = mem;
-                image.EndInit();
-            }
-            image.Freeze();
-            return image;
         }
     }
 }

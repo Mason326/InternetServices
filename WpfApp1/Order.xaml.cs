@@ -48,7 +48,6 @@ namespace WpfApp1
             servicesTotalCostLabel.Content = 0;
             orderTotalCostLabel.Content = 0;
             discountAmountLabel.Content = 0;
-            printOrderButton.IsEnabled = false;
             RefreshDG += refreshDG;
         }
 
@@ -61,6 +60,14 @@ namespace WpfApp1
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
             numberOrderLabel.Content = GetOrderNumber();
             try
             {
@@ -218,12 +225,11 @@ namespace WpfApp1
 
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
                 servicesCost += Convert.ToDouble(items[3]);
-                servicesTotalCostLabel.Content = servicesCost;
+                servicesTotalCostLabel.Content = Math.Round(servicesCost, 2);
 
                 double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
 
-                orderTotalCostLabel.Content = servicesCost + materialsCost;
-                printOrderButton.IsEnabled = true;
+                orderTotalCostLabel.Content = Math.Round(servicesCost + materialsCost, 2);
                 RefreshDiscountLabel();
             }
         }
@@ -260,11 +266,11 @@ namespace WpfApp1
                 }
                 double materialCost = Convert.ToDouble(materialsTotalCostLabel.Content);
                 materialCost += Convert.ToDouble(items[3]);
-                materialsTotalCostLabel.Content = materialCost;
+                materialsTotalCostLabel.Content = Math.Round(materialCost, 2);
 
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
 
-                orderTotalCostLabel.Content = servicesCost + materialCost;
+                orderTotalCostLabel.Content = Math.Round(servicesCost + materialCost, 2);
                 RefreshDiscountLabel();
             }
         }
@@ -298,13 +304,11 @@ namespace WpfApp1
                 if (servicesCost != 0)
                 {
                     servicesCost -= Convert.ToDouble(items[2]);
-                    servicesTotalCostLabel.Content = servicesCost;
+                    servicesTotalCostLabel.Content = Math.Round(servicesCost, 2);
                 }
                 double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
 
-                orderTotalCostLabel.Content = servicesCost + materialsCost;
-                if(servicesDictionary.Count < 1)
-                    printOrderButton.IsEnabled = false;
+                orderTotalCostLabel.Content = Math.Round(servicesCost + materialsCost, 2);
                 RefreshDiscountLabel();
             }
         }
@@ -337,12 +341,12 @@ namespace WpfApp1
                 if (materialCost != 0)
                 {
                     materialCost -= Convert.ToDouble(items[2]);
-                    materialsTotalCostLabel.Content = materialCost;
+                    materialsTotalCostLabel.Content = Math.Round(materialCost, 2);
                 }
 
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
 
-                orderTotalCostLabel.Content = servicesCost + materialCost;
+                orderTotalCostLabel.Content = Math.Round(servicesCost + materialCost, 2);
                 RefreshDiscountLabel();
             }
         }
@@ -396,6 +400,9 @@ namespace WpfApp1
                     transaction.Commit();
                     MessageBox.Show($"Наряд успешно закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     RefreshDG();
+                    MessageBoxResult printRes = MessageBox.Show("Хотите распечатать акт выполненных работ?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                    if (res == MessageBoxResult.Yes)
+                        PrintADocument();
                     this.Close();
                 }
                 catch (Exception exc)
@@ -420,7 +427,7 @@ namespace WpfApp1
             orderTotalCostLabel.Content = checkedFlag ? Math.Round(currentOrderCost - discount, 3) : Math.Round(Convert.ToDouble(servicesTotalCostLabel.Content) + Convert.ToDouble(materialsTotalCostLabel.Content), 3);
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
+        private void PrintADocument()
         {
             if (servicesDictionary.Count < 1)
             {
@@ -466,7 +473,7 @@ namespace WpfApp1
                 doc.Fields.Update();
 
                 ReplaceWord("{orderNumber}", numberOrderLabel.Content.ToString(), doc);
-                ReplaceWord("{orderDate}", (DateTime.Parse(executionDateLabel.Content.ToString())).ToString("dd.MM.yyyy"), doc);
+                ReplaceWord("{orderDate}", (DateTime.Now).ToString("dd.MM.yyyy"), doc);
                 ReplaceWord("{companyName}", Properties.Settings.Default.companyName, doc);
                 ReplaceWord("{companyDescription}", Properties.Settings.Default.companyDescription, doc);
                 ReplaceWord("{clientName}", clientLabel.Content.ToString(), doc);
@@ -619,8 +626,8 @@ namespace WpfApp1
             {
                 wordApp.Visible = true;
             }
-
         }
+
         private void ReplaceWord(string src, string dest, Word.Document doc)
         {
             Word.Range range = doc.Content;
