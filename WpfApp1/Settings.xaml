@@ -5,26 +5,110 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Настройки" Height="499.6" Width="368" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
+        Title="Настройки" 
+        Height="520" 
+        Width="450" 
+        MinHeight="480"
+        MinWidth="400"
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="SingleBorderWindow" 
+        Loaded="Window_Loaded" 
+        Icon="internet_102151.ico"
+        ResizeMode="CanResizeWithGrip">
+
+    <Window.Resources>
+        <Style TargetType="Label">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style TargetType="PasswordBox">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="#FF4F6DD3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <StackPanel>
-            <DockPanel Height="57" Margin="0,0,-0.4,0">
-                <Label Content="Сервер" HorizontalAlignment="Left" Margin="34,28,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
-                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,28,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-            </DockPanel>
-            <TextBox x:Name="ServerTextbox" HorizontalAlignment="Left" Height="36" Margin="34,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
-            <DockPanel>
-                <Label Content="Пользователь" HorizontalAlignment="Left" Margin="34,10,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
-                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-7,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="29"/>
-            </DockPanel>
-            <TextBox x:Name="UserTextbox" HorizontalAlignment="Left" Height="36" Margin="34,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="293" FontSize="18"/>
-            <DockPanel>
-                <Label Content="Пароль" HorizontalAlignment="Left" Margin="34,10,0,0" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
-            </DockPanel>
-            <PasswordBox x:Name="PasswordTextbox" HorizontalAlignment="Left" Height="36" Margin="34,0,0,0" VerticalAlignment="Top" Width="293" FontSize="18"/>
-            <Button x:Name="TestConnectionButton" Content="Тест соединения" HorizontalAlignment="Left" Margin="34,25,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" UseLayoutRounding="False" Click="TestConnectionButton_Click"/>
-            <Button x:Name="SaveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="34,15,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" UseLayoutRounding="False" Click="SaveChangesButton_Click"/>
-            <Button x:Name="ToAuthButton" Content="К авторизации" HorizontalAlignment="Left" Margin="34,15,0,0" VerticalAlignment="Top" Width="293" Height="48" FontSize="18" FontFamily="Arial" FontWeight="Bold" Background="#FF4F6DD3" Foreground="White" Click="Button_Click_1" UseLayoutRounding="False"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer Grid.Row="0" 
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="30,20,30,20">
+                <DockPanel Margin="0,0,0,0">
+                    <Label Content="Сервер" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-10,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                </DockPanel>
+                <TextBox x:Name="ServerTextbox" HorizontalAlignment="Stretch" Height="36" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18"/>
+
+                <DockPanel Margin="0,10,0,0">
+                    <Label Content="Пользователь" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-10,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="29"/>
+                </DockPanel>
+                <TextBox x:Name="UserTextbox" HorizontalAlignment="Stretch" Height="36" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="18"/>
+
+                <DockPanel Margin="0,10,0,0">
+                    <Label Content="Пароль" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="18" FontFamily="Arial"/>
+                </DockPanel>
+                <PasswordBox x:Name="PasswordTextbox" HorizontalAlignment="Stretch" Height="36" VerticalAlignment="Top" FontSize="18"/>
+
+                <Border Height="10"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Margin="30,0,30,20">
+            <Button x:Name="TestConnectionButton" 
+                    Content="Тест соединения"
+                    HorizontalAlignment="Stretch" 
+                    Height="48" 
+                    Style="{StaticResource ButtonStyle}"
+                    Click="TestConnectionButton_Click"/>
+
+            <Button x:Name="SaveChangesButton" 
+                    Content="Сохранить изменения" 
+                    HorizontalAlignment="Stretch" 
+                    Margin="0,15,0,0" 
+                    Height="48" 
+                    Style="{StaticResource ButtonStyle}"
+                    Click="SaveChangesButton_Click"/>
+
+            <Button x:Name="ToAuthButton" 
+                    Content="К авторизации" 
+                    HorizontalAlignment="Stretch" 
+                    Margin="0,15,0,0" 
+                    Height="48" 
+                    Style="{StaticResource ButtonStyle}"
+                    Click="Button_Click_1"/>
         </StackPanel>
     </Grid>
 </Window>
