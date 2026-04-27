@@ -44,11 +44,6 @@ namespace WpfApp1
                 this.Close();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            SendAuthАttempt();
-        }
-
         private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -223,6 +218,7 @@ namespace WpfApp1
             {
                 captchaImage.Visibility = Visibility.Visible;
                 refreshButton.Visibility = Visibility.Visible;
+                CaptchaPanel.Visibility = Visibility.Visible;
                 captchaLabel.Visibility = Visibility.Visible;
                 captchaTextbox.Visibility = Visibility.Visible;
                 captchaAsterisk.Visibility = Visibility.Visible;
@@ -233,6 +229,7 @@ namespace WpfApp1
             {
                 captchaImage.Visibility = Visibility.Hidden;
                 refreshButton.Visibility = Visibility.Hidden;
+                CaptchaPanel.Visibility = Visibility.Collapsed;
                 captchaLabel.Visibility = Visibility.Hidden;
                 captchaTextbox.Visibility = Visibility.Hidden;
                 captchaAsterisk.Visibility = Visibility.Hidden;
@@ -292,6 +289,11 @@ namespace WpfApp1
             AuthButton.Foreground = Brushes.White;
             AuthButton.IsEnabled = true;
             AuthButton.Content = "Авторизоваться";
+        }
+
+        private void AuthButton_Click(object sender, RoutedEventArgs e)
+        {
+            SendAuthАttempt();
         }
     }
 }

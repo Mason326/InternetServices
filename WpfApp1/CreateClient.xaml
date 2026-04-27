@@ -34,7 +34,7 @@
                 <DataGridTextColumn Header="Кем выдан" Binding="{Binding issued_by}" Width="100" Visibility="Collapsed" />
                 <DataGridTextColumn Header="Дата выдачи" Binding="{Binding issue_date, StringFormat=\{0:dd.MM.yy\}}" Width="80" Visibility="Collapsed" />
                 <DataGridTextColumn Header="Код подразделения" Binding="{Binding department_code}" Width="120"  Visibility="Collapsed"/>
-                <DataGridTextColumn Header="Клиент" Binding="{Binding clientDetails}" Width="780">
+                <DataGridTextColumn Header="Клиент" Binding="{Binding clientDetails}" Width="805">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
