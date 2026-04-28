@@ -435,5 +435,62 @@ namespace WpfApp1
                 MessageBox.Show($"Не удалось распечатать акт\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double windowHeight = e.NewSize.Height;
+            double baseFontSize = 14;
+            int newPageSize = _pageSize;
+
+            if (windowHeight > 800)
+            {
+                newPageSize = 3;
+                double scale = windowHeight / 700;
+                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5));
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else if (windowHeight < 600)
+            {
+                newPageSize = 3;
+                double scale = windowHeight / 700;
+                int newFontSize = (int)Math.Max(baseFontSize * scale, 10);
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else
+            {
+                newPageSize = 3;
+                UpdateButtonsFontSize((int)baseFontSize);
+            }
+
+            if (newPageSize != _pageSize)
+            {
+                _pageSize = newPageSize;
+
+                int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+
+                if (_currentPage > totalPages && totalPages > 0)
+                {
+                    _currentPage = totalPages;
+                }
+                else if (_currentPage < 1)
+                {
+                    _currentPage = 1;
+                }
+
+                UpdatePagination();
+
+                DisplayCurrentPage();
+            }
+        }
+
+        private void UpdateButtonsFontSize(int fontSize)
+        {
+            var buttons = new[] { clearFilters, showContractVerbose, toMain, printAReportButton };
+            foreach (var button in buttons)
+            {
+                if (button != null)
+                    button.FontSize = fontSize;
+            }
+        }
     }
 }
