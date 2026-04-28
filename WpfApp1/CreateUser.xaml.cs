@@ -708,5 +708,44 @@ namespace WpfApp1
         {
             return imageBytes.Length > IMAGE_MAX_BYTE_SIZE;
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double windowHeight = e.NewSize.Height;
+            double baseFontSize = 14;
+
+            if (windowHeight > 700)
+            {
+                double scale = windowHeight / 600;
+                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5));
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else if (windowHeight < 550)
+            {
+                double scale = windowHeight / 600;
+                int newFontSize = (int)Math.Max(baseFontSize * scale, 10);
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else
+            {
+                UpdateButtonsFontSize((int)baseFontSize);
+            }
+        }
+
+        private void UpdateButtonsFontSize(int fontSize)
+        {
+            var buttons = new[] { createUserButton, editUserButton, deleteUserButton,
+                          toMainButton, endEditingButton, cancelChangesButton,
+                          generateButton, uploadImageButton };
+            foreach (var button in buttons)
+            {
+                if (button != null)
+                    button.FontSize = fontSize;
+            }
+
+            // Обновляем размер шрифта в DataGrid
+            if (userDG != null)
+                userDG.FontSize = fontSize;
+        }
     }
 }

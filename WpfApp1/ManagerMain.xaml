@@ -75,7 +75,6 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Первая строка -->
                 <Button Grid.Row="0" 
                         Grid.Column="0"
                         x:Name="CreateRequestButton"
