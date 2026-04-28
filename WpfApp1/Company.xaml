@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Организация" Height="450" Width="726.265" Loaded="Window_Loaded" FontFamily="Arial" FontSize="16" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Icon="internet_102151.ico">
-    <Grid>
+    <Viewbox Stretch="Fill">
+        <Grid>
         <GroupBox Header="Организация" HorizontalAlignment="Left" Height="394" Margin="10,22,0,0" VerticalAlignment="Top" Width="503" FontFamily="Arial" FontSize="16">
             <StackPanel>
                 <DockPanel>
@@ -26,8 +27,8 @@
                 <TextBox x:Name="companyDescriptionTextBox" HorizontalAlignment="Left" Height="185" Margin="20,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="457" FontFamily="Arial" FontSize="16"/>
             </StackPanel>
         </GroupBox>
-        <Button Content="Редактировать" HorizontalAlignment="Left" Margin="530,35,0,0" VerticalAlignment="Top" Width="172" Height="30" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_1"/>
+        <Button Content="Редактировать" HorizontalAlignment="Left" Margin="530,35,15,0" VerticalAlignment="Top" Width="172" Height="30" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_1"/>
         <Button Content="На главную" HorizontalAlignment="Left" Margin="530,85,0,0" VerticalAlignment="Top" Width="172" Height="30" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
-
-    </Grid>
+        </Grid>
+    </Viewbox>
 </Window>

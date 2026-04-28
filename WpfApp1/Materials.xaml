@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Материалы" Height="527.9" Width="913.2" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
-    <Grid>
+    <Viewbox Stretch="Fill">
+        <Grid>
         <TextBox HorizontalAlignment="Left" Height="30" Margin="608,38,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="210"/>
         <Label Content="Материал" HorizontalAlignment="Left" Margin="608,12,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273" FontSize="14"/>
         <Label Content="Цена" HorizontalAlignment="Left" Margin="608,163,0,0" VerticalAlignment="Top" FontSize="14"/>
@@ -30,7 +31,7 @@
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="672,11,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="740,103,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="642,161,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <StackPanel HorizontalAlignment="Left" Height="201" Margin="608,246,0,0" VerticalAlignment="Top" Width="262">
+        <StackPanel HorizontalAlignment="Left" Height="201" Margin="608,246,20,0" VerticalAlignment="Top" Width="262">
             <Button x:Name="addMaterialButton" Content="Добавить материал" HorizontalAlignment="Left" VerticalAlignment="Top" Width="262" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
             <Button x:Name="editMaterialButton" Content="Редактировать материал" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="262" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="editMaterialButton_Click"/>
             <Button x:Name="deleteMaterialButton" Content="Удалить материал" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="262" Height="31" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="deleteMaterialButton_Click"/>
@@ -41,4 +42,5 @@
         <Label Content="Количество материалов:" HorizontalAlignment="Left" Margin="17,461,0,0" VerticalAlignment="Top" Width="196" FontFamily="Arial" FontSize="16"/>
         <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="216,461,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
     </Grid>
+    </Viewbox>
 </Window>
