@@ -62,7 +62,6 @@
                    Height="200"/>
         </Viewbox>
 
-        <!-- Кнопки меню - внизу -->
         <Border Grid.Row="1" Margin="30,0,30,20">
             <Grid>
                 <Grid.RowDefinitions>
@@ -91,7 +90,6 @@
                         Style="{StaticResource MenuButtonStyle}"
                         Click="Button_Click_1"/>
 
-                <!-- Вторая строка -->
                 <Button Grid.Row="1" 
                         Grid.Column="0"
                         x:Name="ClientsButton"
@@ -110,7 +108,6 @@
             </Grid>
         </Border>
 
-        <!-- Кнопка выхода - в самом низу -->
         <Border Grid.Row="2" Margin="30,0,30,20">
             <Button x:Name="LogoutButton"
                     Content="Выйти из учетной записи" 

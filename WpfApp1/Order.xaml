@@ -6,6 +6,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Заказ-наряд" Height="616.6" Width="1267.6" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
+    <Viewbox Stretch="Uniform">
+        
     <Grid>
         <GroupBox Header="Заявка" HorizontalAlignment="Left" Height="392" Margin="40,56,0,0" VerticalAlignment="Top" Width="373" FontSize="16">
             <StackPanel HorizontalAlignment="Left" Height="344" Margin="10,10,-2.2,-1.2" VerticalAlignment="Top" Width="353">
@@ -54,7 +56,7 @@
             </DataGrid.Columns>
         </DataGrid>
         <TextBox x:Name="searchServiceTextBox" HorizontalAlignment="Left" Height="23" Margin="429,64,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="256" KeyUp="searchTextBox_KeyUp"/>
-        <DataGrid SelectionMode="Single" x:Name="orderServiceDG" IsReadOnly="True" AutoGenerateColumns="False" HorizontalAlignment="Left" Height="119" Margin="891,97,0,0" VerticalAlignment="Top" Width="328">
+        <DataGrid SelectionMode="Single" x:Name="orderServiceDG" IsReadOnly="True" AutoGenerateColumns="False" HorizontalAlignment="Left" Height="119" Margin="891,97,20,0" VerticalAlignment="Top" Width="328">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Услуга" Binding="{Binding service_name}" Width="240"/>
                 <DataGridTextColumn Header="Количество" Binding="{Binding count}" Width="75"/>
@@ -105,4 +107,5 @@
             <Label Content="руб." FontSize="16" />
         </DockPanel>
     </Grid>
+    </Viewbox>
 </Window>

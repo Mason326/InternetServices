@@ -108,5 +108,39 @@ namespace WpfApp1
         {
             e.Cancel = true;
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double windowHeight = e.NewSize.Height;
+            double baseFontSize = 14;
+
+            if (windowHeight > 650)
+            {
+                double scale = windowHeight / 550;
+                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5));
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else if (windowHeight < 480)
+            {
+                double scale = windowHeight / 550;
+                int newFontSize = (int)Math.Max(baseFontSize * scale, 10);
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else
+            {
+                UpdateButtonsFontSize((int)baseFontSize);
+            }
+        }
+
+        private void UpdateButtonsFontSize(int fontSize)
+        {
+            var buttons = new[] { AdditionalServicesButton, ServicesButton, TariffsButton,
+                          MaterialsButton, UsersButton, OrganizationButton, LogoutButton };
+            foreach (var button in buttons)
+            {
+                if (button != null)
+                    button.FontSize = fontSize;
+            }
+        }
     }
 }

@@ -200,10 +200,10 @@
             <Label x:Name="recordsCountLabel" Content="" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
             <Rectangle Fill="#FFFFCC80" HorizontalAlignment="Left" Height="30" Margin="100,3,0,0" VerticalAlignment="Center" Width="31"/>
             <Label Content="- заявка просрочена" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center" FontSize="16"/>
-            <Label x:Name="incomesLabel" Content="Общий доход от заявок:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" Margin="50,0,0,0" FontSize="16"/>
             <DockPanel x:Name="totalSumDock" Margin="5,5,0,0" Width="386" VerticalAlignment="Center">
-                <Label x:Name="totalSumLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold" Margin="0,0,0,-0.2" Height="33" RenderTransformOrigin="0.449,0.727"/>
-                <Label Content="руб." FontSize="16" VerticalAlignment="Center" Height="38" />
+                <Label x:Name="incomesLabel" Content="Общий доход от заявок:" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" Margin="50,0,0,0" FontSize="16"/>
+                <Label x:Name="totalSumLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" FontFamily="Arial" FontSize="16" FontWeight="Bold" Margin="0,5,0,-0.2" Height="33" RenderTransformOrigin="0.449,0.727"/>
+                <Label Content="руб." FontSize="16" VerticalAlignment="Center" Height="38" Margin="0,5,0, 0.2" />
             </DockPanel>
         </DockPanel>
     </Grid>

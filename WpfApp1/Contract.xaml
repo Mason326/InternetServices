@@ -6,6 +6,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Оформление договора" Height="520.6" Width="865.6" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
+    <Viewbox Stretch="Uniform">
+        
     <Grid>
         <GroupBox Header="Заявка" HorizontalAlignment="Left" Height="328" Margin="40,114,0,0" VerticalAlignment="Top" Width="470" FontSize="16">
             <StackPanel HorizontalAlignment="Left" Height="283" Margin="10,10,-10.6,0" VerticalAlignment="Top" Width="459">
@@ -48,7 +50,7 @@
         <TextBox x:Name="abonentPasswordTextBox" IsReadOnly="True" HorizontalAlignment="Left" Height="33" Margin="544,279,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="273"/>
 
         <Label Content="Дата заключения договора: " HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Width="214" Margin="38,74,0,0"/>
-        <Button Content="К заявке" HorizontalAlignment="Left" Margin="544,437,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click"/>
+        <Button Content="К заявке" HorizontalAlignment="Left" Margin="544,437,15,10" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click"/>
         <ComboBox x:Name="contractStatusComboBox" IsEnabled="False"  HorizontalAlignment="Left" Margin="544,78,0,0" FontSize="16" VerticalAlignment="Top" Width="220" Height="44" SelectionChanged="contractStatusComboBox_SelectionChanged"/>
         <Button x:Name="exportAContractButton" Content="Печать договора" HorizontalAlignment="Left" Margin="544,383,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_2"/>
         <Label x:Name="contractNumberLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="181,43,0,0"/>
@@ -56,4 +58,5 @@
         <Label x:Name="contractDateLabel" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" Height="31" Margin="257,78,0,0"/>
         <Button x:Name="formAContractButton" Content="Оформить договор" HorizontalAlignment="Left" Margin="546,333,0,0" VerticalAlignment="Top" Width="273" Height="37" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16" Click="Button_Click_1"/>
     </Grid>
+    </Viewbox>
 </Window>
