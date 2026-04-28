@@ -5,14 +5,115 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Главная форма" Height="436.4" Width="613.8" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
-    <Grid>
+        Title="Главная форма" 
+        Height="500" 
+        Width="650" 
+        MinHeight="450"
+        MinWidth="600"
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="SingleBorderWindow" 
+        Loaded="Window_Loaded" 
+        Icon="internet_102151.ico"
+        ResizeMode="CanResizeWithGrip" 
+        SizeChanged="Window_SizeChanged">
 
-        <Button Content="Создание заявки" HorizontalAlignment="Left" Height="36" Margin="42,236,0,0" VerticalAlignment="Top" Width="239" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Button Content="Учет заявок" HorizontalAlignment="Left" Height="36" Margin="318,236,0,0" VerticalAlignment="Top" Width="239" RenderTransformOrigin="0.458,-0.148" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Button Content="Учет договоров" HorizontalAlignment="Left" Height="37" Margin="318,287,0,0" VerticalAlignment="Top" Width="239" RenderTransformOrigin="0.458,-0.148" Click="Button_Click_3" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Button Content="Выйти из учетной записи" HorizontalAlignment="Left" Height="36" Margin="42,342,0,0" VerticalAlignment="Top" Width="515" RenderTransformOrigin="0,0" Click="Button_Click_4" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Button Content="Клиенты" HorizontalAlignment="Left" Height="36" Margin="42,288,0,0" VerticalAlignment="Top" Width="239" RenderTransformOrigin="0.458,-0.148" Click="Button_Click_2" Background="#FF4F6DD3" Foreground="White" FontWeight="Bold" FontFamily="Arial" FontSize="16"/>
-        <Image x:Name="userImage" HorizontalAlignment="Left" Height="188" Margin="202,24,0,0" VerticalAlignment="Top" Width="194" Source="Resources/Images/user.png"/>
+    <Window.Resources>
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF4F6DD3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF3E5BC4"/>
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF2E4BB4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <!-- Изображение + пространство -->
+            <RowDefinition Height="Auto"/>
+            <!-- Кнопки меню -->
+            <RowDefinition Height="Auto"/>
+            <!-- Кнопка выхода -->
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя часть с изображением (растягивается) -->
+        <Viewbox Grid.Row="0" 
+                 Stretch="Uniform"
+                 StretchDirection="Both"
+                 Margin="30,20,30,20">
+            <Image x:Name="userImage" 
+                   Source="Resources/Images/user.png"
+                   Width="200" 
+                   Height="200"/>
+        </Viewbox>
+
+        <Border Grid.Row="1" Margin="30,0,30,20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0" 
+                        Grid.Column="0"
+                        x:Name="CreateRequestButton"
+                        Content="Создание заявки" 
+                        Margin="0,0,10,10"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Click="Button_Click"/>
+
+                <Button Grid.Row="0" 
+                        Grid.Column="1"
+                        x:Name="RequestsButton"
+                        Content="Учет заявок" 
+                        Margin="10,0,0,10"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Click="Button_Click_1"/>
+
+                <Button Grid.Row="1" 
+                        Grid.Column="0"
+                        x:Name="ClientsButton"
+                        Content="Клиенты" 
+                        Margin="0,10,10,0"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Click="Button_Click_2"/>
+
+                <Button Grid.Row="1" 
+                        Grid.Column="1"
+                        x:Name="ContractsButton"
+                        Content="Учет договоров" 
+                        Margin="10,10,0,0"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Click="Button_Click_3"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Margin="30,0,30,20">
+            <Button x:Name="LogoutButton"
+                    Content="Выйти из учетной записи" 
+                    Height="40"
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="Button_Click_4"/>
+        </Border>
     </Grid>
 </Window>

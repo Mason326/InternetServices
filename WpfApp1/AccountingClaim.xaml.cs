@@ -221,24 +221,21 @@ namespace WpfApp1
                         cmd2.ExecuteNonQuery();
                     }
 
-                    // Сохраняем все строки для пагинации
                     _allRows.Clear();
                     foreach (DataRow row in dt.Rows)
                     {
                         _allRows.Add(row);
                     }
 
-                    // Показываем общее количество записей
                     ShowRecordsCount(cmdText);
 
-                    // Показываем общий доход (для директора)
                     if (AccountHolder.UserRole == "Директор")
                         ShowTotalSum(cmdText);
                     else
                         totalSumDock.Visibility = Visibility.Collapsed;
 
-                    // Обновляем пагинацию
                     UpdatePagination();
+
                 }
             }
             catch (Exception exc)
@@ -763,6 +760,66 @@ namespace WpfApp1
                 printAReport.IsEnabled = true;
             else
                 printAReport.IsEnabled = false;
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double windowHeight = e.NewSize.Height;
+            double baseFontSize = 14;
+            int newPageSize = _pageSize;
+
+            if (windowHeight > 800)
+            {
+                newPageSize = 4;
+                double scale = windowHeight / 700;
+                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5));
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else if (windowHeight < 600)
+            {
+                newPageSize = 3;
+                double scale = windowHeight / 700;
+                int newFontSize = (int)Math.Max(baseFontSize * scale, 10);
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else
+            {
+                newPageSize = 3;
+                UpdateButtonsFontSize((int)baseFontSize);
+            }
+
+            if (newPageSize != _pageSize)
+            {
+                _pageSize = newPageSize;
+
+                int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+
+                if (_currentPage > totalPages && totalPages > 0)
+                {
+                    _currentPage = totalPages;
+                }
+                else if (_currentPage < 1)
+                {
+                    _currentPage = 1;
+                }
+
+                UpdatePagination();
+
+                DisplayCurrentPage();
+            }
+        }
+
+        private void UpdateButtonsFontSize(int fontSize)
+        {
+            var buttons = new[] { showClaimButton, orderButton, toMainButton, printAReport, clearFiltersButton, btnPrev, btnNext };
+            foreach (var button in buttons)
+            {
+                if (button != null)
+                    button.FontSize = fontSize;
+            }
+
+            if (reportVariantsComboBox != null)
+                reportVariantsComboBox.FontSize = fontSize;
         }
     }
 }

@@ -5,11 +5,95 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Главная форма" Height="409.89" Width="513.6" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
+        Title="Главная форма" 
+        Height="500" 
+        Width="600" 
+        MinHeight="450"
+        MinWidth="550"
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="SingleBorderWindow" 
+        Loaded="Window_Loaded" 
+        Icon="internet_102151.ico"
+        ResizeMode="CanResizeWithGrip" 
+        SizeChanged="Window_SizeChanged">
+
+    <Window.Resources>
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FF4F6DD3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF3E5BC4"/>
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF2E4BB4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <Image x:Name="userImage" HorizontalAlignment="Left" Height="188" Margin="155,29,0,0" VerticalAlignment="Top" Width="199" Source="Resources/Images/user.png" />
-        <Button Content="Учёт заявок" HorizontalAlignment="Left" Margin="23,255,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_2" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
-        <Button Content="Учёт договоров" HorizontalAlignment="Left" Margin="268,255,0,0" VerticalAlignment="Top" Width="221" Height="33" Click="Button_Click_1" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
-        <Button Content="Выйти из учётной записи" HorizontalAlignment="Left" Margin="23,312,0,0" VerticalAlignment="Top" Width="466" Height="33" Click="Button_Click_3" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Viewbox Grid.Row="0" 
+                 Stretch="Uniform"
+                 StretchDirection="Both"
+                 Margin="30,20,30,20">
+            <Image x:Name="userImage" 
+                   Source="Resources/Images/user.png"
+                   Width="180" 
+                   Height="180"/>
+        </Viewbox>
+
+        <!-- Кнопки меню -->
+        <Border Grid.Row="1" Margin="30,0,30,20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0" 
+                        Grid.Column="0"
+                        x:Name="ClaimsButton"
+                        Content="Учёт заявок" 
+                        Margin="0,0,10,0"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Click="Button_Click_2"/>
+
+                <Button Grid.Row="0" 
+                        Grid.Column="1"
+                        x:Name="ContractsButton"
+                        Content="Учёт договоров" 
+                        Margin="10,0,0,0"
+                        Style="{StaticResource MenuButtonStyle}"
+                        Click="Button_Click_1"/>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Margin="30,0,30,20">
+            <Button x:Name="LogoutButton"
+                    Content="Выйти из учётной записи" 
+                    Height="40"
+                    Style="{StaticResource MenuButtonStyle}"
+                    Click="Button_Click_3"/>
+        </Border>
     </Grid>
 </Window>

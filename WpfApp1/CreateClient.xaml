@@ -5,17 +5,88 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Клиенты" Height="790.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
+        Title="Клиенты" Height="790.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico" SizeChanged="Window_SizeChanged">
     <Grid Margin="0,4,-0.2,-4.4">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="604*"/>
-            <ColumnDefinition Width="377*"/>
-        </Grid.ColumnDefinitions>
-        <TextBox TabIndex="1" x:Name="fioTextBox" MaxLength="150" HorizontalAlignment="Left" Margin="33,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="394" Height="29" PreviewTextInput="fioTextBox_PreviewTextInput" PreviewKeyUp="fioTextBox_PreviewKeyUp"/>
-        <Label Content="ФИО" HorizontalAlignment="Left" Margin="28,-8,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="46"/>
-        <TextBox TabIndex="2" x:Name="phoneTextBox" HorizontalAlignment="Left" Margin="33,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28" PreviewKeyUp="phoneTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture" PreviewTextInput="phoneTextBox_PreviewTextInput" MaxLength="19"/>
-        <Label Content="Телефон" HorizontalAlignment="Left" Margin="28,52,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="73"/>
-        <DataGrid IsReadOnly="True" x:Name="clientsDG" Margin="10,444,9.8,34.2" AutoGenerateColumns="False" SelectionChanged="clientsDG_SelectionChanged" Grid.ColumnSpan="2" SelectionMode="Single" FontSize="15" Height="Auto">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <TextBox TabIndex="1" x:Name="fioTextBox" MaxLength="150" HorizontalAlignment="Left" Margin="33,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="394" Height="29" PreviewTextInput="fioTextBox_PreviewTextInput" PreviewKeyUp="fioTextBox_PreviewKeyUp"/>
+                <Label Content="ФИО" HorizontalAlignment="Left" Margin="28,-8,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="46"/>
+                <TextBox TabIndex="2" x:Name="phoneTextBox" HorizontalAlignment="Left" Margin="33,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28" PreviewKeyUp="phoneTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture" PreviewTextInput="phoneTextBox_PreviewTextInput" MaxLength="19"/>
+                <Label Content="Телефон" HorizontalAlignment="Left" Margin="28,52,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="73"/>
+                <TextBox TabIndex="3"  MaxLength="100" x:Name="emailTextBox" HorizontalAlignment="Left" Margin="208,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="215" Height="28" PreviewKeyDown="emailTextBox_PreviewKeyDown"/>
+                <Label Content="Email" HorizontalAlignment="Left" Margin="202,52,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="221"/>
+                <GroupBox Header="Паспорт" HorizontalAlignment="Left" Height="195" Margin="31,244,0,0" VerticalAlignment="Top" Width="558" FontSize="16">
+                    <StackPanel Margin="0,0,12.4,0.4">
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Серия" Margin="0,10,0,0" />
+                            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-8,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
+                            <TextBox TabIndex="7" MaxLength="5" x:Name="passportSeriesTextBox" DockPanel.Dock="Left" Margin="0,10,10,0" Width="93" Height="26" PreviewTextInput="seriesAndNumberTextBox_PreviewTextInput" PreviewKeyUp="passportSeriesTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture"/>
+                            <Label Content="Номер" Margin="0,10,5,0"/>
+                            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
+                            <TextBox TabIndex="8" MaxLength="7" x:Name="passportNumberTextBox" DockPanel.Dock="Left" Margin="0,10,0,0" Width="133" Height="27" PreviewTextInput="seriesAndNumberTextBox_PreviewTextInput" PreviewKeyUp="passportNumberTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Кем выдан" Margin="0,10,5,0" />
+                            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
+                            <TextBox TabIndex="9" AcceptsReturn="True" TextWrapping="Wrap" MaxLength="250" x:Name="issuedByTextBox" DockPanel.Dock="Left" Margin="16,10,10,0" Width="405" Height="47" PreviewTextInput="issuedByTextBox_PreviewTextInput"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <Label Content="Дата выдачи" Margin="0,10,5,0"/>
+                            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
+                            <DatePicker TabIndex="10" x:Name="issueDate" Height="31" Width="145" Margin="0,10,5,0" PreviewTextInput="Date_PreviewTextInput"/>
+                            <Label Content="Код подразделения" Margin="0,10,5,0"/>
+                            <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
+                            <TextBox TabIndex="11" MaxLength="8" x:Name="departmentCodeTextBox" DockPanel.Dock="Left" Margin="0,10,10,0" Width="93" Height="26" PreviewTextInput="departmentCodeTextBox_PreviewTextInput" PreviewKeyUp="departmentCodeTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture"/>
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+                <Label Content="Дата рождения" HorizontalAlignment="Left" Margin="440,53,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="131"/>
+                <TextBox AcceptsReturn="True" TabIndex="5" MaxLength="250" x:Name="placeOfResidenceTextBox" HorizontalAlignment="Left" Margin="33,136,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="555" Height="51" PreviewTextInput="placeOfResidenceTextBox_PreviewTextInput"/>
+                <Label Content="Место жительства" HorizontalAlignment="Left" Margin="28,105,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="146"/>
+                <DatePicker TabIndex="4" x:Name="dateOfBirthDatePicker" HorizontalAlignment="Left" Margin="445,80,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.094,0.323" Width="143" Height="28" PreviewTextInput="Date_PreviewTextInput"/>
+
+                <TextBox IsReadOnly="True" x:Name="abonentLoginTextBox" HorizontalAlignment="Left" Margin="32,217,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28"/>
+                <Label Content="Логин абонента" HorizontalAlignment="Left" Margin="27,189,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="133"/>
+                <TextBox IsReadOnly="True" x:Name="abonentPasswordTextBox" HorizontalAlignment="Left" Margin="208,217,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="190" Height="28"/>
+                <Label Content="Пароль абонента" HorizontalAlignment="Left" Margin="201,189,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="221"/>
+                <Button TabIndex="6" Content="Сгенерировать" HorizontalAlignment="Left" Margin="412,216,0,0" VerticalAlignment="Top" Width="177" Height="31" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_1"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="64,-7,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="93,53,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="93,53,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="163,106,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="145,189,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="330,190,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="554,54,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+            </Grid>
+            <StackPanel Grid.Column="1">
+                <StackPanel HorizontalAlignment="Left" Height="273" Margin="24,0,0,0" VerticalAlignment="Top" Width="304">
+                    <Button x:Name="createClientButton" Content="Создать клиента" HorizontalAlignment="Left" Height="36" Margin="0,20,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="createClientButton_Click"/>
+                    <Button x:Name="inClaimButton" Content="В заявку" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="inClaimButton_Click" Grid.Column="1"/>
+                    <Button x:Name="editClientButton" Content="Редактировать клиента" HorizontalAlignment="Right" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="editClientButton_Click"/>
+                    <Button x:Name="showClientButton" Content="Просмотреть клиента" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="showClient_Click"/>
+                    <Button x:Name="toMenuButton" Content="В меню" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1"/>
+                    <Button x:Name="endEditingButton" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="EditClaim"/>
+                    <Button x:Name="cancelChangesButton" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="CancelEdit" />
+                </StackPanel>
+                <StackPanel Margin="0,0,0,0">
+                    <DockPanel>
+                        <Label Content="Статус клиента:" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="136" />
+                        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-18,0,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" />
+                    </DockPanel>
+                    <ComboBox IsEnabled="False" x:Name="clientStatusCombobox" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" Width="234" Height="34" />
+                    <Label Content="Поиск по ФИО и серии и номеру паспорта" HorizontalAlignment="Left" Margin="18,0,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="327" />
+                    <TextBox x:Name="searchByPassportSeriesAndNumber" HorizontalAlignment="Left" Margin="20,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="315" Height="29" TextChanged="searchByPassportSeriesAndNumber_TextChanged"/>
+                    <Button Content="Очистить поля ввода" Grid.Column="1" HorizontalAlignment="Left" Margin="20,10,0,0" VerticalAlignment="Top" Width="234" Height="41" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="Button_Click_2"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+        <Label Content="Количество активных клиентов:" HorizontalAlignment="Left" Margin="9,725,0,0" VerticalAlignment="Top" Width="247" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="257,725,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <DataGrid IsReadOnly="True" x:Name="clientsDG" Margin="10,461,10,31.2" AutoGenerateColumns="False" SelectionChanged="clientsDG_SelectionChanged" SelectionMode="Single" FontSize="15" Height="Auto">
             <DataGrid.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Просмотр" Click="showClient_Click" />
@@ -34,14 +105,14 @@
                 <DataGridTextColumn Header="Кем выдан" Binding="{Binding issued_by}" Width="100" Visibility="Collapsed" />
                 <DataGridTextColumn Header="Дата выдачи" Binding="{Binding issue_date, StringFormat=\{0:dd.MM.yy\}}" Width="80" Visibility="Collapsed" />
                 <DataGridTextColumn Header="Код подразделения" Binding="{Binding department_code}" Width="120"  Visibility="Collapsed"/>
-                <DataGridTextColumn Header="Клиент" Binding="{Binding clientDetails}" Width="780">
+                <DataGridTextColumn Header="Клиент" Binding="{Binding clientDetails}" Width="4*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTemplateColumn Header="Статус клиента" Width="140">
+                <DataGridTemplateColumn Header="Статус клиента" Width="Auto">
                     <DataGridTemplateColumn.CellStyle>
                         <Style TargetType="DataGridCell">
                             <Setter Property="Padding" Value="0"/>
@@ -88,65 +159,5 @@
                 <Button x:Name="btnNext" Content="▶" Width="80" Height="28" Margin="15, 5, 5, 5" Click="NextPage_Click" FontSize="13" IsEnabled="False"/>
             </StackPanel>
         </Border>
-        <TextBox TabIndex="3"  MaxLength="100" x:Name="emailTextBox" HorizontalAlignment="Left" Margin="208,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="215" Height="28" PreviewKeyDown="emailTextBox_PreviewKeyDown"/>
-        <Label Content="Email" HorizontalAlignment="Left" Margin="202,52,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="221"/>
-        <GroupBox Header="Паспорт" HorizontalAlignment="Left" Height="195" Margin="31,244,0,0" VerticalAlignment="Top" Width="558" FontSize="16">
-            <StackPanel Margin="0,0,12.4,0.4">
-                <DockPanel LastChildFill="False">
-                    <Label Content="Серия" Margin="0,10,0,0" />
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-8,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
-                    <TextBox TabIndex="7" MaxLength="5" x:Name="passportSeriesTextBox" DockPanel.Dock="Left" Margin="0,10,10,0" Width="93" Height="26" PreviewTextInput="seriesAndNumberTextBox_PreviewTextInput" PreviewKeyUp="passportSeriesTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture"/>
-                    <Label Content="Номер" Margin="0,10,5,0"/>
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
-                    <TextBox TabIndex="8" MaxLength="7" x:Name="passportNumberTextBox" DockPanel.Dock="Left" Margin="0,10,0,0" Width="133" Height="27" PreviewTextInput="seriesAndNumberTextBox_PreviewTextInput" PreviewKeyUp="passportNumberTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture"/>
-                </DockPanel>
-                <DockPanel LastChildFill="False">
-                    <Label Content="Кем выдан" Margin="0,10,5,0" />
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
-                    <TextBox TabIndex="9" AcceptsReturn="True" TextWrapping="Wrap" MaxLength="250" x:Name="issuedByTextBox" DockPanel.Dock="Left" Margin="16,10,10,0" Width="405" Height="47" PreviewTextInput="issuedByTextBox_PreviewTextInput"/>
-                </DockPanel>
-                <DockPanel LastChildFill="False">
-                    <Label Content="Дата выдачи" Margin="0,10,5,0"/>
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
-                    <DatePicker TabIndex="10" x:Name="issueDate" Height="31" Width="145" Margin="0,10,5,0" PreviewTextInput="Date_PreviewTextInput"/>
-                    <Label Content="Код подразделения" Margin="0,10,5,0"/>
-                    <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="-13,10,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Height="27"/>
-                    <TextBox TabIndex="11" MaxLength="8" x:Name="departmentCodeTextBox" DockPanel.Dock="Left" Margin="0,10,10,0" Width="93" Height="26" PreviewTextInput="departmentCodeTextBox_PreviewTextInput" PreviewKeyUp="departmentCodeTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture"/>
-                </DockPanel>
-            </StackPanel>
-        </GroupBox>
-        <Label Content="Дата рождения" HorizontalAlignment="Left" Margin="440,53,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="131"/>
-        <TextBox AcceptsReturn="True" TabIndex="5" MaxLength="250" x:Name="placeOfResidenceTextBox" HorizontalAlignment="Left" Margin="33,136,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="555" Height="51" PreviewTextInput="placeOfResidenceTextBox_PreviewTextInput"/>
-        <Label Content="Место жительства" HorizontalAlignment="Left" Margin="28,105,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="146"/>
-        <DatePicker TabIndex="4" x:Name="dateOfBirthDatePicker" HorizontalAlignment="Left" Margin="445,80,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.094,0.323" Width="143" Height="28" PreviewTextInput="Date_PreviewTextInput"/>
-        <TextBox x:Name="searchByPassportSeriesAndNumber" HorizontalAlignment="Left" Margin="24,357,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="322" Height="29" Grid.Column="1" TextChanged="searchByPassportSeriesAndNumber_TextChanged"/>
-        <Label Content="Поиск по ФИО и серии и номеру паспорта" HorizontalAlignment="Left" Margin="19,326,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="327" Grid.Column="1"/>
-        <Label Content="Статус клиента:" HorizontalAlignment="Left" Margin="24,251,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="136" Grid.Column="1"/>
-        <ComboBox IsEnabled="False" x:Name="clientStatusCombobox" HorizontalAlignment="Left" Margin="24,287,0,0" VerticalAlignment="Top" Width="234" Height="34" Grid.Column="1"/>
-        <TextBox IsReadOnly="True" x:Name="abonentLoginTextBox" HorizontalAlignment="Left" Margin="32,217,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28"/>
-        <Label Content="Логин абонента" HorizontalAlignment="Left" Margin="27,189,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="133"/>
-        <TextBox IsReadOnly="True" x:Name="abonentPasswordTextBox" HorizontalAlignment="Left" Margin="208,217,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="190" Height="28"/>
-        <Label Content="Пароль абонента" HorizontalAlignment="Left" Margin="201,189,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="221"/>
-        <Button TabIndex="6" Content="Сгенерировать" HorizontalAlignment="Left" Margin="412,216,0,0" VerticalAlignment="Top" Width="177" Height="31" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_1"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="64,-7,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="93,53,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="93,53,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="163,106,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="145,189,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="330,190,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="554,54,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-        <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="139,251,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Grid.Column="1"/>
-        <Button Content="Очистить поля ввода" Grid.Column="1" HorizontalAlignment="Left" Margin="24,395,0,0" VerticalAlignment="Top" Width="234" Height="41" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" Click="Button_Click_2"/>
-        <StackPanel HorizontalAlignment="Left" Height="273" Margin="24,1,0,0" VerticalAlignment="Top" Width="304" Grid.Column="1">
-            <Button x:Name="createClientButton" Content="Создать клиента" HorizontalAlignment="Left" Height="36" Margin="0,20,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="createClientButton_Click"/>
-            <Button x:Name="inClaimButton" Content="В заявку" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="inClaimButton_Click" Grid.Column="1"/>
-            <Button x:Name="editClientButton" Content="Редактировать клиента" HorizontalAlignment="Right" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="editClientButton_Click"/>
-            <Button x:Name="showClientButton" Content="Просмотреть клиента" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1" Click="showClient_Click"/>
-            <Button x:Name="toMenuButton" Content="В меню" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" RenderTransformOrigin="0.458,-0.148" Click="Button_Click" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1"/>
-            <Button x:Name="endEditingButton" Content="Завершить редактирование" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="EditClaim"/>
-            <Button x:Name="cancelChangesButton" Content="Отменить изменения" HorizontalAlignment="Left" Height="36" Margin="0,15,0,0" VerticalAlignment="Top" Width="304" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="CancelEdit" />
-        </StackPanel>
-        <Label Content="Количество активных клиентов:" HorizontalAlignment="Left" Margin="9,725,0,0" VerticalAlignment="Top" Width="247" FontFamily="Arial" FontSize="16"/>
-        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="257,725,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
     </Grid>
 </Window>

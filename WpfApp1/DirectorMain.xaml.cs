@@ -69,5 +69,38 @@ namespace WpfApp1
                 MessageBox.Show("Не удалось загрузить картинку", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double windowHeight = e.NewSize.Height;
+            double baseFontSize = 14;
+
+            if (windowHeight > 600)
+            {
+                double scale = windowHeight / 500;
+                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5));
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else if (windowHeight < 450)
+            {
+                double scale = windowHeight / 500;
+                int newFontSize = (int)Math.Max(baseFontSize * scale, 10);
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else
+            {
+                UpdateButtonsFontSize((int)baseFontSize);
+            }
+        }
+
+        private void UpdateButtonsFontSize(int fontSize)
+        {
+            var buttons = new[] { ClaimsButton, ContractsButton, LogoutButton };
+            foreach (var button in buttons)
+            {
+                if (button != null)
+                    button.FontSize = fontSize;
+            }
+        }
     }
 }

@@ -6,20 +6,22 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Дополнительне услуги" Height="592.4" Width="903.6" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico" >
+    <Viewbox Stretch="Fill">
+        
     <Grid>
         <TextBox TabIndex="1" x:Name="serviceTextBox" HorizontalAlignment="Left" Height="77" Margin="626,53,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="248" PreviewTextInput="serviceTextBox_PreviewTextInput" FontSize="14"/>
         <Label Content="Услуга" HorizontalAlignment="Left" Margin="622,27,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273" FontSize="14"/>
         <Label Content="Оплата за месяц" HorizontalAlignment="Left" Margin="622,144,0,0" VerticalAlignment="Top" FontSize="14"/>
-        <DataGrid FontSize="16" IsReadOnly="True" SelectionMode="Single" x:Name="addServicesDG" HorizontalAlignment="Left" Height="485" Margin="10,27,0,0" VerticalAlignment="Top" Width="595" AutoGenerateColumns="False" SelectionChanged="addServicesDG_SelectionChanged">
+        <DataGrid FontSize="16" IsReadOnly="True" SelectionMode="Single" x:Name="addServicesDG" HorizontalAlignment="Left" Height="485" Margin="10,27,0,0" VerticalAlignment="Top" Width="582" AutoGenerateColumns="False" SelectionChanged="addServicesDG_SelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Услуга" Binding="{Binding additional_service_name}" Width="397">
+                <DataGridTextColumn Header="Услуга" Binding="{Binding additional_service_name}" Width="2*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Ежемесячные выплаты" Binding="{Binding monthly_fee}" Width="190" />
+                <DataGridTextColumn Header="Ежемесячные выплаты" Binding="{Binding monthly_fee}" Width="*" />
             </DataGrid.Columns>
         </DataGrid>
         <TextBox CommandManager.PreviewExecuted="TextBox_PreviewExecuted" TabIndex="2" x:Name="monthFee" HorizontalAlignment="Left" Height="30" Margin="626,172,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="248" PreviewTextInput="TextBox_PreviewTextInput" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="6" FontSize="14"/>
@@ -37,4 +39,5 @@
         <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="193,527,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
 
     </Grid>
+    </Viewbox>
 </Window>

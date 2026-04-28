@@ -6,14 +6,15 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Выбор доп. услуг" Height="421.268" Width="869.891" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Icon="internet_102151.ico">
-    <Grid>
+    <Viewbox Stretch="Fill">
+        <Grid>
         <DataGrid SelectionMode="Single" IsReadOnly="True" AutoGenerateColumns="False" x:Name="additionalServicesDG" HorizontalAlignment="Left" Height="130" Margin="29,126,0,0" VerticalAlignment="Top" Width="403">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Услуга" Binding="{Binding additional_service_name}" Width="280"/>
                 <DataGridTextColumn Header="Стоимость" Binding="{Binding monthly_fee}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
-        <DataGrid x:Name="orderAddServiceDG" SelectionMode="Single" HorizontalAlignment="Left" Height="130" Margin="491,126,0,0" VerticalAlignment="Top" Width="328">
+        <DataGrid x:Name="orderAddServiceDG" SelectionMode="Single" HorizontalAlignment="Left" Height="130" Margin="491,126,10,0" VerticalAlignment="Top" Width="328">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Услуга" Binding="{Binding additional_service_name}"/>
             </DataGrid.Columns>
@@ -26,7 +27,8 @@
         <Label Content="Оплата в месяц:" HorizontalAlignment="Left" Margin="633,251,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
         <Label x:Name="addServicesTotalCostLabel" Content="" HorizontalAlignment="Left" Margin="746,253,0,0" VerticalAlignment="Top" FontSize="14" RenderTransformOrigin="0.337,0.402"/>
         <Button Content="Сохранить изменения" HorizontalAlignment="Left" Margin="633,297,0,0" VerticalAlignment="Top" Width="186" Height="35" Click="Button_Click_1" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold" />
-        <Button Content="К заявке" HorizontalAlignment="Left" Margin="634,341,0,0" VerticalAlignment="Top" Width="186" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <Button Content="К заявке" HorizontalAlignment="Left" Margin="634,341,10,10" VerticalAlignment="Top" Width="186" Height="31" Click="Button_Click" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
 
     </Grid>
+    </Viewbox>
 </Window>
