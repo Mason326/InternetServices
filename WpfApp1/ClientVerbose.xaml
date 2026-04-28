@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Клиент" Height="497.711" Width="1040.723" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
-    <Grid>
+    <Viewbox Stretch="Uniform">
+        <Grid>
         <GroupBox x:Name="ClaimGroupBox" Header="Клиент" HorizontalAlignment="Left" Height="422" Margin="10,10,0,0" VerticalAlignment="Top" Width="791" FontSize="16">
             <StackPanel>
                 <DockPanel>
@@ -82,8 +83,9 @@
                 </DockPanel>
             </StackPanel>
         </GroupBox>
-        <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="825,21,0,0" VerticalAlignment="Top" Width="187" Height="48" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="saveChangesButton_Click"/>
+        <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="825,21,10,0" VerticalAlignment="Top" Width="187" Height="48" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="saveChangesButton_Click"/>
         <Button Content="Закрыть просмотр" HorizontalAlignment="Left" Margin="825,87,0,0" VerticalAlignment="Top" Width="187" Height="47" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click"/>
 
     </Grid>
+    </Viewbox>
 </Window>

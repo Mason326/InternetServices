@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="Договор" Height="375.6" Width="682" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico">
-    <Grid Margin="0,0,16.8,0">
+    <Viewbox Stretch="Uniform">
+        <Grid Margin="0,0,16.8,0">
         <GroupBox x:Name="ContractGroupBox" Header="Договор № " HorizontalAlignment="Left" Height="304" Margin="38,27,0,0" VerticalAlignment="Top" Width="398" FontSize="16" FontFamily="Arial">
             <StackPanel Margin="0,0,15,0">
                 <DockPanel  Margin="0,20,0,0">
@@ -26,7 +27,7 @@
             </StackPanel>
         </GroupBox>
         <Button Content="К договорам" HorizontalAlignment="Left" Margin="453,96,0,0" VerticalAlignment="Top" Width="185" Click="Button_Click" Height="38" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16"/>
-        <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="453,38,0,0" VerticalAlignment="Top" Width="185" Height="42" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16" Click="Button_Click_1"/>
-
-    </Grid>
+            <Button x:Name="saveChangesButton" Content="Сохранить изменения" HorizontalAlignment="Left" Margin="453,38,0,0" VerticalAlignment="Top" Width="185" Height="42" Background="#FF4F6DD3" Foreground="White" FontFamily="Arial" FontWeight="Bold" FontSize="16" Click="Button_Click_1"/>
+        </Grid>
+    </Viewbox>
 </Window>
