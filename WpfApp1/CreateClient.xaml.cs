@@ -1018,5 +1018,69 @@ namespace WpfApp1
                 MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double windowHeight = e.NewSize.Height;
+            double baseFontSize = 14;
+            int newPageSize = _pageSize;
+
+            if (windowHeight > 800)
+            {
+                newPageSize = 2;
+                double scale = windowHeight / 700;
+                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5));
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else if (windowHeight < 600)
+            {
+                newPageSize = 2;
+                double scale = windowHeight / 700;
+                int newFontSize = (int)Math.Max(baseFontSize * scale, 10);
+                UpdateButtonsFontSize(newFontSize);
+            }
+            else
+            {
+                newPageSize = 2;
+                UpdateButtonsFontSize((int)baseFontSize);
+            }
+
+            if (newPageSize != _pageSize)
+            {
+                _pageSize = newPageSize;
+
+                int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
+
+                if (_currentPage > totalPages && totalPages > 0)
+                {
+                    _currentPage = totalPages;
+                }
+                else if (_currentPage < 1)
+                {
+                    _currentPage = 1;
+                }
+
+                UpdatePagination();
+
+                DisplayCurrentPage();
+            }
+        }
+
+        private void UpdateButtonsFontSize(int fontSize)
+        {
+            var buttons = new[] { showClientButton, createClientButton, editClientButton, inClaimButton, toMenuButton, endEditingButton, cancelChangesButton };
+            foreach (var button in buttons)
+            {
+                if (button != null)
+                    button.FontSize = fontSize;
+            }
+
+            if (clientStatusCombobox != null)
+                clientStatusCombobox.FontSize = fontSize;
+
+            if (clientsDG != null)
+                clientsDG.FontSize = fontSize;
+        }
+
     }
 }
