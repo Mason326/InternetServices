@@ -16,6 +16,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -30,6 +32,10 @@ namespace WpfApp1
         {
             InitializeComponent();
             ShowCaptcha(authAttempsCounter);
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMinutes(180);
+            timer.Tick += new EventHandler(Backup.MakeABackup);
+            timer.Start();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -295,5 +301,11 @@ namespace WpfApp1
         {
             SendAuthАttempt();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Backup.MakeABackup(sender, e);
+        }
+
     }
 }

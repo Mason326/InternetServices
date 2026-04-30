@@ -15,7 +15,7 @@
         PreviewKeyUp="Window_PreviewKeyUp" 
         Loaded="Window_Loaded" 
         Icon="internet_102151.ico"
-        ResizeMode="CanResizeWithGrip">
+        ResizeMode="CanResizeWithGrip" Closing="Window_Closing">
 
     <Window.Resources>
         <!-- Стиль для кнопки авторизации -->
