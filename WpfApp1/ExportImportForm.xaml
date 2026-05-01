@@ -1,0 +1,27 @@
+﻿<Window x:Class="WpfApp1.ExportImportForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="ExportImportForm" Height="450" Width="689.6" Loaded="Window_Loaded">
+    <Grid Margin="10, 10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Content="Таблицы" FontFamily="Arial" FontSize="14" />
+        <ComboBox x:Name="tablesComboBox" Grid.Row="1" SelectionChanged="tablesComboBox_SelectionChanged" FontSize="14" FontFamily="Arial" />
+        <StackPanel Grid.Row="2" Margin="0, 10">
+            <Label Content="Расположение колонок в базе данных" FontFamily="Arial" FontSize="14"/>
+            <DataGrid x:Name="datagrid" IsReadOnly="True" Grid.Row="3" Height="50" VerticalAlignment="Top" FontSize="14" FontFamily="Arial"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

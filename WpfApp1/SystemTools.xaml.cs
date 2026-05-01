@@ -79,5 +79,11 @@ namespace WpfApp1
                 MessageBox.Show($"Не удалось восстановить базу данных\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            var win = new ExportImportForm();
+            win.ShowDialog();
+        }
     }
 }

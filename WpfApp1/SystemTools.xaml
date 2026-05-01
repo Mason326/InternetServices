@@ -39,7 +39,7 @@
             </Grid.ColumnDefinitions>
             <Button Style="{StaticResource MenuButton}" Content="Создать резервную копию" Grid.Column="0" Grid.Row="0" Click="Button_Click_1" />
             <Button Style="{StaticResource MenuButton}" Content="Восстановить базу" Grid.Column="0" Grid.Row="1" Click="Button_Click_2" />
-            <Button Style="{StaticResource MenuButton}" Content="Импорт" Grid.Column="1" Grid.Row="0" />
+            <Button Style="{StaticResource MenuButton}" Content="Импорт" Grid.Column="1" Grid.Row="0" Click="Button_Click_3" />
             <Button Style="{StaticResource MenuButton}" Content="Экспорт" Grid.Column="1" Grid.Row="1" />
         </Grid>
         <Button Grid.Row="2" Style="{StaticResource MenuButton}" Content="Выйти из учётной записи" Click="Button_Click" />
