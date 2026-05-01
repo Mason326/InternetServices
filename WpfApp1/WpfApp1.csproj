@@ -130,11 +130,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SystemTools.xaml.cs">
+      <DependentUpon>SystemTools.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\AccountHolder.cs" />
     <Compile Include="AdditionalServices.xaml.cs">
       <DependentUpon>AdditionalServices.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\AdditionalServicesHolder.cs" />
+    <Compile Include="Utils\Backup.cs" />
     <Compile Include="Utils\CheckDuplicateUtil.cs" />
     <Compile Include="Utils\ClientHolder.cs" />
     <Compile Include="ClientVerbose.xaml.cs">
@@ -247,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SystemTools.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -398,6 +406,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="internet_102151.ico" />
+    <None Include="Resources\database-4941338_1280.png" />
+    <Resource Include="database-4941338_1280.png" />
     <Content Include="Resources\Dump\backup.sql" />
     <None Include="Resources\internet_102151.ico" />
     <Resource Include="user.png" />

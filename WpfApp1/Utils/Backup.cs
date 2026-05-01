@@ -10,11 +10,12 @@ namespace WpfApp1.Utils
 {
     public class Backup
     {
-        public static void MakeABackup(object sender, EventArgs e)
+        public static string MakeABackup()
         {
             string pathToProject = string.Join("\\", Directory.GetCurrentDirectory().Split('\\').TakeWhile(item => item != "bin"));
             if (!Directory.Exists($@"{pathToProject}\Resources\Backups\"))
                 Directory.CreateDirectory($@"{pathToProject}\Resources\Backups\");
+            string fileName = $@"{pathToProject}\Resources\Backups\backup_{DateTime.Now.Ticks}.sql";
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 using (MySqlCommand cmd = conn.CreateCommand())
@@ -22,10 +23,12 @@ namespace WpfApp1.Utils
                     using (MySqlBackup backup = new MySqlBackup(cmd))
                     {
                         conn.Open();
-                        backup.ExportToFile($@"{pathToProject}\Resources\Backups\backup_{DateTime.Now.Ticks}.sql");
+                        backup.ExportToFile(fileName);
                     }
                 }
             }
+
+            return fileName;
         }
     }
 }

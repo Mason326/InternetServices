@@ -34,7 +34,7 @@ namespace WpfApp1
             ShowCaptcha(authAttempsCounter);
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMinutes(180);
-            timer.Tick += new EventHandler(Backup.MakeABackup);
+            timer.Tick += new EventHandler(MakeABackupEvent);
             timer.Start();
         }
 
@@ -60,6 +60,12 @@ namespace WpfApp1
 
         private void SendAuthАttempt()
         {
+            string serviceLogin = Properties.Settings.Default.serviceLogin;
+            string servicePassword = Properties.Settings.Default.servicePassword;
+            string userLogin = LoginTextbox.Text;
+            string userPassword = PasswordTextBox.Password;
+            string captchaInput = captchaTextbox.Text;
+
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
@@ -73,9 +79,7 @@ namespace WpfApp1
                         OpenSettingsForm();
                     return;
                 }
-                string userLogin = LoginTextbox.Text;
-                string userPassword = PasswordTextBox.Password;
-                string captchaInput = captchaTextbox.Text;
+                
                 if (userLogin == "" || userPassword == "" || (authAttempsCounter > 1 && captchaInput == ""))
                 {
                     MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -96,6 +100,20 @@ namespace WpfApp1
                     captchaTextbox.Clear();
                     try
                     {
+                        if (serviceLogin == userLogin && servicePassword == userPassword)
+                        {
+                            LoginTextbox.Text = "";
+                            PasswordTextBox.Password = "";
+                            captchaTextbox.Clear();
+                            authAttempsCounter = 0;
+                            ShowCaptcha(authAttempsCounter);
+                            this.Hide();
+                            var win = new SystemTools();
+                            win.ShowDialog();
+                            this.ShowDialog();
+                            return;
+                        }
+
                         StringBuilder Sb = new StringBuilder();
                         using (SHA256 hash = SHA256Managed.Create())
                         {
@@ -302,9 +320,28 @@ namespace WpfApp1
             SendAuthАttempt();
         }
 
+        private void MakeABackupEvent(object sender, EventArgs e)
+        {
+            try
+            {
+                Backup.MakeABackup();
+            }
+            catch
+            {
+                ;
+            }
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Backup.MakeABackup(sender, e);
+            try
+            {
+                Backup.MakeABackup();
+            }
+            catch
+            {
+                ;
+            }
         }
 
     }
