@@ -12,7 +12,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Vit.Db.Util.Data;
 using MySql.Data.MySqlClient;
+using Microsoft.Win32;
+using System.IO;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -21,9 +25,22 @@ namespace WpfApp1
     /// </summary>
     public partial class ExportImportForm : Window
     {
-        public ExportImportForm()
+        public ExportImportForm(DataManagement.DataOperationType type)
         {
             InitializeComponent();
+            switch (type)
+            {
+                case DataManagement.DataOperationType.Export:
+                    importButton.Visibility = Visibility.Collapsed;
+                    exportButton.Visibility = Visibility.Visible;
+                    skipHeaderButton.Visibility = Visibility.Collapsed;
+                    break;
+                case DataManagement.DataOperationType.Import:
+                    importButton.Visibility = Visibility.Visible;
+                    exportButton.Visibility = Visibility.Collapsed;
+                    skipHeaderButton.Visibility = Visibility.Visible;
+                    break;
+            }
         }
 
         private void tablesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -76,6 +93,9 @@ namespace WpfApp1
         {
             try
             {
+                fieldTerminatorComboBox.ItemsSource = new List<string>() { ";", ",", "|", ":" };
+                fieldTerminatorComboBox.SelectedItem = ";";
+
                 List<string> tables = new List<string>();
                 tables.Add("- -");
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -97,6 +117,143 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Не удалось загрузить таблицы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (tablesComboBox.SelectedItem != null && filePathTextBox.Text != string.Empty)
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+
+                        MySqlBulkLoader loader = new MySqlBulkLoader(conn);
+                        loader.Local = true;
+                        loader.TableName = tablesComboBox.SelectedItem.ToString();
+                        loader.FileName = filePathTextBox.Text;
+                        loader.FieldTerminator = fieldTerminatorComboBox.SelectedItem.ToString();
+                        loader.LineTerminator = "\n";
+                        if (skipHeaderButton.IsChecked != null && skipHeaderButton.IsChecked.Value)
+                        {
+                            loader.NumberOfLinesToSkip = 1;
+                        }
+                        else
+                        {
+                            loader.NumberOfLinesToSkip = 0;
+                        }
+
+                        int uploadedRows = loader.Load();
+                        MessageBox.Show($"Загружено строк: {uploadedRows}");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"Заполните поля помеченные *", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось загрузить данные\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void exportButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (tablesComboBox.SelectedItem != null && filePathTextBox.Text != string.Empty)
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+                        string tableName = tablesComboBox.SelectedItem.ToString();
+                        string fieldTerminator = fieldTerminatorComboBox.SelectedItem.ToString();
+
+                        MySqlCommand cmd = new MySqlCommand($"SELECT * FROM `{tableName}`", conn);
+
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            using (StreamWriter writer = new StreamWriter("D:\\test.csv", false, Encoding.UTF8))
+                            {
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    writer.Write($"{reader.GetName(i)}");
+                                    if (i < reader.FieldCount - 1) writer.Write(fieldTerminator);
+                                }
+                                writer.WriteLine();
+
+                                while (reader.Read())
+                                {
+                                    for (int i = 0; i < reader.FieldCount; i++)
+                                    {
+                                        string value;
+
+                                        if (reader.IsDBNull(i))
+                                        {
+                                            value = "";
+                                        }
+                                        else if (reader.GetFieldType(i) == typeof(DateTime))
+                                        {
+                                            value = DateTime.Parse(reader.GetValue(i).ToString()).ToString("yyyy-MM-dd HH:mm");
+                                        }
+                                        else if (reader.GetFieldType(i) == typeof(byte[]))
+                                        {
+                                            byte[] blobData = (byte[])reader.GetValue(i);
+                                            value = $"0x{BitConverter.ToString(blobData).Replace("-", "")}";
+                                        }
+                                        else
+                                        {
+                                            value = reader.GetValue(i).ToString();
+                                        }
+    ;
+                                        writer.Write($"{value}");
+
+                                        if (i < reader.FieldCount - 1) writer.Write(fieldTerminator);
+                                    }
+                                    writer.WriteLine();
+                                }
+                            }
+                        }
+                    }
+
+                    MessageBox.Show($"Файл сохранён: D:\\test.csv ");
+                }
+                else
+                {
+                    MessageBox.Show($"Заполните поля помеченные *", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось загрузить таблицы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void browseFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.Filter = "CSV-файлы (*.csv)|*.csv";
+                dialog.Title = "Выберите файл";
+                dialog.ShowDialog();
+
+                if (dialog.FileName != string.Empty)
+                {
+                    filePathTextBox.Text = dialog.FileName;
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось загрузить файл\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void toMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

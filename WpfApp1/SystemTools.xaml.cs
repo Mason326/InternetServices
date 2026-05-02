@@ -82,8 +82,18 @@ namespace WpfApp1
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            var win = new ExportImportForm();
+            this.Hide();
+            var win = new ExportImportForm(DataManagement.DataOperationType.Import);
             win.ShowDialog();
+            this.ShowDialog();
+        }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            var win = new ExportImportForm(DataManagement.DataOperationType.Export);
+            win.ShowDialog();
+            this.ShowDialog();
         }
     }
 }

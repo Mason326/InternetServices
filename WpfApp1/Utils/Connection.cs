@@ -13,14 +13,14 @@ namespace WpfApp1
         static string db = Properties.Settings.Default.database;
         static string user = Properties.Settings.Default.user;
         static string password = Properties.Settings.Default.password;
-        public static string ConnectionString = $"server={server};user={user};password={password};database={db}";
+        public static string ConnectionString = $"server={server};user={user};password={password};database={db};AllowLoadLocalInfile=True;CharSet=utf8mb4";
 
         public static void Refresh() {
             server = Properties.Settings.Default.server;
             db = Properties.Settings.Default.database;
             user = Properties.Settings.Default.user;
             password = Properties.Settings.Default.password;
-            ConnectionString = $"server={server};user={user};password={password};database={db}";
+            ConnectionString = $"server={server};user={user};password={password};database={db};AllowLoadLocalInfile=True;CharSet=utf8mb4";
         }
     }
 }

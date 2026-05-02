@@ -5,7 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="ExportImportForm" Height="450" Width="689.6" Loaded="Window_Loaded">
+        Title="Управление данными" Height="464.4" Width="689.6" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen" WindowStyle="ThreeDBorderWindow" Icon="internet_102151.ico">
+    <Window.Resources>
+        <Style x:Key="MenuButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF4F6DD3" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Height" Value="30" />
+        </Style>
+    </Window.Resources>
     <Grid Margin="10, 10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -14,14 +26,92 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <Label Grid.Row="0" Content="Таблицы" FontFamily="Arial" FontSize="14" />
-        <ComboBox x:Name="tablesComboBox" Grid.Row="1" SelectionChanged="tablesComboBox_SelectionChanged" FontSize="14" FontFamily="Arial" />
-        <StackPanel Grid.Row="2" Margin="0, 10">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto "/>
+                <RowDefinition Height="Auto "/>
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0">
+                <Label Content="Таблицы" FontFamily="Arial" FontSize="14" />
+                <Label Foreground="Red"
+                               Content="*" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Margin="1,0,0,0"
+                               Padding="0"/>
+            </DockPanel>
+            <ComboBox Grid.Row="1" x:Name="tablesComboBox" SelectionChanged="tablesComboBox_SelectionChanged" FontSize="14" FontFamily="Arial" />
+        </Grid>
+        <StackPanel Grid.Row="1" Margin="0, 10">
             <Label Content="Расположение колонок в базе данных" FontFamily="Arial" FontSize="14"/>
             <DataGrid x:Name="datagrid" IsReadOnly="True" Grid.Row="3" Height="50" VerticalAlignment="Top" FontSize="14" FontFamily="Arial"/>
         </StackPanel>
-
+        <Grid Grid.Row="2" Margin="0, 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Column="0" Margin="5,5">
+                <DockPanel>
+                    <Label Content="Разделитель полей" FontFamily="Arial" FontSize="14" />
+                    <Label Foreground="Red" 
+                               Content="*" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Margin="1,0,0,0"
+                               Padding="0"/>
+                </DockPanel>
+                <ComboBox x:Name="fieldTerminatorComboBox" FontFamily="Arial" FontSize="14" />
+            </StackPanel>
+            <DockPanel Grid.Column="2" VerticalAlignment="Center" Margin="5,5">
+                <CheckBox x:Name="skipHeaderButton" Content="Пропустить заголовок" FontFamily="Arial" FontSize="14" />
+            </DockPanel>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="0.3*" />
+            </Grid.ColumnDefinitions>
+            <DockPanel Grid.Row="0">
+                <Label Content="Путь до файла" FontFamily="Arial" FontSize="14" />
+                <Label Foreground="Red" 
+                               Content="*" 
+                               FontSize="20" 
+                               FontWeight="Bold" 
+                               Margin="1,0,0,0"
+                               Padding="0"/>
+            </DockPanel>
+            <TextBox Grid.Row="1" x:Name="filePathTextBox" Grid.Column="0" FontFamily="Arial" FontSize="14" Margin="5, 0"  />
+            <Button Grid.Row="1" x:Name="browseFileButton" Style="{StaticResource MenuButton}" Grid.Column="1" Content="Обзор" Click="browseFileButton_Click" Margin="0.2,0" VerticalAlignment="Top" />
+        </Grid>
+        <Grid Grid.Row="4" />
+        <Grid Grid.Row="5" Margin="5, 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Button x:Name="importButton" Style="{StaticResource MenuButton}" Grid.Row="0" Content="Импорт" Click="Button_Click" Margin="0, 5" />
+            <Button x:Name="exportButton" Style="{StaticResource MenuButton}" Grid.Row="1" Content="Экспорт" Margin="0, 5" Click="exportButton_Click"  />
+            <Button x:Name="toMenuButton" Style="{StaticResource MenuButton}" Grid.Row="2" Content="На главную" Margin="0, 5" Click="toMenuButton_Click" />
+        </Grid>
     </Grid>
 </Window>
