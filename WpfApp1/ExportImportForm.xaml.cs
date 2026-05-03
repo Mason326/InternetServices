@@ -23,8 +23,11 @@ namespace WpfApp1
     /// <summary>
     /// Interaction logic for ExportImportForm.xaml
     /// </summary>
+                    
+                    
     public partial class ExportImportForm : Window
     {
+        bool isExport = false;
         public ExportImportForm(DataManagement.DataOperationType type)
         {
             InitializeComponent();
@@ -34,11 +37,13 @@ namespace WpfApp1
                     importButton.Visibility = Visibility.Collapsed;
                     exportButton.Visibility = Visibility.Visible;
                     skipHeaderButton.Visibility = Visibility.Collapsed;
+                    isExport = true;
                     break;
                 case DataManagement.DataOperationType.Import:
                     importButton.Visibility = Visibility.Visible;
                     exportButton.Visibility = Visibility.Collapsed;
                     skipHeaderButton.Visibility = Visibility.Visible;
+                    isExport = false;
                     break;
             }
         }
@@ -145,7 +150,7 @@ namespace WpfApp1
                         }
 
                         int uploadedRows = loader.Load();
-                        MessageBox.Show($"Загружено строк: {uploadedRows}");
+                        MessageBox.Show($"Загружено строк: {uploadedRows}", "Процесс", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
                 else
@@ -175,7 +180,7 @@ namespace WpfApp1
 
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            using (StreamWriter writer = new StreamWriter("D:\\test.csv", false, Encoding.UTF8))
+                            using (StreamWriter writer = new StreamWriter(filePathTextBox.Text, false, Encoding.UTF8))
                             {
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
@@ -218,7 +223,7 @@ namespace WpfApp1
                         }
                     }
 
-                    MessageBox.Show($"Файл сохранён: D:\\test.csv ");
+                    MessageBox.Show($"Файл сохранён: {filePathTextBox.Text}", "Процесс", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
@@ -235,14 +240,31 @@ namespace WpfApp1
         {
             try
             {
-                OpenFileDialog dialog = new OpenFileDialog();
-                dialog.Filter = "CSV-файлы (*.csv)|*.csv";
-                dialog.Title = "Выберите файл";
-                dialog.ShowDialog();
-
-                if (dialog.FileName != string.Empty)
+                if (isExport)
                 {
-                    filePathTextBox.Text = dialog.FileName;
+                    SaveFileDialog save = new SaveFileDialog();
+                    save.Filter = "CSV-файлы (*.csv)|*.csv";
+                    save.Title = "Выберите файл для импорта";
+
+                    save.ShowDialog();
+
+                    if (save.FileName != string.Empty)
+                    {
+                        filePathTextBox.Text = save.FileName;
+                    }
+                }
+                else
+                {
+                    OpenFileDialog dialog = new OpenFileDialog();
+                    dialog.Filter = "CSV-файлы (*.csv)|*.csv";
+                    dialog.Title = "Выберите файл для экспорта";
+                    dialog.ShowDialog();
+
+                    if (dialog.FileName != string.Empty)
+                    {
+                        filePathTextBox.Text = dialog.FileName;
+                    }
+
                 }
             }
             catch (Exception exc)
