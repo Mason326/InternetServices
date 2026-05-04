@@ -138,7 +138,7 @@ namespace WpfApp1
                                 AccountHolder.FIO = (string)accountData[1];
                                 AccountHolder.UserLogin = (string)accountData[2];
                                 AccountHolder.UserPassword = (string)accountData[3];
-                                AccountHolder.UserRole = (string)accountData[4];
+                                AccountHolder.UserRole = ((string)accountData[4]).Replace("\r", "").Replace("\n", "");
                                 this.Hide();
                                 switch (AccountHolder.UserRole)
                                 {

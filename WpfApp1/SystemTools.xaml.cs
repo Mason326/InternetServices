@@ -58,7 +58,7 @@ namespace WpfApp1
                     string filePath = dialog.FileName;
                     MessageBoxResult res = MessageBox.Show($"Вы уверены что хотите восстановить базу данных из файла: \"{filePath}\"? Действие не может быть отменено", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
                     if (res == MessageBoxResult.Yes)
-                    { 
+                    {
                         using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                         {
                             using (MySqlCommand cmd = conn.CreateCommand())

@@ -182,6 +182,7 @@ namespace WpfApp1
                         {
                             using (StreamWriter writer = new StreamWriter(filePathTextBox.Text, false, Encoding.UTF8))
                             {
+                                writer.NewLine = "\n";
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     writer.Write($"{reader.GetName(i)}");
@@ -205,15 +206,15 @@ namespace WpfApp1
                                         }
                                         else if (reader.GetFieldType(i) == typeof(byte[]))
                                         {
-                                            byte[] blobData = (byte[])reader.GetValue(i);
-                                            value = $"0x{BitConverter.ToString(blobData).Replace("-", "")}";
+                                            value = "";
+                                            continue;
                                         }
                                         else
                                         {
                                             value = reader.GetValue(i).ToString();
                                         }
     ;
-                                        writer.Write($"{value}");
+                                        writer.Write($"{value}".Replace("\r", ""));
 
                                         if (i < reader.FieldCount - 1) writer.Write(fieldTerminator);
                                     }
