@@ -1,0 +1,47 @@
+﻿<Window x:Class="WpfApp1.SystemTools"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="Системные инстурменты (Система)" Height="400.54" Width="548.8" WindowStartupLocation="CenterScreen" WindowStyle="ThreeDBorderWindow" ResizeMode="CanResize" Icon="internet_102151.ico">
+    <Window.Resources>
+        <Style x:Key="MenuButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF4F6DD3" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="10, 5" />
+            <Setter Property="Height" Value="40" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="20, 20">
+            <Image Margin="0,5" Source="database-4941338_1280.png" Stretch="Uniform" VerticalAlignment="Center" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Style="{StaticResource MenuButton}" Content="Создать резервную копию" Grid.Column="0" Grid.Row="0" Click="Button_Click_1" />
+            <Button Style="{StaticResource MenuButton}" Content="Восстановить базу" Grid.Column="0" Grid.Row="1" Click="Button_Click_2" />
+            <Button Style="{StaticResource MenuButton}" Content="Импорт" Grid.Column="1" Grid.Row="0" Click="Button_Click_3" />
+            <Button Style="{StaticResource MenuButton}" Content="Экспорт" Grid.Column="1" Grid.Row="1" Click="Button_Click_4" />
+        </Grid>
+        <Button Grid.Row="2" Style="{StaticResource MenuButton}" Content="Выйти из учётной записи" Click="Button_Click" />
+    </Grid>
+</Window>

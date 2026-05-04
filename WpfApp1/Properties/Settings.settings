@@ -15,13 +15,19 @@
       <Value Profile="(Default)">localhost</Value>
     </Setting>
     <Setting Name="database" Type="System.String" Scope="User">
-      <Value Profile="(Default)">internetservices</Value>
+      <Value Profile="(Default)">testStruct</Value>
     </Setting>
     <Setting Name="user" Type="System.String" Scope="User">
       <Value Profile="(Default)">root</Value>
     </Setting>
     <Setting Name="password" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="serviceLogin" Type="System.String" Scope="User">
+      <Value Profile="(Default)">service</Value>
+    </Setting>
+    <Setting Name="servicePassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)">service</Value>
     </Setting>
   </Settings>
 </SettingsFile>

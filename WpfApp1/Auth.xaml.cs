@@ -16,6 +16,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+using WpfApp1.Utils;
 
 namespace WpfApp1
 {
@@ -30,6 +32,10 @@ namespace WpfApp1
         {
             InitializeComponent();
             ShowCaptcha(authAttempsCounter);
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMinutes(180);
+            timer.Tick += new EventHandler(MakeABackupEvent);
+            timer.Start();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -54,6 +60,12 @@ namespace WpfApp1
 
         private void SendAuthАttempt()
         {
+            string serviceLogin = Properties.Settings.Default.serviceLogin;
+            string servicePassword = Properties.Settings.Default.servicePassword;
+            string userLogin = LoginTextbox.Text;
+            string userPassword = PasswordTextBox.Password;
+            string captchaInput = captchaTextbox.Text;
+
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 try
@@ -67,9 +79,7 @@ namespace WpfApp1
                         OpenSettingsForm();
                     return;
                 }
-                string userLogin = LoginTextbox.Text;
-                string userPassword = PasswordTextBox.Password;
-                string captchaInput = captchaTextbox.Text;
+                
                 if (userLogin == "" || userPassword == "" || (authAttempsCounter > 1 && captchaInput == ""))
                 {
                     MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -90,6 +100,20 @@ namespace WpfApp1
                     captchaTextbox.Clear();
                     try
                     {
+                        if (serviceLogin == userLogin && servicePassword == userPassword)
+                        {
+                            LoginTextbox.Text = "";
+                            PasswordTextBox.Password = "";
+                            captchaTextbox.Clear();
+                            authAttempsCounter = 0;
+                            ShowCaptcha(authAttempsCounter);
+                            this.Hide();
+                            var win = new SystemTools();
+                            win.ShowDialog();
+                            this.ShowDialog();
+                            return;
+                        }
+
                         StringBuilder Sb = new StringBuilder();
                         using (SHA256 hash = SHA256Managed.Create())
                         {
@@ -114,7 +138,7 @@ namespace WpfApp1
                                 AccountHolder.FIO = (string)accountData[1];
                                 AccountHolder.UserLogin = (string)accountData[2];
                                 AccountHolder.UserPassword = (string)accountData[3];
-                                AccountHolder.UserRole = (string)accountData[4];
+                                AccountHolder.UserRole = ((string)accountData[4]).Replace("\r", "").Replace("\n", "");
                                 this.Hide();
                                 switch (AccountHolder.UserRole)
                                 {
@@ -295,5 +319,30 @@ namespace WpfApp1
         {
             SendAuthАttempt();
         }
+
+        private void MakeABackupEvent(object sender, EventArgs e)
+        {
+            try
+            {
+                Backup.MakeABackup();
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                Backup.MakeABackup();
+            }
+            catch
+            {
+                ;
+            }
+        }
+
     }
 }

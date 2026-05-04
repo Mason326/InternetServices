@@ -74,7 +74,7 @@ namespace WpfApp1.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("internetservices")]
+        [global::System.Configuration.DefaultSettingValueAttribute("testStruct")]
         public string database {
             get {
                 return ((string)(this["database"]));
@@ -105,6 +105,30 @@ namespace WpfApp1.Properties {
             }
             set {
                 this["password"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("service")]
+        public string serviceLogin {
+            get {
+                return ((string)(this["serviceLogin"]));
+            }
+            set {
+                this["serviceLogin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("service")]
+        public string servicePassword {
+            get {
+                return ((string)(this["servicePassword"]));
+            }
+            set {
+                this["servicePassword"] = value;
             }
         }
     }
