@@ -28,7 +28,7 @@ namespace WpfApp1
     {
         int authAttempsCounter = 0;
         string captchaCompare = "";
-        public static bool locker = false;
+        public static bool locker = true;
         public Auth()
         {
             InitializeComponent();

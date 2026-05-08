@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Клиенты" Height="790.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico" SizeChanged="Window_SizeChanged">
+        Title="Клиенты" Height="790.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico" SizeChanged="Window_SizeChanged" MouseMove="HandleActivity" KeyDown="HandleActivity">
     <Grid Margin="0,4,-0.2,-4.4">
         <Grid>
             <Grid.ColumnDefinitions>

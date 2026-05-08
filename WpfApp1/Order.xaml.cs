@@ -401,7 +401,7 @@ namespace WpfApp1
                     MessageBox.Show($"Наряд успешно закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     RefreshDG();
                     MessageBoxResult printRes = MessageBox.Show("Хотите распечатать акт выполненных работ?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-                    if (res == MessageBoxResult.Yes)
+                    if (printRes == MessageBoxResult.Yes)
                         PrintADocument();
                     this.Close();
                 }
