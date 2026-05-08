@@ -60,6 +60,12 @@ namespace WpfApp1
             try
             {
                 this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+                var res = MessageBox.Show("Закрыть окна", "", MessageBoxButton.YesNo);
+                if (res == MessageBoxResult.Yes)
+                {
+                    Auth.BackToAuth();
+                    return;
+                }
             }
             catch
             {

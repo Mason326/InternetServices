@@ -46,7 +46,9 @@ namespace WpfApp1
             this.Hide();
             var win = new CreateClient(false);
             win.ShowDialog();
-            this.ShowDialog();
+            var test = this;
+            if (Auth.locker)
+                this.ShowDialog();
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)

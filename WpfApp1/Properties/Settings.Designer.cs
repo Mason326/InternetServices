@@ -74,7 +74,7 @@ namespace WpfApp1.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("testStruct")]
+        [global::System.Configuration.DefaultSettingValueAttribute("internetServices")]
         public string database {
             get {
                 return ((string)(this["database"]));
