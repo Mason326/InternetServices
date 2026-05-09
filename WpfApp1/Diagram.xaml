@@ -1,11 +1,35 @@
-﻿<Window x:Class="WpfApp1.Diagram" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window x:Class="WpfApp1.Diagram" Title="Статистика" WindowStartupLocation="CenterScreen" Name="diagram" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
 xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-xmlns:dvc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization" Loaded="Window_Loaded">
-    <StackPanel>
-        <WindowsFormsHost>
+xmlns:dvc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization" Loaded="Window_Loaded" Width="688.8" Height="408" WindowStyle="ThreeDBorderWindow" Icon="internet_102151.ico">
+    <Window.Resources>
+        <Style x:Key="MenuButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF4F6DD3" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="10, 5" />
+            <Setter Property="Height" Value="40" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <WindowsFormsHost Grid.Row="0">
             <dvc:Chart x:Name="chart" />
         </WindowsFormsHost>
-    </StackPanel>
+        <Grid Grid.Row="1" Margin="0, 5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Button Style="{StaticResource MenuButton}" Content="К заявкам" Grid.Column="1" Click="Button_Click" />
+        </Grid>
+    </Grid>
 </Window>

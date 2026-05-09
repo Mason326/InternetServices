@@ -121,12 +121,14 @@ namespace WpfApp1
                 case "Менеджер":
                     printAReport.Visibility = Visibility.Collapsed;
                     orderButton.Visibility = Visibility.Collapsed;
+                    diagram.Visibility = Visibility.Collapsed;
                     incomesLabel.Visibility = Visibility.Collapsed;
                     reportVariantsComboBox.Visibility = Visibility.Collapsed;
                     break;
                 case "Мастер":
                     printAReport.Visibility = Visibility.Collapsed;
                     incomesLabel.Visibility = Visibility.Collapsed;
+                    diagram.Visibility = Visibility.Collapsed;
                     reportVariantsComboBox.Visibility = Visibility.Collapsed;
                     masterId = AccountHolder.userId;
                     break;
@@ -134,6 +136,7 @@ namespace WpfApp1
                     printAReport.Visibility = Visibility.Visible;
                     reportVariantsComboBox.Visibility = Visibility.Visible;
                     orderButton.Visibility = Visibility.Collapsed;
+                    diagram.Visibility = Visibility.Visible;
                     incomesLabel.Visibility = Visibility.Visible;
                     break;
             }
@@ -820,6 +823,14 @@ namespace WpfApp1
 
             if (reportVariantsComboBox != null)
                 reportVariantsComboBox.FontSize = fontSize;
+        }
+
+        private void diagram_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            var win = new Diagram();
+            win.ShowDialog();
+            this.ShowDialog();
         }
     }
 }
