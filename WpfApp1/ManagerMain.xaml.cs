@@ -27,10 +27,10 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.Hide();
+            //this.Hide();
             var win = new CreateClaim();
             win.ShowDialog();
-            this.ShowDialog();
+            //this.ShowDialog();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -46,7 +46,6 @@ namespace WpfApp1
             this.Hide();
             var win = new CreateClient(false);
             win.ShowDialog();
-            var test = this;
             if (Auth.locker)
                 this.ShowDialog();
         }

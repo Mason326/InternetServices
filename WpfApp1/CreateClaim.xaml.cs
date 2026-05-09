@@ -26,9 +26,14 @@ namespace WpfApp1
         DispatcherTimer timerRef;
         bool isExpired = false;
         DataTable dtAddServices = new DataTable();
+        private DispatcherTimer inactivityTimer;
         public CreateClaim()
         {
             InitializeComponent();
+            inactivityTimer = new DispatcherTimer();
+            inactivityTimer.Interval = TimeSpan.FromMinutes(2);
+            inactivityTimer.Tick += CheckInactivity;
+
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(300);
             timer.Tick += Timer_Tick;
@@ -38,6 +43,24 @@ namespace WpfApp1
             dtAddServices.Columns.Add("additional_service_id", typeof(int));
 
             timerRef = timer;
+        }
+
+        private void CheckInactivity(object sender, EventArgs e)
+        {
+            inactivityTimer.Stop();
+            Auth.BackToAuth();
+        }
+
+        private void HandleActivity(object sender, MouseEventArgs e)
+        {
+            inactivityTimer.Stop();
+            inactivityTimer.Start();
+        }
+
+        private void HandleActivity(object sender, KeyEventArgs e)
+        {
+            inactivityTimer.Stop();
+            inactivityTimer.Start();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -51,15 +74,16 @@ namespace WpfApp1
             ClearSelected();
             timerRef.Stop();
             timerRef.Tick -= Timer_Tick;
+            inactivityTimer.Stop();
             this.Close();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            //this.Hide();
+            inactivityTimer.Stop();
             var win = new CreateClient(true);
             win.ShowDialog();
-            //this.ShowDialog();
+            inactivityTimer.Start();
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
@@ -415,9 +439,11 @@ namespace WpfApp1
             {
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                inactivityTimer.Stop();
                 this.Hide();
                 var win = new ClaimVerbose(fieldValuesOfARecord, true, RefreshData, RereleaseClaim);
                 win.ShowDialog();
+                inactivityTimer.Start();
                 this.ShowDialog();
             }
         }
@@ -685,8 +711,12 @@ namespace WpfApp1
 
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
+            inactivityTimer.Stop();
+            //this.Hide();
             var win = new EmployeesViewWindow();
             win.ShowDialog();
+            inactivityTimer.Start();
+            //this.ShowDialog();
 
             if (MasterHolder.data != null)
             {
@@ -810,9 +840,11 @@ namespace WpfApp1
 
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
+            inactivityTimer.Stop();
             this.Hide();
             var win = new PickAdditionalServices();
             win.ShowDialog();
+            inactivityTimer.Start();
             this.ShowDialog();
         }
     }

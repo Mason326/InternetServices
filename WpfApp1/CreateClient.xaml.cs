@@ -42,7 +42,7 @@ namespace WpfApp1
         {
             InitializeComponent();
             inactivityTimer = new DispatcherTimer();
-            inactivityTimer.Interval = TimeSpan.FromSeconds(15);
+            inactivityTimer.Interval = TimeSpan.FromMinutes(2);
             inactivityTimer.Tick += CheckInactivity;
             if (!isSelectClient)
             {
