@@ -28,6 +28,7 @@ namespace WpfApp1
     {
         int authAttempsCounter = 0;
         string captchaCompare = "";
+        public static bool locker = true;
         public Auth()
         {
             InitializeComponent();
@@ -38,6 +39,24 @@ namespace WpfApp1
             timer.Start();
         }
 
+
+        public static void BackToAuth()
+        {
+            locker = true;
+            var windows = App.Current.Windows;
+            for (int i = windows.Count - 1; i >= 0; i--)
+            {
+                if (windows[i] != App.Current.MainWindow && windows[i].Name != "")
+                {
+                    if (!windows[i].IsVisible && windows[i].Name != "")
+                    {
+                        windows[i].Show();
+                    }
+                    windows[i].Close();
+                }
+            }
+            locker = false;
+        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

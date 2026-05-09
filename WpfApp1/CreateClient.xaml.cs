@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace WpfApp1
 {
@@ -36,9 +37,13 @@ namespace WpfApp1
         private List<DataRow> _allRows = new List<DataRow>();
         private int _currentPage = 1;
         private int _pageSize = 2;
+        private DispatcherTimer inactivityTimer;
         public CreateClient(bool isSelectClient)
         {
             InitializeComponent();
+            inactivityTimer = new DispatcherTimer();
+            inactivityTimer.Interval = TimeSpan.FromMinutes(2);
+            inactivityTimer.Tick += CheckInactivity;
             if (!isSelectClient)
             {
                 inClaimButton.Visibility = Visibility.Collapsed;
@@ -50,8 +55,28 @@ namespace WpfApp1
             }
         }
 
+        private void CheckInactivity(object sender, EventArgs e)
+        {
+            inactivityTimer.Stop();
+            Auth.BackToAuth();
+        }
+
+        private void HandleActivity(object sender, MouseEventArgs e)
+        { 
+            inactivityTimer.Stop();
+            inactivityTimer.Start();
+        }
+
+        private void HandleActivity(object sender, KeyEventArgs e)
+        {
+            inactivityTimer.Stop();
+            inactivityTimer.Start();
+        }
+
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            inactivityTimer.Stop();
             this.Close();
         }
 
@@ -60,6 +85,7 @@ namespace WpfApp1
             try
             {
                 this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+                inactivityTimer.Start();
             }
             catch
             {
@@ -149,6 +175,7 @@ namespace WpfApp1
                     return;
                 }
                 ClientHolder.data = clientData;
+                inactivityTimer.Stop();
                 this.Close();
             }
         }
@@ -859,9 +886,11 @@ namespace WpfApp1
             {
                 DataRowView drv = clientsDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
+                inactivityTimer.Stop();
                 this.Hide();
                 var win = new ClientVerbose(fieldValuesOfARecord, RefreshDataGrid);
                 win.ShowDialog();
+                inactivityTimer.Start();
                 this.ShowDialog();
             }
         }

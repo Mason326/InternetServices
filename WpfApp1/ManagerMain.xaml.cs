@@ -27,10 +27,10 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.Hide();
+            //this.Hide();
             var win = new CreateClaim();
             win.ShowDialog();
-            this.ShowDialog();
+            //this.ShowDialog();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -46,7 +46,8 @@ namespace WpfApp1
             this.Hide();
             var win = new CreateClient(false);
             win.ShowDialog();
-            this.ShowDialog();
+            if (Auth.locker)
+                this.ShowDialog();
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
@@ -86,22 +87,19 @@ namespace WpfApp1
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            // Адаптивный размер шрифта для кнопок в зависимости от высоты окна
             double windowHeight = e.NewSize.Height;
             double baseFontSize = 16;
 
             if (windowHeight > 600)
             {
-                // При большом окне увеличиваем шрифт
-                double scale = windowHeight / 500; // 500 - базовая высота
-                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5)); // максимум x1.5
+                double scale = windowHeight / 500;
+                int newFontSize = (int)(baseFontSize * Math.Min(scale, 1.5));
                 UpdateButtonsFontSize(newFontSize);
             }
             else if (windowHeight < 450)
             {
-                // При маленьком окне уменьшаем шрифт
                 double scale = windowHeight / 500;
-                int newFontSize = (int)Math.Max(baseFontSize * scale, 10); // минимум 10
+                int newFontSize = (int)Math.Max(baseFontSize * scale, 10);
                 UpdateButtonsFontSize(newFontSize);
             }
             else
