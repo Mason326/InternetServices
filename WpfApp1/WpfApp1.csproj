@@ -145,6 +145,9 @@
     <Compile Include="Diagram.xaml.cs">
       <DependentUpon>Diagram.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ExportAs.xaml.cs">
+      <DependentUpon>ExportAs.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ExportImportForm.xaml.cs">
       <DependentUpon>ExportImportForm.xaml</DependentUpon>
     </Compile>
@@ -174,6 +177,7 @@
       <DependentUpon>EmployeesViewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\DataManagement.cs" />
+    <Compile Include="Utils\ExportHolder.cs" />
     <Compile Include="Utils\FullNameSplitter.cs" />
     <Compile Include="Utils\ImageUtils.cs" />
     <Compile Include="Utils\MasterHolder.cs" />
@@ -263,6 +267,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EmployeesViewWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExportAs.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

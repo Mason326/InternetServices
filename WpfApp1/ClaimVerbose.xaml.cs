@@ -166,10 +166,11 @@ namespace WpfApp1
                     }
                     else if (AccountHolder.UserRole == "Директор")
                     {
+                        statusQuery = "SELECT `status` FROM claim_status;";
                         saveChangesButton.Visibility = Visibility.Collapsed;
                         statusComboBox.IsEnabled = false;
                     }
-                    if (!(currStatus == "В работе" || currStatus == "Закрыта") || AccountHolder.UserRole == "Мастер")
+                    if (!(currStatus == "В работе" || currStatus == "Закрыта") || AccountHolder.UserRole == "Мастер" || AccountHolder.UserRole == "Директор")
                     { 
                         conn.Open();
                         MySqlCommand cmd = new MySqlCommand(statusQuery, conn);

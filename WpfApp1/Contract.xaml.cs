@@ -13,7 +13,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Diagnostics;
+using WpfApp1.Utils;
 using Word = Microsoft.Office.Interop.Word;
+using Microsoft.Win32;
 
 namespace WpfApp1
 {
@@ -155,7 +158,7 @@ namespace WpfApp1
         {
             try
             {
-                ExportAsWordDocument();
+                ExportContract();
             }
             catch (Exception exc)
             {
@@ -163,8 +166,15 @@ namespace WpfApp1
             }
         }
 
-        private void ExportAsWordDocument()
+        private void ExportContract()
         {
+            var win = new ExportAs();
+            win.ShowDialog();
+
+            if (ExportHolder.exportOptions == ExportHolder.ExportOptions.CancelExport)
+                return;
+
+
             string fileName = Directory.GetCurrentDirectory();
             if (fileName.Contains("bin\\"))
             {
@@ -173,6 +183,7 @@ namespace WpfApp1
             fileName += "\\Resources\\Templates\\ContractTemplate.doc";
             Word.Application wordApp = new Word.Application();
             wordApp.Visible = false;
+
 
             Word.Document wordDocument = wordApp.Documents.Open(fileName, ReadOnly: true);
 
@@ -193,7 +204,7 @@ namespace WpfApp1
             string[] director = Properties.Settings.Default.companyDirector.Split();
             ReplaceWord("{companyDirector}", $"{director[0]} {director[1][0]}. {director[2][0]}.", wordDocument);
             ReplaceWord("{abonentFullName}", claimClientLabel.Content.ToString(), wordDocument);
-            ReplaceWord("{birthDate}", DateTime.Parse(clientVerbose[11].ToString()).ToString("dd.MM.yyyy"), wordDocument);
+            ReplaceWord("{birthDate}", DateTime.Parse(clientVerbose[5].ToString()).ToString("dd.MM.yyyy"), wordDocument);
             ReplaceWord("{passportSeries}", clientVerbose[8].ToString(), wordDocument);
             ReplaceWord("{passportNumber}", clientVerbose[9].ToString(), wordDocument);
             ReplaceWord("{issueDate}", DateTime.Parse(clientVerbose[11].ToString()).ToString("dd.MM.yyyy"), wordDocument);
@@ -204,14 +215,29 @@ namespace WpfApp1
             ReplaceWord("{mountAddress}", address, wordDocument);
             ReplaceWord("{phoneNumber}", clientVerbose[3].ToString(), wordDocument);
 
-            wordDocument.SaveAs2("D:\\test.pdf", Word.WdSaveFormat.wdFormatPDF);
+            if (ExportHolder.exportOptions == ExportHolder.ExportOptions.ExportPdf)
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Title = "Сохранение...";
+                saveFileDialog.Filter = "PDF-файл (*.pdf)|*.pdf";
+                saveFileDialog.ShowDialog();
 
-            // Показываем пользователю результат (например, открываем PDF)
-            System.Diagnostics.Process.Start("D:\\test.pdf");
-            //wordApp.Visible = true;
+                if (saveFileDialog.FileName != string.Empty)
+                {
+                    string savePath = saveFileDialog.FileName;
+                    wordDocument.SaveAs2(savePath, Word.WdSaveFormat.wdFormatPDF);
+                    Process.Start(savePath);
+                }
+                wordDocument?.Close(false);
+                wordApp.Quit();
+            }
 
-            wordDocument?.Close(false);
-            wordApp.Quit();
+            if (ExportHolder.exportOptions == ExportHolder.ExportOptions.ExportWord)
+            {
+                wordApp.Visible = true;
+            }
+
+            ExportHolder.exportOptions = ExportHolder.ExportOptions.CancelExport;
         }
 
 
