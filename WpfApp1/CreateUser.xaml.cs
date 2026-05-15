@@ -3,6 +3,8 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -340,7 +342,7 @@ namespace WpfApp1
                 }
 
                 if (HasDirectorAccount() && rolesComboBox.SelectedItem.ToString() == "Директор")
-                { 
+                {
                     MessageBox.Show("В системе уже существует учетная запись директора", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
@@ -417,7 +419,7 @@ namespace WpfApp1
                     string cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
                                                           FROM employees
                                                           inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;";
-                    if(isInitial)
+                    if (isInitial)
                     {
                         cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
                                                           FROM employees
@@ -530,7 +532,7 @@ namespace WpfApp1
                 }
             }
             catch
-            { 
+            {
                 return false;
             }
         }
@@ -591,7 +593,6 @@ namespace WpfApp1
 
             userDG.SelectedItem = null;
             userId = -1;
-            //searchByPassportSeriesAndNumber.IsEnabled = true;
             editUserButton.IsEnabled = false;
             deleteUserButton.IsEnabled = false;
             userDG.IsEnabled = true;
@@ -694,14 +695,107 @@ namespace WpfApp1
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.FileName = "UserImage"; // имя файла по умолчанию 
-            dialog.Filter = "Images (.jpg)|*.jpg";
+            dialog.FileName = "UserImage";
+            dialog.Filter = "JPG-images (.jpg)|*.jpg| PNG-images (.png)|*.png";
 
             if (dialog.ShowDialog() == true)
             {
                 filePath = dialog.FileName;
+                var sizeActual = File.ReadAllBytes(filePath).Length;
                 userImage.Source = new BitmapImage(new Uri(filePath));
+                MemoryStream imageInMemory = CompressImage(filePath, 10);
+
+                var img = ConvertToBitmapImage(imageInMemory);
+                var size2 = GetActualBitmapImageSize(img);
             }
+        }
+
+        public static long GetActualBitmapImageSize(BitmapImage bitmapImage)
+        {
+            if (bitmapImage.StreamSource != null && bitmapImage.StreamSource.CanSeek)
+            {
+                return bitmapImage.StreamSource.Length;
+            }
+
+            byte[] result;
+            string ext = System.IO.Path.GetExtension(bitmapImage.UriSource.AbsoluteUri);
+            switch (ext)
+            {
+                case ".png":
+                    PngBitmapEncoder pngEncoder = new PngBitmapEncoder();
+                    pngEncoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        pngEncoder.Save(stream);
+                        result = stream.ToArray();
+                    }
+
+                    return result.Length;
+                case ".jpg":
+                    JpegBitmapEncoder jpegEncoder = new JpegBitmapEncoder();
+                    jpegEncoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        jpegEncoder.Save(stream);
+                        result = stream.ToArray();
+                    }
+
+                    return result.Length;
+                default:
+                    return 0;
+            }
+        }
+
+
+        public static MemoryStream CompressImage(string sourceImagePath, long quality)
+        {
+            try
+            {
+                using (Bitmap sourceImage = new Bitmap(sourceImagePath))
+                {
+                    string ext = System.IO.Path.GetExtension(sourceImagePath);
+                    ImageCodecInfo imageEncoder;
+                    switch (ext)
+                    {
+                        case ".png":
+                            imageEncoder = GetEncoder(ImageFormat.Png);
+                            break;
+                        case ".jpg":
+                            imageEncoder = GetEncoder(ImageFormat.Jpeg);
+                            break;
+                        default:
+                            return null;
+                    }
+
+                    EncoderParameters encoderParameters = new EncoderParameters(1);
+                    encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, quality);
+
+                    MemoryStream memoryStream = new MemoryStream();
+                    sourceImage.Save(memoryStream, imageEncoder, encoderParameters);
+                    memoryStream.Position = 0;
+                    return memoryStream;
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось сжать картинку\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return null;
+            }
+        }
+
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+            foreach (var codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+            return null;
         }
 
         private bool ImageIsTooLarge(byte[] imageBytes)
@@ -743,9 +837,19 @@ namespace WpfApp1
                     button.FontSize = fontSize;
             }
 
-            // Обновляем размер шрифта в DataGrid
             if (userDG != null)
                 userDG.FontSize = fontSize;
+        }
+
+        public static BitmapImage ConvertToBitmapImage(MemoryStream stream)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = stream;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+            bitmapImage.Freeze();
+            return bitmapImage;
         }
     }
 }
