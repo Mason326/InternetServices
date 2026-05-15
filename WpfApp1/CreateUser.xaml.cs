@@ -694,6 +694,12 @@ namespace WpfApp1
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
+            var win = new ImageCompressionWindow();
+            win.ShowDialog();
+            return;
+
+
+
             var dialog = new OpenFileDialog();
             dialog.FileName = "UserImage";
             dialog.Filter = "JPG-images (.jpg)|*.jpg| PNG-images (.png)|*.png";

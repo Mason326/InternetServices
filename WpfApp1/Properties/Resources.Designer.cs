@@ -63,9 +63,29 @@ namespace WpfApp1.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap _8782201770 {
+            get {
+                object obj = ResourceManager.GetObject("_8782201770", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap database_4941338_1280 {
             get {
                 object obj = ResourceManager.GetObject("database_4941338_1280", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap e3cc8aa1d71a44d95ab43467a0e70e9a {
+            get {
+                object obj = ResourceManager.GetObject("e3cc8aa1d71a44d95ab43467a0e70e9a", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

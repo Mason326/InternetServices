@@ -151,6 +151,9 @@
     <Compile Include="ExportImportForm.xaml.cs">
       <DependentUpon>ExportImportForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ImageCompressionWindow.xaml.cs">
+      <DependentUpon>ImageCompressionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SystemTools.xaml.cs">
       <DependentUpon>SystemTools.xaml</DependentUpon>
     </Compile>
@@ -275,6 +278,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ExportImportForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ImageCompressionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -442,9 +449,13 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\e3cc8aa1d71a44d95ab43467a0e70e9a.png" />
     <Resource Include="internet_102151.ico" />
     <None Include="Resources\database-4941338_1280.png" />
     <Resource Include="database-4941338_1280.png" />
+    <None Include="Resources\8782201770.jpg" />
+    <Resource Include="8782201770.jpg" />
+    <Resource Include="e3cc8aa1d71a44d95ab43467a0e70e9a.png" />
     <Content Include="Resources\Dump\backup.sql" />
     <None Include="Resources\internet_102151.ico" />
     <Resource Include="user.png" />
