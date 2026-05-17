@@ -182,6 +182,7 @@
     <Compile Include="Utils\DataManagement.cs" />
     <Compile Include="Utils\ExportHolder.cs" />
     <Compile Include="Utils\FullNameSplitter.cs" />
+    <Compile Include="Utils\ImageHolder.cs" />
     <Compile Include="Utils\ImageUtils.cs" />
     <Compile Include="Utils\MasterHolder.cs" />
     <Compile Include="PickAdditionalServices.xaml.cs">
@@ -449,11 +450,15 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\e3cc8aa1d71a44d95ab43467a0e70e9a.png" />
+    <None Include="Resources\e3cc8aa1d71a44d95ab43467a0e70e9a.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="internet_102151.ico" />
     <None Include="Resources\database-4941338_1280.png" />
     <Resource Include="database-4941338_1280.png" />
-    <None Include="Resources\8782201770.jpg" />
+    <None Include="Resources\8782201770.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Resource Include="8782201770.jpg" />
     <Resource Include="e3cc8aa1d71a44d95ab43467a0e70e9a.png" />
     <Content Include="Resources\Dump\backup.sql" />

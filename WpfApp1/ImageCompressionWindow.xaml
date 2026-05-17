@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Сжатие картинки" Height="450" Width="800" Icon="internet_102151.ico"  WindowStyle="ThreeDBorderWindow" WindowStartupLocation="CenterScreen" FontFamily="Arial" FontSize="16">
+        Title="Сжатие картинки" Height="450" Width="800" Icon="internet_102151.ico"  WindowStyle="ThreeDBorderWindow" WindowStartupLocation="CenterScreen" FontFamily="Arial" FontSize="16" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF4F6DD3"/>
@@ -42,9 +42,23 @@
                 <ColumnDefinition Width="0.4*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Margin="10, 0" Source="8782201770.jpg"/>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Image x:Name="srcImage" Margin="10, 0" Source="8782201770.jpg" Grid.Row="0"/>
+                <Label x:Name="sourceSizeLabel" Content="0 КБ" Grid.Row="1" HorizontalAlignment="Center" />
+            </Grid>
             <Image Grid.Column="1" Margin="10, 0" Source="e3cc8aa1d71a44d95ab43467a0e70e9a.png"/>
-            <Image Grid.Column="2" Margin="10, 0" Source="8782201770.jpg" />
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Image x:Name="destImage" Margin="10, 0" Source="8782201770.jpg" Grid.Row="0" />
+                <Label x:Name="destinationSizeLabel" Content="0 КБ" HorizontalAlignment="Center" Grid.Row="1" />
+            </Grid>
         </Grid>
         <Grid Grid.Row="2" VerticalAlignment="Top">
             <Grid.RowDefinitions>
@@ -61,8 +75,8 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <ComboBox Height="30" Grid.Column="0" />
-                <Button Style="{StaticResource MenuButtonStyle}" Content="Сжать" Height="35" Margin="10,0,0,0" Grid.Column="1" />
+                <ComboBox x:Name="compressionDegreeComboBox" Height="30" Grid.Column="0" />
+                <Button Style="{StaticResource MenuButtonStyle}" Content="Сжать" Height="35" Margin="10,0,0,0" Grid.Column="1" Click="Button_Click" />
             </Grid>
         </Grid>
         <Grid Grid.Row="3">
@@ -71,7 +85,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button Style="{StaticResource MenuButtonStyle}" Content="Сохранить" Grid.Column="0" Margin="0,0,5,0" />
-            <Button Style="{StaticResource MenuButtonStyle}" Content="Отменить изменения" Grid.Column="1" Margin="5,0,0,0" />
+            <Button Style="{StaticResource MenuButtonStyle}" Content="Отменить изменения" Grid.Column="1" Margin="5,0,0,0" Click="Button_Click_1" />
         </Grid>
     </Grid>
 </Window>
