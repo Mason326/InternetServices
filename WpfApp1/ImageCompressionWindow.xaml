@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Сжатие картинки" Height="450" Width="800" Icon="internet_102151.ico"  WindowStyle="ThreeDBorderWindow" WindowStartupLocation="CenterScreen" FontFamily="Arial" FontSize="16" Closing="Window_Closing">
+        Title="Сжатие картинки" Height="450" Width="800" Icon="internet_102151.ico"  WindowStyle="ThreeDBorderWindow" WindowStartupLocation="CenterScreen" FontFamily="Arial" FontSize="16" Loaded="Window_Loaded">
     <Window.Resources>
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#FF4F6DD3"/>
@@ -69,7 +69,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Label Content="Степень сжатия" Grid.Row="0" Grid.Column="0" />
+            <Label Content="Уровень сжатия" Grid.Row="0" Grid.Column="0" />
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -84,8 +84,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Style="{StaticResource MenuButtonStyle}" Content="Сохранить" Grid.Column="0" Margin="0,0,5,0" />
-            <Button Style="{StaticResource MenuButtonStyle}" Content="Отменить изменения" Grid.Column="1" Margin="5,0,0,0" Click="Button_Click_1" />
+            <Button Style="{StaticResource MenuButtonStyle}" Content="Сохранить" Height="40" Grid.Column="0" Margin="0,0,5,0" Click="Button_Click_2" />
+            <Button Style="{StaticResource MenuButtonStyle}" Content="Отменить изменения" Height="40" Grid.Column="1" Margin="5,0,0,0" Click="Button_Click_1" />
         </Grid>
     </Grid>
 </Window>

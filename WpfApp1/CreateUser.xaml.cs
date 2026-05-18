@@ -365,11 +365,22 @@ namespace WpfApp1
                         if (filePath != null)
                         {
                             byte[] imageBytes = File.ReadAllBytes(filePath);
+                        compressionLabel:
                             bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
                             if (imageSizeIsInvalid)
                             {
-                                MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                                return;
+                                if (imageSizeIsInvalid)
+                                {
+                                    MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                    if (res == MessageBoxResult.Yes)
+                                    {
+                                        var win = new ImageCompressionWindow();
+                                        win.ShowDialog();
+                                        imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
+                                        goto compressionLabel;
+                                    }
+                                    return;
+                                }
                             }
                             cmdText = $@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id, photo) 
                                                             value(
@@ -655,11 +666,22 @@ namespace WpfApp1
                             {
                                 cmd.CommandText += ", photo = @File";
                                 byte[] imageBytes = File.ReadAllBytes(filePath);
+                            compressionLabel2:
                                 bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
                                 if (imageSizeIsInvalid)
                                 {
-                                    MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                                    return;
+                                    if (imageSizeIsInvalid)
+                                    {
+                                        MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                        if (res == MessageBoxResult.Yes)
+                                        {
+                                            var win = new ImageCompressionWindow();
+                                            win.ShowDialog();
+                                            imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
+                                            goto compressionLabel2;
+                                        }
+                                        return;
+                                    }
                                 }
                                 cmd.Parameters.AddWithValue("@File", imageBytes);
                             }
@@ -694,6 +716,7 @@ namespace WpfApp1
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
+            ImageHolder.BackToDefaultValues();
             var dialog = new OpenFileDialog();
             dialog.FileName = "UserImage";
             dialog.Filter = "JPG-images (.jpg)|*.jpg| PNG-images (.png)|*.png";
@@ -704,10 +727,6 @@ namespace WpfApp1
                 ImageHolder.sourcePath = filePath;
                 ImageHolder.sourceImage = new BitmapImage(new Uri(filePath));
                 userImage.Source = new BitmapImage(new Uri(filePath));
-
-                var win = new ImageCompressionWindow();
-                win.ShowDialog();
-                return;
             }
         }
 

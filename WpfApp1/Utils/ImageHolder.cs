@@ -21,5 +21,44 @@ namespace WpfApp1.Utils
             sourceImage = new BitmapImage(new Uri(sourcePath));
             destinationImage = new BitmapImage(new Uri($"{currentDirectory}\\Resources\\8782201770.jpg"));
         }
+
+        public static byte[] GetBitmapImageBytes(BitmapImage bitmapImage)
+        {
+            byte[] result;
+            string ext = Path.GetExtension(sourcePath);
+            switch (ext)
+            {
+                case ".png":
+                    PngBitmapEncoder pngEncoder = new PngBitmapEncoder();
+                    pngEncoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        pngEncoder.Save(stream);
+                        result = stream.ToArray();
+                    }
+
+                    return result;
+                case ".jpg":
+                    JpegBitmapEncoder jpegEncoder = new JpegBitmapEncoder();
+                    jpegEncoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        jpegEncoder.Save(stream);
+                        result = stream.ToArray();
+                    }
+
+                    return result;
+                default:
+                    return new byte[0];
+            }
+        }
+
+        //public static bool isDefault(BitmapImage image)
+        //{
+        //    if(image.UriSource != null )
+        //    return false;
+        //}
     }
 }

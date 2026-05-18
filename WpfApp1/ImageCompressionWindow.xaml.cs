@@ -23,12 +23,20 @@ namespace WpfApp1
     /// </summary>
     public partial class ImageCompressionWindow : Window
     {
+        Dictionary<string, int> compressionDegreeDict = new Dictionary<string, int>();
         public ImageCompressionWindow()
         {
             InitializeComponent();
             srcImage.Source = ImageHolder.sourceImage;
-            compressionDegreeComboBox.ItemsSource = new List<string>() { "10", "20", "30", "40", "50", "60", "70" };
-            compressionDegreeComboBox.SelectedItem = "10";
+            compressionDegreeDict.Add("Ультра", 10);
+            compressionDegreeDict.Add("Максимальный", 20);
+            compressionDegreeDict.Add("Сильный", 30);
+            compressionDegreeDict.Add("Нормальный", 40);
+            compressionDegreeDict.Add("Быстрый", 50);
+            compressionDegreeDict.Add("Легкий", 60);
+            compressionDegreeDict.Add("Минимальный", 70);
+            compressionDegreeComboBox.ItemsSource = compressionDegreeDict.Keys;
+            compressionDegreeComboBox.SelectedItem = "Минимальный";
             var sizeActual = File.ReadAllBytes(ImageHolder.sourcePath).Length;
             FormatSize(sourceSizeLabel, sizeActual);
         }
@@ -148,11 +156,21 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MemoryStream compressedImageStream = CompressImage(ImageHolder.sourcePath, Convert.ToInt64(compressionDegreeComboBox.SelectedItem));
-            BitmapImage compressedImage = ConvertToBitmapImage(compressedImageStream);
-            long bitmapSize = GetActualBitmapImageSize(compressedImage);
-            destImage.Source = compressedImage;
-            FormatSize(destinationSizeLabel, Convert.ToDouble(bitmapSize));
+            try
+            {
+                int getValue;
+                bool compressionLevel = compressionDegreeDict.TryGetValue(compressionDegreeComboBox.SelectedItem.ToString(), out getValue);
+                MemoryStream compressedImageStream = CompressImage(ImageHolder.sourcePath, Convert.ToInt64(getValue));
+                BitmapImage compressedImage = ConvertToBitmapImage(compressedImageStream);
+                long bitmapSize = GetActualBitmapImageSize(compressedImage);
+                destImage.Source = compressedImage;
+                FormatSize(destinationSizeLabel, Convert.ToDouble(bitmapSize));
+                MessageBox.Show("Изображение успешно сжато", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Не удалось сжать картинку\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -160,9 +178,22 @@ namespace WpfApp1
             this.Close();
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ImageHolder.BackToDefaultValues();
+            try
+            {
+                this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
+            }
+            catch
+            {
+                ;
+            }
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            ImageHolder.destinationImage = destImage.Source as BitmapImage;
+            this.Close();
         }
     }
 }

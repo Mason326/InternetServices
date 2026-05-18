@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="Клиенты" Height="790.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico" SizeChanged="Window_SizeChanged" MouseMove="HandleActivity" KeyDown="HandleActivity">
+        Title="Клиенты" Height="790.4" Width="987" WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" Loaded="Window_Loaded" Icon="internet_102151.ico" SizeChanged="Window_SizeChanged" MouseMove="HandleActivity" KeyDown="HandleActivity" FontFamily="Arial">
     <Grid Margin="0,4,-0.2,-4.4">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -16,7 +16,7 @@
                 <TextBox TabIndex="1" x:Name="fioTextBox" MaxLength="150" HorizontalAlignment="Left" Margin="33,23,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="394" Height="29" PreviewTextInput="fioTextBox_PreviewTextInput" PreviewKeyUp="fioTextBox_PreviewKeyUp"/>
                 <Label Content="ФИО" HorizontalAlignment="Left" Margin="28,-8,0,0" VerticalAlignment="Top" FontSize="16" Height="31" Width="46"/>
                 <TextBox TabIndex="2" x:Name="phoneTextBox" HorizontalAlignment="Left" Margin="33,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="152" Height="28" PreviewKeyUp="phoneTextBox_PreviewKeyUp" GotFocus="phoneTextBox_GotFocus" GotMouseCapture="phoneTextBox_GotMouseCapture" PreviewTextInput="phoneTextBox_PreviewTextInput" MaxLength="19"/>
-                <Label Content="Телефон" HorizontalAlignment="Left" Margin="28,52,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="73"/>
+                <Label Content="Телефон" HorizontalAlignment="Left" Margin="28,52,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="92"/>
                 <TextBox TabIndex="3"  MaxLength="100" x:Name="emailTextBox" HorizontalAlignment="Left" Margin="208,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="215" Height="28" PreviewKeyDown="emailTextBox_PreviewKeyDown"/>
                 <Label Content="Email" HorizontalAlignment="Left" Margin="202,52,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="221"/>
                 <GroupBox Header="Паспорт" HorizontalAlignment="Left" Height="195" Margin="31,244,0,0" VerticalAlignment="Top" Width="558" FontSize="16">
@@ -55,12 +55,11 @@
                 <Label Content="Пароль абонента" HorizontalAlignment="Left" Margin="201,189,0,0" VerticalAlignment="Top" FontSize="16" Height="31" RenderTransformOrigin="0.402,0.551" Width="221"/>
                 <Button TabIndex="6" Content="Сгенерировать" HorizontalAlignment="Left" Margin="412,216,0,0" VerticalAlignment="Top" Width="177" Height="31" Background="#FF4F6DD3" FontFamily="Arial" FontSize="16" FontWeight="Bold" Foreground="White" Click="Button_Click_1"/>
                 <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="64,-7,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="93,53,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="93,53,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="97,52,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="163,106,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
                 <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="145,189,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="330,190,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
-                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="554,54,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="332,190,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
+                <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="554,51,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>
             </Grid>
             <StackPanel Grid.Column="1">
                 <StackPanel HorizontalAlignment="Left" Height="273" Margin="24,0,0,0" VerticalAlignment="Top" Width="304">
@@ -84,8 +83,8 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <Label Content="Количество активных клиентов:" HorizontalAlignment="Left" Margin="9,725,0,0" VerticalAlignment="Top" Width="247" FontFamily="Arial" FontSize="16"/>
-        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="257,725,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
+        <Label Content="Количество активных клиентов:" HorizontalAlignment="Left" Margin="9,727,0,0" VerticalAlignment="Top" Width="247" FontFamily="Arial" FontSize="16"/>
+        <Label x:Name="countRecordsLabel" Content="" HorizontalAlignment="Left" Margin="257,727,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.26,0.246" FontFamily="Arial" FontSize="16" FontWeight="Bold"/>
         <DataGrid IsReadOnly="True" x:Name="clientsDG" Margin="10,461,10,31.2" AutoGenerateColumns="False" SelectionChanged="clientsDG_SelectionChanged" SelectionMode="Single" FontSize="15" Height="Auto">
             <DataGrid.ContextMenu>
                 <ContextMenu>
