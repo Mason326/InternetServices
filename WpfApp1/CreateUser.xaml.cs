@@ -3,6 +3,8 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -340,7 +342,7 @@ namespace WpfApp1
                 }
 
                 if (HasDirectorAccount() && rolesComboBox.SelectedItem.ToString() == "Директор")
-                { 
+                {
                     MessageBox.Show("В системе уже существует учетная запись директора", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
@@ -363,11 +365,27 @@ namespace WpfApp1
                         if (filePath != null)
                         {
                             byte[] imageBytes = File.ReadAllBytes(filePath);
+                        compressionLabel:
                             bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
                             if (imageSizeIsInvalid)
                             {
-                                MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                                return;
+                                if (imageSizeIsInvalid)
+                                {
+                                    MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                    if (res == MessageBoxResult.Yes)
+                                    {
+                                        var win = new ImageCompressionWindow();
+                                        win.ShowDialog();
+                                        if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
+                                        {
+                                            ImageHolder.isCanceled = false;
+                                            return;
+                                        }
+                                        imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
+                                        goto compressionLabel;
+                                    }
+                                    return;
+                                }
                             }
                             cmdText = $@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id, photo) 
                                                             value(
@@ -384,6 +402,7 @@ namespace WpfApp1
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Пользователь создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         ClearInputData();
+                        userImage.Source = ImageUtils.LoadImage(null);
                     }
 
                 }
@@ -417,7 +436,7 @@ namespace WpfApp1
                     string cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
                                                           FROM employees
                                                           inner join `roles` on employees.roles_id = roles.idroles order by idemployees desc;";
-                    if(isInitial)
+                    if (isInitial)
                     {
                         cmdText = @"SELECT idemployees, full_name, login, password, roles.role_name, phoneNumber, photo, concat('ФИО: ', full_name, '\nРоль: ', role_name, '\nТелефон: ', phoneNumber, '\nЛогин: ', `login`) as userData
                                                           FROM employees
@@ -530,7 +549,7 @@ namespace WpfApp1
                 }
             }
             catch
-            { 
+            {
                 return false;
             }
         }
@@ -591,7 +610,6 @@ namespace WpfApp1
 
             userDG.SelectedItem = null;
             userId = -1;
-            //searchByPassportSeriesAndNumber.IsEnabled = true;
             editUserButton.IsEnabled = false;
             deleteUserButton.IsEnabled = false;
             userDG.IsEnabled = true;
@@ -654,11 +672,27 @@ namespace WpfApp1
                             {
                                 cmd.CommandText += ", photo = @File";
                                 byte[] imageBytes = File.ReadAllBytes(filePath);
+                            compressionLabel2:
                                 bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
                                 if (imageSizeIsInvalid)
                                 {
-                                    MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                                    return;
+                                    if (imageSizeIsInvalid)
+                                    {
+                                        MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                        if (res == MessageBoxResult.Yes)
+                                        {
+                                            var win = new ImageCompressionWindow();
+                                            win.ShowDialog();
+                                            if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
+                                            {
+                                                ImageHolder.isCanceled = false;
+                                                return;
+                                            }
+                                            imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
+                                            goto compressionLabel2;
+                                        }
+                                        return;
+                                    }
                                 }
                                 cmd.Parameters.AddWithValue("@File", imageBytes);
                             }
@@ -694,12 +728,16 @@ namespace WpfApp1
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
-            dialog.FileName = "UserImage"; // имя файла по умолчанию 
-            dialog.Filter = "Images (.jpg)|*.jpg";
+            dialog.FileName = "UserImage";
+            dialog.Filter = "JPG-images (.jpg)|*.jpg| PNG-images (.png)|*.png";
 
             if (dialog.ShowDialog() == true)
             {
+                ImageHolder.BackToDefaultValues();
+
                 filePath = dialog.FileName;
+                ImageHolder.sourcePath = filePath;
+                ImageHolder.sourceImage = new BitmapImage(new Uri(filePath));
                 userImage.Source = new BitmapImage(new Uri(filePath));
             }
         }
@@ -743,7 +781,6 @@ namespace WpfApp1
                     button.FontSize = fontSize;
             }
 
-            // Обновляем размер шрифта в DataGrid
             if (userDG != null)
                 userDG.FontSize = fontSize;
         }
