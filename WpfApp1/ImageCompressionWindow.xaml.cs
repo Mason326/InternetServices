@@ -162,9 +162,9 @@ namespace WpfApp1
                 bool compressionLevel = compressionDegreeDict.TryGetValue(compressionDegreeComboBox.SelectedItem.ToString(), out getValue);
                 MemoryStream compressedImageStream = CompressImage(ImageHolder.sourcePath, Convert.ToInt64(getValue));
                 BitmapImage compressedImage = ConvertToBitmapImage(compressedImageStream);
-                long bitmapSize = GetActualBitmapImageSize(compressedImage);
+                byte[] bitmapBytes = ImageHolder.GetBitmapImageBytes(compressedImage);
                 destImage.Source = compressedImage;
-                FormatSize(destinationSizeLabel, Convert.ToDouble(bitmapSize));
+                FormatSize(destinationSizeLabel, Convert.ToDouble(bitmapBytes.Length));
                 MessageBox.Show("Изображение успешно сжато", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception exc)
@@ -175,6 +175,7 @@ namespace WpfApp1
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            ImageHolder.isCanceled = true;
             this.Close();
         }
 

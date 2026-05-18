@@ -14,12 +14,14 @@ namespace WpfApp1.Utils
         public static string sourcePath = $"{currentDirectory}\\Resources\\8782201770.jpg";
         public static BitmapImage sourceImage = new BitmapImage(new Uri(sourcePath));
         public static BitmapImage destinationImage = new BitmapImage(new Uri($"{currentDirectory}\\Resources\\8782201770.jpg"));
+        public static bool isCanceled = false;
 
         public static void BackToDefaultValues()
         {
             sourcePath = $"{currentDirectory}\\Resources\\8782201770.jpg";
             sourceImage = new BitmapImage(new Uri(sourcePath));
             destinationImage = new BitmapImage(new Uri($"{currentDirectory}\\Resources\\8782201770.jpg"));
+            isCanceled = false;
         }
 
         public static byte[] GetBitmapImageBytes(BitmapImage bitmapImage)
@@ -54,11 +56,5 @@ namespace WpfApp1.Utils
                     return new byte[0];
             }
         }
-
-        //public static bool isDefault(BitmapImage image)
-        //{
-        //    if(image.UriSource != null )
-        //    return false;
-        //}
     }
 }

@@ -376,6 +376,11 @@ namespace WpfApp1
                                     {
                                         var win = new ImageCompressionWindow();
                                         win.ShowDialog();
+                                        if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
+                                        {
+                                            ImageHolder.isCanceled = false;
+                                            return;
+                                        }
                                         imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
                                         goto compressionLabel;
                                     }
@@ -397,6 +402,7 @@ namespace WpfApp1
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Пользователь создан", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                         ClearInputData();
+                        userImage.Source = ImageUtils.LoadImage(null);
                     }
 
                 }
@@ -677,6 +683,11 @@ namespace WpfApp1
                                         {
                                             var win = new ImageCompressionWindow();
                                             win.ShowDialog();
+                                            if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
+                                            {
+                                                ImageHolder.isCanceled = false;
+                                                return;
+                                            }
                                             imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
                                             goto compressionLabel2;
                                         }
@@ -716,13 +727,14 @@ namespace WpfApp1
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            ImageHolder.BackToDefaultValues();
             var dialog = new OpenFileDialog();
             dialog.FileName = "UserImage";
             dialog.Filter = "JPG-images (.jpg)|*.jpg| PNG-images (.png)|*.png";
 
             if (dialog.ShowDialog() == true)
             {
+                ImageHolder.BackToDefaultValues();
+
                 filePath = dialog.FileName;
                 ImageHolder.sourcePath = filePath;
                 ImageHolder.sourceImage = new BitmapImage(new Uri(filePath));
