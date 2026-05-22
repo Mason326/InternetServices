@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -36,6 +37,15 @@ namespace WpfApp1
         int userId = -1;
         string filePath;
         Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
+
+        [DllImport("user32.dll")]
+        static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, uint flags);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetKeyboardLayout(uint idThread);
+
+        private static readonly IntPtr RussianLayout = new IntPtr(0x04190419);
+        private static readonly IntPtr EnglishLayout = new IntPtr(0x04090409);
         public CreateUser()
         {
             InitializeComponent();
@@ -283,13 +293,29 @@ namespace WpfApp1
             try
             {
                 if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                {
                     e.Handled = false;
+                }
                 else
                     e.Handled = true;
             }
             catch
             {
                 ;
+            }
+        }
+
+        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                if (fioTextBox.Text.Length > 0)
+                {
+                    if (fioTextBox.Text.Count(c => c == ' ') > 1)
+                        e.Handled = true;
+                    else
+                        e.Handled = false;
+                }
             }
         }
 
@@ -783,6 +809,11 @@ namespace WpfApp1
 
             if (userDG != null)
                 userDG.FontSize = fontSize;
+        }
+
+        private void fioTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ActivateKeyboardLayout(RussianLayout, 0);
         }
     }
 }
