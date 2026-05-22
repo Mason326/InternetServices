@@ -75,6 +75,7 @@ namespace WpfApp1
             timerRef.Stop();
             timerRef.Tick -= Timer_Tick;
             inactivityTimer.Stop();
+            Auth.locker = true;
             this.Close();
         }
 

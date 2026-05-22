@@ -77,6 +77,7 @@ namespace WpfApp1
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             inactivityTimer.Stop();
+            Auth.locker = true;
             this.Close();
         }
 
