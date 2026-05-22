@@ -9,7 +9,7 @@
     <Viewbox Stretch="Fill">
         
     <Grid>
-        <TextBox TabIndex="1" x:Name="serviceTextBox" HorizontalAlignment="Left" Height="84" Margin="610,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="281" PreviewTextInput="TextBox_PreviewTextInput" FontSize="14"/>
+            <TextBox TabIndex="1" x:Name="serviceTextBox" HorizontalAlignment="Left" Height="84" Margin="610,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="281" PreviewTextInput="TextBox_PreviewTextInput" FontSize="14" MaxLength="200"/>
         <Label Content="Услуга" HorizontalAlignment="Left" Margin="610,24,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.893,-0.273" FontSize="14"/>
         <Label Content="Единицы измерения" HorizontalAlignment="Left" Margin="610,132,0,0" VerticalAlignment="Top" FontSize="14"/>
         <DataGrid FontSize="16" IsReadOnly="True" SelectionMode="Single" x:Name="servicesDG" HorizontalAlignment="Left" Height="403" Margin="10,27,0,0" VerticalAlignment="Top" Width="556" AutoGenerateColumns="False" SelectionChanged="servicesDG_SelectionChanged">

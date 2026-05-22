@@ -70,7 +70,16 @@ namespace WpfApp1
             { 
                 Regex regex = new Regex(@"[0-9,\b]");
                 if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
+                { 
                     e.Handled = false;
+                    int commaIndex = monthFee.Text.IndexOf(',');
+                    if (commaIndex != -1)
+                    {
+                        int costLength = monthFee.Text.Length;
+                        monthFee.Text = monthFee.Text.Substring(0, commaIndex + 2);
+                        monthFee.CaretIndex = monthFee.Text.Length;
+                    }
+                }
                 else
                     e.Handled = true;
             }
