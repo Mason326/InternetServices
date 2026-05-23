@@ -23,13 +23,13 @@ namespace WpfApp1
     {
         string currStatus;
         int claimId;
-        Action Refresh;
+        Action<bool> Refresh;
         Action<object[]> ReReleaseClaim;
         object[] fieldValuesOfARecord;
         bool isAccounting = true;
         bool isExpired;
         bool isEdit;
-        public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action RefreshDG)
+        public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action<bool> RefreshDG)
         {
             InitializeComponent();
             ClaimGroupBox.Header += $" {selectedItems[0]} от {((DateTime)selectedItems[1]).ToString("dd.MM.yyyy")}";
@@ -56,7 +56,7 @@ namespace WpfApp1
             claimId = Convert.ToInt32(selectedItems[0]);
         }
 
-        public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action RefreshDG, Action<object[]> RereleaseClaim)
+        public ClaimVerbose(object[] selectedItems, bool isEditStatus, Action<bool> RefreshDG, Action<object[]> RereleaseClaim)
         {
             InitializeComponent();
             ClaimGroupBox.Header += $" {selectedItems[0]} от {((DateTime)selectedItems[1]).ToString("dd.MM.yyyy")}";
@@ -236,7 +236,7 @@ namespace WpfApp1
                     cmd.ExecuteNonQuery();
                     transaction.Commit();
                     MessageBox.Show("Статус успешно обновлен", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    Refresh();
+                    Refresh(true);
                     this.Close();
                 }
                 catch (Exception exc)

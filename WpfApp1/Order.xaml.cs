@@ -29,8 +29,8 @@ namespace WpfApp1
         Dictionary<string, DataRowView> servicesDictionary = new Dictionary<string, DataRowView>();
         DataTable dtMaterials = new DataTable();
         Dictionary<string, DataRowView> materialsDictionary = new Dictionary<string, DataRowView>();
-        Action RefreshDG;
-        public Order(int claimIdentifier, Action refreshDG)
+        Action<bool> RefreshDG;
+        public Order(int claimIdentifier, Action<bool> refreshDG)
         {
             InitializeComponent();
             claimId = claimIdentifier;
@@ -399,7 +399,7 @@ namespace WpfApp1
                     cmd.ExecuteNonQuery();
                     transaction.Commit();
                     MessageBox.Show($"Наряд успешно закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    RefreshDG();
+                    RefreshDG(true);
                     MessageBoxResult printRes = MessageBox.Show("Хотите распечатать акт выполненных работ?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
                     if (printRes == MessageBoxResult.Yes)
                         PrintADocument();

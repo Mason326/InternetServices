@@ -149,7 +149,7 @@ namespace WpfApp1
             reportVariantsComboBox.ItemsSource = new string[] { "Рейтинг менеджеров", "Рейтинг мастеров", "Учет заявок" };
         }
 
-        private void RefreshDatagrid()
+        private void RefreshDatagrid(bool initial = true)
         {
             try
             {
