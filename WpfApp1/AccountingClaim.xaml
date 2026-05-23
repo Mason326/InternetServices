@@ -130,7 +130,7 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
-                <DataGridTextColumn Header="Стоимость" Binding="{Binding claim_cost}" Width="0.8*">
+                <DataGridTextColumn Header="Стоимость" Binding="{Binding claim_cost, StringFormat='{}{0:N2} ₽', TargetNullValue='0.00'}" Width="0.8*">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextWrapping" Value="Wrap"></Setter>
