@@ -261,7 +261,7 @@ namespace WpfApp1
                             cmd.ExecuteNonQuery();
                             transaction.Commit();
                             MessageBox.Show($"Заявка успешно создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                            RefreshData();
+                            RefreshData(false);
                             ClearSelected();
                         }
                         catch (Exception exc)
@@ -283,20 +283,30 @@ namespace WpfApp1
             }
         }
 
-        private void RefreshData()
+        private void RefreshData(bool initial = true)
         {
+            string cmdString = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
+                                                        from `connection_claim`
+                                                        inner join `client` on client.idclient = connection_claim.client_id
+                                                        inner join `employees` on employees.idemployees = connection_claim.employees_id
+                                                        inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                        inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterOption} order by id_claim desc;";
+            if (initial)
+            {
+                cmdString = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
+                                                        from `connection_claim`
+                                                        inner join `client` on client.idclient = connection_claim.client_id
+                                                        inner join `employees` on employees.idemployees = connection_claim.employees_id
+                                                        inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
+                                                        inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterOption};";
+            }
             try
             {
                 string cmdUpdateExpired = "";
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-                    MySqlCommand cmd = new MySqlCommand($@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
-                                                        from `connection_claim`
-                                                        inner join `client` on client.idclient = connection_claim.client_id
-                                                        inner join `employees` on employees.idemployees = connection_claim.employees_id
-                                                        inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
-                                                        inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterOption};", conn);
+                    MySqlCommand cmd = new MySqlCommand(cmdString, conn);
                     DataTable dt = new DataTable();
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
