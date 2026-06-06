@@ -372,7 +372,7 @@ namespace WpfApp1
                 Excel.Range writeRange = worksheet.Range[startCell, endCell];
                 object[,] dataArray = new object[rowCount + 1, colCount];
 
-                for (int i = 0; i < rowCount + 1; i++)
+                for (int i = 0; i <= rowCount + 1; i++)
                 {
                     for (int j = 0; j < colCount; j++)
                     {

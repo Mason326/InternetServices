@@ -41,7 +41,7 @@ namespace WpfApp1.Utils
                     if (dr.Read())
                     {
                         byte[] imageBytes = dr.GetValue(0) as byte[];
-                        if (imageBytes.Length > 0)
+                        if (imageBytes != null && imageBytes.Length > 0)
                         {
                             userImage.Source = ImageUtils.LoadImage(imageBytes);
                         }

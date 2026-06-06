@@ -104,6 +104,9 @@ namespace WpfApp1
                     }
                     catch
                     {
+                        contractStatusComboBox.ItemsSource = new string[] { "Не заключен" };
+                        contractStatusComboBox.SelectedItem = "Не заключен";
+                        formAContractButton.IsEnabled = true;
                         return 1;
                     }
                 }

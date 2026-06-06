@@ -429,7 +429,6 @@ namespace WpfApp1
             searchByContractNumAndFio.Text = "";
             reportVariantsComboBox.SelectedItem = null;
 
-            // Сброс пагинации
             _currentPage = 1;
             _pageSize = 3;
         }
@@ -521,13 +520,17 @@ namespace WpfApp1
                 var workbook = application.Workbooks.Add();
                 var worksheet = workbook.Worksheets[1] as Excel.Worksheet;
 
-                int rowCount = claimsDG.Items.Count;
-                int colCount = claimsDG.Columns.Count;
+                int colCount = claimsDG.Columns.Count - 1;
 
                 var data = new List<object[]>();
                 var cols = new List<object>();
                 foreach (var col in claimsDG.Columns)
-                    cols.Add(col.Header);
+                {
+                    if (col.Header.ToString() != "Описание")
+                    {
+                        cols.Add(col.Header);
+                    }
+                }
                 data.Add(cols.ToArray());
                 string filterParams = "";
                 if (masterId != -1 && (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty))
@@ -556,8 +559,10 @@ namespace WpfApp1
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
                         object[] record = new object[dr.FieldCount + 1];
+                        int rowCount = 0;
                         while (dr.Read())
                         {
+                            rowCount++;
                             dr.GetValues(record);
                             record[1] = ((DateTime)record[1]).ToString("dd.MM.yyyy");
                             record[2] = ((DateTime)record[2]).ToString("dd.MM.yyyy");
@@ -566,8 +571,8 @@ namespace WpfApp1
                             record = new object[dr.FieldCount + 1];
                         }
 
-                        Excel.Range startCell = worksheet.Range["A1"];
-                        Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
+                        Excel.Range startCell = worksheet.Range["A2"];
+                        Excel.Range endCell = worksheet.Cells[rowCount + 2, colCount];
 
                         Excel.Range writeRange = worksheet.Range[startCell, endCell];
                         object[,] dataArray = new object[rowCount + 1, colCount];
@@ -583,7 +588,7 @@ namespace WpfApp1
                         writeRange.Value2 = dataArray;
                         writeRange.Columns.AutoFit();
 
-                        for (int i = 2; i <= rowCount + 1; i++)
+                        for (int i = 2; i <= rowCount + 2; i++)
                         {
                             Excel.Range cell = writeRange.Cells[colCount][i];
                             cell.Font.Bold = true;
@@ -594,7 +599,7 @@ namespace WpfApp1
                                 cell.Interior.Color = Excel.XlRgbColor.rgbForestGreen;
                             else if (cell.Text == "В работе")
                                 cell.Interior.Color = Excel.XlRgbColor.rgbCoral;
-                            else
+                            else if(cell.Text == "Отменена")
                                 cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;
                         }
 
@@ -827,8 +832,26 @@ namespace WpfApp1
 
         private void diagram_Click(object sender, RoutedEventArgs e)
         {
+
+            if (fromDate.SelectedDate.HasValue && toDate.SelectedDate.HasValue)
+            {
+                additionalDateFilterParams = $"connection_creationDate between '{fromDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}' and '{toDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}'";
+            }
+            else if (fromDate.SelectedDate.HasValue && !toDate.SelectedDate.HasValue)
+            {
+                additionalDateFilterParams = $"connection_creationDate between '{fromDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}' and '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}'";
+            }
+            else if (!fromDate.SelectedDate.HasValue && toDate.SelectedDate.HasValue)
+            {
+                additionalDateFilterParams = $"connection_creationDate between '{DateTime.MinValue.ToString("yyyy-MM-dd HH:mm:ss")}' and '{toDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}'";
+            }
+            else
+            {
+                additionalDateFilterParams = "1 > 0";
+            }
+
             this.Hide();
-            var win = new Diagram();
+            var win = new Diagram(additionalDateFilterParams);
             win.ShowDialog();
             this.ShowDialog();
         }

@@ -21,15 +21,22 @@ xmlns:dvc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembl
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <WindowsFormsHost Grid.Row="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <WindowsFormsHost Grid.Row="0" Grid.Column="0">
             <dvc:Chart x:Name="chart" />
         </WindowsFormsHost>
-        <Grid Grid.Row="1" Margin="0, 5">
+        <WindowsFormsHost Grid.Row="0" Grid.Column="1">
+            <dvc:Chart x:Name="chart2" />
+        </WindowsFormsHost>
+        <Grid Grid.Row="1" Margin="0, 5" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <Button Style="{StaticResource MenuButton}" Content="К заявкам" Grid.Column="1" Click="Button_Click" />
+            <Button Style="{StaticResource MenuButton}"  Grid.Column="1" Content="К заявкам" Click="Button_Click" />
         </Grid>
     </Grid>
 </Window>
