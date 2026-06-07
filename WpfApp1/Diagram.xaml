@@ -2,7 +2,7 @@
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
 xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
-xmlns:dvc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization" Loaded="Window_Loaded" Width="688.8" Height="408" WindowStyle="ThreeDBorderWindow" Icon="internet_102151.ico">
+xmlns:dvc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization" Loaded="Window_Loaded" Width="1000.6" Height="493.6" WindowStyle="ThreeDBorderWindow" Icon="internet_102151.ico">
     <Window.Resources>
         <Style x:Key="MenuButton" TargetType="Button">
             <Setter Property="Background" Value="#FF4F6DD3" />
@@ -24,6 +24,7 @@ xmlns:dvc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembl
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <WindowsFormsHost Grid.Row="0" Grid.Column="0">
             <dvc:Chart x:Name="chart" />
@@ -31,10 +32,13 @@ xmlns:dvc="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembl
         <WindowsFormsHost Grid.Row="0" Grid.Column="1">
             <dvc:Chart x:Name="chart2" />
         </WindowsFormsHost>
-        <Grid Grid.Row="1" Margin="0, 5" Grid.Column="1">
+        <WindowsFormsHost Grid.Row="0" Grid.Column="2">
+            <dvc:Chart x:Name="chart3" />
+        </WindowsFormsHost>
+        <Grid Grid.Row="1" Margin="0, 5" Grid.Column="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Button Style="{StaticResource MenuButton}"  Grid.Column="1" Content="К заявкам" Click="Button_Click" />
         </Grid>
