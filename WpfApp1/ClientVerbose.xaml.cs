@@ -124,8 +124,8 @@ namespace WpfApp1
                             dateOfBirthLabel.Content = dr.GetDateTime("birthdate").ToString("dd.MM.yyyy");
                             abonentLoginLabel.Content = dr.GetString("subscriber_login");
                             abonentPasswordLabel.Content = dr.GetString("subscriber_password");
-                            passportSeriesLabel.Content = dr.GetString("passport_series");
-                            passportNumberLabel.Content = dr.GetString("passport_number");
+                            passportSeriesLabel.Content = dr["passport_series"];
+                            passportNumberLabel.Content = dr["passport_number"];
                             issuedByLabel.Text = dr.GetString("issued_by");
                             issueDateLabel.Content = dr.GetDateTime("issue_date").ToString("dd.MM.yyyy");
                             departmentCodeLabel.Content = dr.GetString("department_code");

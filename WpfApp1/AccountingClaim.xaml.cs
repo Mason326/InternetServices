@@ -832,7 +832,6 @@ namespace WpfApp1
 
         private void diagram_Click(object sender, RoutedEventArgs e)
         {
-
             if (fromDate.SelectedDate.HasValue && toDate.SelectedDate.HasValue)
             {
                 additionalDateFilterParams = $"connection_creationDate between '{fromDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}' and '{toDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}'";

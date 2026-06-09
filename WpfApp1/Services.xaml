@@ -25,7 +25,7 @@
                 <DataGridTextColumn Header="Цена" Binding="{Binding service_cost}" Width="130" />
             </DataGrid.Columns>
         </DataGrid>
-        <TextBox TabIndex="2"  x:Name="unitsTextBox" HorizontalAlignment="Left" Height="30" Margin="610,158,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="281" PreviewTextInput="TextBox_PreviewTextInput_1" FontSize="14"/>
+        <TextBox TabIndex="2"  x:Name="unitsTextBox" HorizontalAlignment="Left" Height="30" Margin="610,158,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="281" PreviewTextInput="TextBox_PreviewTextInput_1" FontSize="14" MaxLength="64"/>
         <Label Content="Цена" HorizontalAlignment="Left" Margin="610,185,0,0" VerticalAlignment="Top" FontSize="14"/>
         <TextBox CommandManager.PreviewExecuted="TextBox_PreviewExecuted" TabIndex="3" x:Name="costTextBox" HorizontalAlignment="Left" Height="30" Margin="610,210,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="281" PreviewTextInput="cost_PreviewTextInput" PreviewKeyDown="cost_PreviewKeyDown" MaxLength="6" FontSize="14"/>
         <Label Foreground="Red" Content="*" HorizontalAlignment="Left" Margin="651,22,0,0" VerticalAlignment="Top" FontSize="20" FontWeight="Bold"/>

@@ -357,20 +357,67 @@ namespace WpfApp1
                         cols.Add(col.Header);
                 }
                 data.Add(cols.ToArray());
-                foreach (DataRowView row in contractsDG.Items)
-                {
-                    object[] values = row.Row.ItemArray;
+                //foreach (DataRowView row in contractsDG.Items)
+                //{
+                //    object[] values = row.Row.ItemArray;
 
-                    values[1] = ((DateTime)values[1]).ToString("dd.MM.yyyy");
-                    values[6] = ((DateTime)values[6]).ToString("dd.MM.yyyy");
-                    object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[5], values[7], values[6], values[1], values[4] };
-                    data.Add(valuesRightOrder);
+
+                //    values[1] = ((DateTime)values[1]).ToString("dd.MM.yyyy");
+                //    values[6] = ((DateTime)values[6]).ToString("dd.MM.yyyy");
+                //    object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[5], values[7], values[6], values[1], values[4] };
+                //    data.Add(valuesRightOrder);
+                //}
+                try
+                {
+                    using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
+                    {
+                        conn.Open();
+
+                        string filterParams = "";
+                        if (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty)
+                        {
+                            string betweenExpressions1 = additionalDateFilterParams != string.Empty && additionalFilterParams != string.Empty ? " And " : "";
+                            string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
+                            filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
+                        }
+                        MySqlCommand cmd = new MySqlCommand($@"SELECT idcontract, contract_date, (Select full_name from `client`
+                                                        where idclient = connection_claim.client_id) as 'client',
+                                                        connection_claim_id, `contract_status`.`status` as 'status',
+                                                        (Select `tariff_name` FROM `tariff` Where idtariff = `connection_claim`.tariff_id) as 'tariff',
+                                                        `connection_claim`.connection_creationDate as 'claimDate',
+                                                        `connection_claim`.connection_address as 'connection_address'
+                                                        FROM contract
+                                                        inner join `connection_claim` on contract.connection_claim_id = connection_claim.id_claim
+                                                        inner join contract_status on contract_status.idcontract_status = contract.contract_status_id {filterParams}{additionalSortParams};", conn);
+                        cmd.ExecuteNonQuery();
+                        using (MySqlDataReader dr = cmd.ExecuteReader())
+                        {
+                            while (dr.Read())
+                            {
+                                data.Add(new object[] {
+                                    dr["idcontract"],
+                                    dr["connection_claim_id"],
+                                    dr["client"],
+                                    dr["tariff"],
+                                    dr["connection_address"],
+                                    DateTime.Parse(dr["claimDate"].ToString()).ToString("dd.MM.yyyy"),
+                                    DateTime.Parse(dr["contract_date"].ToString()).ToString("dd.MM.yyyy"),
+                                    dr["status"]
+                                });
+                            }
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show($"Не удалось загрузить данные для отчета\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
                 Excel.Range startCell = worksheet.Range["A1"];
-                Excel.Range endCell = worksheet.Cells[rowCount + 1, colCount];
+                Excel.Range endCell = worksheet.Cells[rowCount + 2, colCount];
 
                 Excel.Range writeRange = worksheet.Range[startCell, endCell];
-                object[,] dataArray = new object[rowCount + 1, colCount];
+                object[,] dataArray = new object[rowCount + 2, colCount];
 
                 for (int i = 0; i <= rowCount + 1; i++)
                 {
@@ -383,7 +430,7 @@ namespace WpfApp1
                 writeRange.Value2 = dataArray;
                 writeRange.Columns.AutoFit();
 
-                for (int i = 2; i <= rowCount + 1; i++)
+                for (int i = 2; i <= rowCount + 2; i++)
                 {
                     Excel.Range cell = writeRange.Cells[colCount][i];
                     cell.Font.Bold = true;
