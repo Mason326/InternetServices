@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -38,6 +39,15 @@ namespace WpfApp1
         private int _currentPage = 1;
         private int _pageSize = 2;
         private DispatcherTimer inactivityTimer;
+
+        [DllImport("user32.dll")]
+        static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, uint flags);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetKeyboardLayout(uint idThread);
+
+        private static readonly IntPtr RussianLayout = new IntPtr(0x04190419);
+        private static readonly IntPtr EnglishLayout = new IntPtr(0x04090409);
         public CreateClient(bool isSelectClient)
         {
             InitializeComponent();
@@ -266,6 +276,20 @@ namespace WpfApp1
             catch
             {
                 ;
+            }
+        }
+
+        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                if (fioTextBox.Text.Length > 0)
+                {
+                    if (fioTextBox.Text.Count(c => c == ' ') > 1)
+                        e.Handled = true;
+                    else
+                        e.Handled = false;
+                }
             }
         }
 
@@ -1112,5 +1136,9 @@ namespace WpfApp1
                 clientsDG.FontSize = fontSize;
         }
 
+        private void fioTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ActivateKeyboardLayout(RussianLayout, 0);
+        }
     }
 }

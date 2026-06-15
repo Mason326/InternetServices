@@ -99,19 +99,21 @@ namespace WpfApp1
                     return;
                 }
                 
-                if (userLogin == "" || userPassword == "" || (authAttempsCounter > 1 && captchaInput == ""))
+                if (userLogin == "" || userPassword == "" || (authAttempsCounter >= 1 && captchaInput == ""))
                 {
                     MessageBox.Show($"Необходимо заполнить поля помеченные \"*\"", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 else
                 {
-                    if (captchaInput != captchaCompare && authAttempsCounter > 1) 
+                    if (captchaInput != captchaCompare && authAttempsCounter >= 1)
                     {
                         MessageBox.Show($"Капча заполнена неверно. Возможность авторизации заблокируется на 10 секунд", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                         authAttempsCounter++;
-                        if (authAttempsCounter > 2)
+                        if (authAttempsCounter >= 2)
                             FrezeForm();
+                        LoginTextbox.Clear();
+                        PasswordTextBox.Clear();
                         captchaTextbox.Clear();
                         ShowCaptcha(authAttempsCounter);
                         return;
@@ -180,9 +182,17 @@ namespace WpfApp1
                             }
                             else
                             {
-                                MessageBox.Show("Неверные данные пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                                ShowCaptcha(authAttempsCounter);
                                 authAttempsCounter++;
+                                if (authAttempsCounter >= 2)
+                                {
+                                    MessageBox.Show("Неверные данные пользователя. Возможность авторизации заблокируется на 10 секунд", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    FrezeForm();
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Неверные данные пользователя", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                                ShowCaptcha(authAttempsCounter);
                             }
                         }
                     }

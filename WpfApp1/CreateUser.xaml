@@ -61,7 +61,7 @@
                     </StackPanel>
                     <TextBox x:Name="fioTextBox" Width="Auto" 
                              PreviewKeyUp="fioTextBox_PreviewKeyUp" 
-                             PreviewTextInput="fioTextBox_PreviewTextInput" Height="27" Margin="0,0,-0.4,0" GotFocus="fioTextBox_GotFocus" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+                             PreviewTextInput="fioTextBox_PreviewTextInput" Height="27" Margin="0,0,-0.4,0" GotFocus="fioTextBox_GotFocus" PreviewKeyDown="TextBox_PreviewKeyDown" MaxLength="150"/>
                 </StackPanel>
 
                 <Grid Margin="0,15,0,0">
