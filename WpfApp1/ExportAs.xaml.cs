@@ -16,7 +16,7 @@ using WpfApp1.Utils;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for ExportAs.xaml
+    /// Форма "Экспорт"
     /// </summary>
     public partial class ExportAs : Window
     {
@@ -27,12 +27,14 @@ namespace WpfApp1
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            // Выбор экспорта в MS Word
             ExportHolder.exportOptions = ExportHolder.ExportOptions.ExportWord;
             this.Close();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            // Выбор экспорта в PDF
             ExportHolder.exportOptions = ExportHolder.ExportOptions.ExportPdf;
             this.Close();
         }

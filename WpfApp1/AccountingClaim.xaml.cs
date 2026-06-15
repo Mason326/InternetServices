@@ -20,35 +20,54 @@ using System.Windows.Threading;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for Window17.xaml
+    /// Форма "Учет услуг" - главная форма для работы с заявками на подключение
     /// </summary>
     public partial class AccountingClaim : Window
     {
+        // Дополнительные условия для SQL-запроса (фильтрация по статусу)
         private string additionalFilterParams = "";
+        // Дополнительные условия для фильтрации по дате
         private string additionalDateFilterParams = "";
+        // Дополнительные условия для сортировки
         private string additionalSortParams = "";
+        // Дополнительные условия для поиска (по номеру заявки или ФИО клиента)
         private string additionalSearchParams = "";
+        // ID текущего мастера (используется при роли "Мастер" для ограничения доступа)
         private int masterId = -1;
+        // Таймер для автоматического обновления DataGrid
         DispatcherTimer timerRef;
+        // Хранилище всех строк данных (для пагинации)
         private List<DataRow> _allRows = new List<DataRow>();
+        // Текущая страница пагинации
         private int _currentPage = 1;
+        // Количество записей на одной странице
         private int _pageSize = 3;
+
+        /// <summary>
+        /// Конструктор формы - инициализация компонентов и запуск таймера автообновления
+        /// </summary>
         public AccountingClaim()
         {
             InitializeComponent();
             DispatcherTimer timer = new DispatcherTimer();
+            // Интервал обновления - каждые 5 минут (300 секунд)
             timer.Interval = TimeSpan.FromSeconds(300);
             timer.Tick += Timer_Tick;
             timer.Start();
-
             timerRef = timer;
         }
 
+        /// <summary>
+        /// Обработчик тика таймера - вызывает обновление таблицы заявок
+        /// </summary>
         private void Timer_Tick(object sender, EventArgs e)
         {
             RefreshDatagrid();
         }
 
+        /// <summary>
+        /// Кнопка "На главную" - закрытие формы с остановкой таймера
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             timerRef.Stop();
@@ -56,6 +75,9 @@ namespace WpfApp1
             this.Close();
         }
 
+        /// <summary>
+        /// Кнопка "Просмотр заявки" - открывает детальную информацию о выбранной заявке
+        /// </summary>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if (claimsDG.SelectedItem != null)
@@ -69,6 +91,10 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "Заказ-наряд" - формирование заказ-наряда для выбранной заявки
+        /// Проверяет статус заявки перед формированием
+        /// </summary>
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             if (claimsDG.SelectedItem != null)
@@ -78,7 +104,9 @@ namespace WpfApp1
                 string currStatus = claimDescription[7].ToString();
                 bool isExpired = Convert.ToBoolean(claimDescription[11]);
                 string message = "";
-                switch(currStatus)
+
+                // Проверка статуса заявки для определения возможности создания заказ-наряда
+                switch (currStatus)
                 {
                     case "Входящая":
                         if (isExpired)
@@ -102,13 +130,18 @@ namespace WpfApp1
                 }
                 else
                     MessageBox.Show(message, "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }    
+            }
         }
 
+        /// <summary>
+        /// Событие загрузки формы - настройка UI в зависимости от роли пользователя,
+        /// установка ограничений на даты, загрузка данных
+        /// </summary>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
+                // Отображение роли и сокращенного ФИО в заголовке
                 this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
             }
             catch
@@ -116,9 +149,11 @@ namespace WpfApp1
                 ;
             }
 
+            // Настройка видимости элементов управления в зависимости от роли пользователя
             switch (AccountHolder.UserRole)
             {
                 case "Менеджер":
+                    // Менеджер не видит отчеты, диаграммы и заказ-наряды
                     printAReport.Visibility = Visibility.Collapsed;
                     orderButton.Visibility = Visibility.Collapsed;
                     diagram.Visibility = Visibility.Collapsed;
@@ -126,6 +161,7 @@ namespace WpfApp1
                     reportVariantsComboBox.Visibility = Visibility.Collapsed;
                     break;
                 case "Мастер":
+                    // Мастер видит только свои заявки
                     printAReport.Visibility = Visibility.Collapsed;
                     incomesLabel.Visibility = Visibility.Collapsed;
                     diagram.Visibility = Visibility.Collapsed;
@@ -133,6 +169,7 @@ namespace WpfApp1
                     masterId = AccountHolder.userId;
                     break;
                 case "Директор":
+                    // Директор имеет полный доступ
                     printAReport.Visibility = Visibility.Visible;
                     reportVariantsComboBox.Visibility = Visibility.Visible;
                     orderButton.Visibility = Visibility.Collapsed;
@@ -140,21 +177,33 @@ namespace WpfApp1
                     incomesLabel.Visibility = Visibility.Visible;
                     break;
             }
+
             RefreshDatagrid();
+
+            // Настройка ограничений для кнопок и дат
             printAReport.IsEnabled = false;
             allStatuses.IsChecked = true;
-            fromDate.DisplayDateStart = DateTime.Today.AddYears(-10);
-            fromDate.DisplayDateEnd = DateTime.Today.AddDays(-1);
-            toDate.DisplayDateEnd = DateTime.Today;
+            fromDate.DisplayDateStart = DateTime.Today.AddYears(-10);  // От -10 лет от сегодня
+            fromDate.DisplayDateEnd = DateTime.Today.AddDays(-1);      // До вчерашнего дня
+            toDate.DisplayDateEnd = DateTime.Today;                    // До сегодня
+
+            // Варианты отчетов для печати
             reportVariantsComboBox.ItemsSource = new string[] { "Рейтинг менеджеров", "Рейтинг мастеров", "Учет заявок" };
         }
 
+        /// <summary>
+        /// Обновление DataGrid - основной метод загрузки данных из БД
+        /// Формирует SQL-запрос с учетом всех фильтров, роли пользователя
+        /// </summary>
+        /// <param name="initial">Флаг первичной загрузки (не используется в текущей реализации)</param>
         private void RefreshDatagrid(bool initial = true)
         {
             try
             {
                 string cmdUpdateExpired = "";
                 string filterParams = "";
+
+                // Формирование WHERE-условия для SQL-запроса в зависимости от роли и активных фильтров
                 if (masterId != -1 && (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty))
                 {
                     string betweenExpressions1 = additionalDateFilterParams != string.Empty && additionalFilterParams != string.Empty ? " And " : "";
@@ -171,6 +220,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
+                    // Основной SQL-запрос для получения всех заявок со связанными данными
                     string cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost, concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
                                                 from `connection_claim`
                                                 inner join `client` on client.idclient = connection_claim.client_id
@@ -179,6 +229,7 @@ namespace WpfApp1
                                                 left join `order` on `order`.idorder = connection_claim.order_id
                                                 inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterParams}{additionalSortParams};";
 
+                    // Для мастера - дополнительный фильтр по master_id
                     if (masterId != -1)
                         cmdText = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', `order`.totalCost as claim_cost, concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
                                                 from `connection_claim`
@@ -190,23 +241,29 @@ namespace WpfApp1
 
                     MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     DataTable dt = new DataTable();
+
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
+                        // Создание структуры DataTable на основе метаданных результата запроса
                         DataColumn[] columns = new DataColumn[dr.FieldCount];
                         for (int i = 0; i < columns.Length; i++)
                         {
                             columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
                         }
-
                         dt.Columns.AddRange(columns);
+                        // Добавление колонки для отметки просроченных заявок
                         dt.Columns.Add("isExpired", Type.GetType("System.Boolean"));
+
                         object[] record = new object[dr.FieldCount + 1];
                         while (dr.Read())
                         {
                             dr.GetValues(record);
                             DateTime executionDate = (DateTime)record[2];
+
+                            // Логика определения просроченной заявки
                             if (executionDate < DateTime.Now && record[7].ToString() == "Входящая")
                                 record[record.Length - 1] = true;
+                            // Автоматическая отмена заявок со статусом "В работе", у которых истек срок выполнения
                             else if (executionDate < DateTime.Today.AddDays(1) && record[7].ToString() == "В работе")
                             {
                                 record[7] = "Отменена";
@@ -218,12 +275,14 @@ namespace WpfApp1
                         }
                     }
 
+                    // Выполнение автоматических обновлений статусов просроченных заявок
                     if (cmdUpdateExpired != string.Empty)
                     {
                         MySqlCommand cmd2 = new MySqlCommand(cmdUpdateExpired, conn);
                         cmd2.ExecuteNonQuery();
                     }
 
+                    // Сохранение всех строк для пагинации
                     _allRows.Clear();
                     foreach (DataRow row in dt.Rows)
                     {
@@ -232,13 +291,13 @@ namespace WpfApp1
 
                     ShowRecordsCount(cmdText);
 
+                    // Для директора отображается общая сумма доходов
                     if (AccountHolder.UserRole == "Директор")
                         ShowTotalSum(cmdText);
                     else
                         totalSumDock.Visibility = Visibility.Collapsed;
 
                     UpdatePagination();
-
                 }
             }
             catch (Exception exc)
@@ -247,11 +306,15 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обновление элементов управления пагинации (кнопки "Вперед/Назад", номер страницы)
+        /// </summary>
         private void UpdatePagination()
         {
             int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
             lblTotalPages.Text = totalPages.ToString();
 
+            // Корректировка текущей страницы, если она выходит за границы
             if (_currentPage > totalPages && totalPages > 0)
                 _currentPage = totalPages;
             if (_currentPage < 1)
@@ -265,6 +328,9 @@ namespace WpfApp1
             DisplayCurrentPage();
         }
 
+        /// <summary>
+        /// Отображение данных текущей страницы в DataGrid
+        /// </summary>
         private void DisplayCurrentPage()
         {
             if (_allRows.Count == 0)
@@ -280,11 +346,13 @@ namespace WpfApp1
 
             if (_allRows.Count > 0)
             {
+                // Копирование структуры таблицы
                 foreach (DataColumn col in _allRows[0].Table.Columns)
                 {
                     pageTable.Columns.Add(col.ColumnName, col.DataType);
                 }
 
+                // Добавление строк только для текущей страницы
                 for (int i = startIndex; i < endIndex; i++)
                 {
                     pageTable.ImportRow(_allRows[i]);
@@ -294,6 +362,9 @@ namespace WpfApp1
             claimsDG.ItemsSource = pageTable.AsDataView();
         }
 
+        /// <summary>
+        /// Обработчик кнопки "Предыдущая страница"
+        /// </summary>
         private void PrevPage_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage > 1)
@@ -303,6 +374,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обработчик кнопки "Следующая страница"
+        /// </summary>
         private void NextPage_Click(object sender, RoutedEventArgs e)
         {
             int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
@@ -313,6 +387,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обработчик ручного ввода номера страницы
+        /// </summary>
         private void txtPageNum_LostFocus(object sender, RoutedEventArgs e)
         {
             int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
@@ -334,13 +411,18 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Валидация ввода - только цифры для поля номера страницы
+        /// </summary>
         private void OnlyNumbers_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]");
             e.Handled = regex.IsMatch(e.Text);
         }
 
-
+        /// <summary>
+        /// Фильтрация заявок по статусу (RadioButton)
+        /// </summary>
         private void FilterByStatus_Checked(object sender, RoutedEventArgs e)
         {
             RadioButton rb = (RadioButton)sender;
@@ -365,6 +447,10 @@ namespace WpfApp1
             RefreshDatagrid();
         }
 
+        /// <summary>
+        /// Поиск по номеру заявки или ФИО клиента
+        /// Активируется при длине поискового запроса более 3 символов или при вводе цифр
+        /// </summary>
         private void searchByContractNumAndFio_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchPrompt = searchByContractNumAndFio.Text;
@@ -379,6 +465,9 @@ namespace WpfApp1
             RefreshDatagrid();
         }
 
+        /// <summary>
+        /// Фильтрация по диапазону дат создания заявки
+        /// </summary>
         private void dates_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             if (fromDate.SelectedDate.HasValue && toDate.SelectedDate.HasValue)
@@ -398,11 +487,15 @@ namespace WpfApp1
                 additionalDateFilterParams = "";
             }
 
+            // Ограничение выбора дат (начало не может быть позже конца и наоборот)
             fromDate.DisplayDateEnd = toDate.SelectedDate == null || toDate?.SelectedDate.Value > DateTime.Now ? DateTime.Now : toDate.SelectedDate.Value.AddDays(-1);
             toDate.DisplayDateStart = fromDate.SelectedDate == null ? fromDate.DisplayDateStart : fromDate.SelectedDate.Value.AddDays(1);
             RefreshDatagrid();
         }
 
+        /// <summary>
+        /// Валидация ввода дат - разрешаем только управляющие символы (Backspace, пробел)
+        /// </summary>
         private void Dates_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[\b\s]");
@@ -412,6 +505,9 @@ namespace WpfApp1
                 e.Handled = true;
         }
 
+        /// <summary>
+        /// Валидация ввода поискового запроса - разрешены буквы, цифры, дефис, пробел, Backspace
+        /// </summary>
         private void searchByContractNumAndFio_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[0-9A-Za-zА-Яа-я-\b\s]");
@@ -421,6 +517,9 @@ namespace WpfApp1
                 e.Handled = true;
         }
 
+        /// <summary>
+        /// Кнопка сброса всех фильтров
+        /// </summary>
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             fromDate.Text = "";
@@ -433,11 +532,17 @@ namespace WpfApp1
             _pageSize = 3;
         }
 
+        /// <summary>
+        /// При выборе строки в DataGrid активируется кнопка просмотра заявки
+        /// </summary>
         private void claimsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             showClaimButton.IsEnabled = true;
         }
 
+        /// <summary>
+        /// Отображение общего количества записей, соответствующих текущим фильтрам
+        /// </summary>
         private void ShowRecordsCount(string strCmd)
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -449,6 +554,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Отображение общей суммы доходов от заявок (только для директора)
+        /// </summary>
         private void ShowTotalSum(string strCmd)
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -468,7 +576,9 @@ namespace WpfApp1
             }
         }
 
-
+        /// <summary>
+        /// Сокрытие части ФИО (остается фамилия и инициалы) - в текущей версии не используется
+        /// </summary>
         private string HideName(string fullName)
         {
             try
@@ -483,6 +593,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка печати отчета - выбор типа отчета из выпадающего списка
+        /// </summary>
         private void printClaimButton_Click(object sender, RoutedEventArgs e)
         {
             switch (reportVariantsComboBox.SelectedItem.ToString())
@@ -497,16 +610,22 @@ namespace WpfApp1
                     PrintClaims();
                     break;
             }
-
-           
         }
 
+        /// <summary>
+        /// Кнопка выбора сотрудника - открывает окно просмотра сотрудников
+        /// </summary>
         private void chooseAnEmployee_Click(object sender, RoutedEventArgs e)
         {
             var win = new EmployeesViewWindow();
             win.Show();
         }
 
+        /// <summary>
+        /// Печать отчета "Учет заявок" в Excel
+        /// Формирует таблицу со всеми заявками, применяет цветовое выделение статусов,
+        /// добавляет итоговую информацию (количество заявок, общий доход, период)
+        /// </summary>
         private void PrintClaims()
         {
             try
@@ -524,6 +643,7 @@ namespace WpfApp1
 
                 var data = new List<object[]>();
                 var cols = new List<object>();
+                // Сбор заголовков колонок (исключая колонку "Описание")
                 foreach (var col in claimsDG.Columns)
                 {
                     if (col.Header.ToString() != "Описание")
@@ -532,6 +652,8 @@ namespace WpfApp1
                     }
                 }
                 data.Add(cols.ToArray());
+
+                // Формирование условий фильтрации для отчета
                 string filterParams = "";
                 if (masterId != -1 && (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty))
                 {
@@ -545,6 +667,7 @@ namespace WpfApp1
                     string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
                     filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
                 }
+
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
@@ -564,6 +687,7 @@ namespace WpfApp1
                         {
                             rowCount++;
                             dr.GetValues(record);
+                            // Форматирование дат
                             record[1] = ((DateTime)record[1]).ToString("dd.MM.yyyy");
                             record[2] = ((DateTime)record[2]).ToString("dd.MM.yyyy");
                             object[] valuesRightOrder = new object[] { record[0], record[1], record[2], record[3], record[4], record[5], record[6], record[8], record[9], record[7], record[10] };
@@ -577,6 +701,7 @@ namespace WpfApp1
                         Excel.Range writeRange = worksheet.Range[startCell, endCell];
                         object[,] dataArray = new object[rowCount + 1, colCount];
 
+                        // Заполнение массива данных
                         for (int i = 0; i < rowCount + 1; i++)
                         {
                             for (int j = 0; j < colCount; j++)
@@ -588,6 +713,7 @@ namespace WpfApp1
                         writeRange.Value2 = dataArray;
                         writeRange.Columns.AutoFit();
 
+                        // Цветовое выделение статусов заявок
                         for (int i = 2; i <= rowCount + 2; i++)
                         {
                             Excel.Range cell = writeRange.Cells[colCount][i];
@@ -599,10 +725,11 @@ namespace WpfApp1
                                 cell.Interior.Color = Excel.XlRgbColor.rgbForestGreen;
                             else if (cell.Text == "В работе")
                                 cell.Interior.Color = Excel.XlRgbColor.rgbCoral;
-                            else if(cell.Text == "Отменена")
+                            else if (cell.Text == "Отменена")
                                 cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;
                         }
 
+                        // Создание форматированной таблицы Excel
                         Excel.ListObject table = worksheet.ListObjects.Add(
                             Excel.XlListObjectSourceType.xlSrcRange,
                             worksheet.Range[startCell, endCell],
@@ -611,16 +738,19 @@ namespace WpfApp1
                             Type.Missing);
                         table.Name = "Claims";
 
+                        // Добавление информации о количестве заявок
                         Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
                         recordCount.Value = $"Количество заявок: {recordsCountLabel.Content}";
                         recordCount.Font.Bold = true;
                         recordCount.Font.Size = 16;
 
+                        // Добавление информации об общем доходе
                         Excel.Range incomes = worksheet.Cells[1][rowCount + 5];
                         incomes.Value = $"Общий доход от реализации заявок: {totalSumLabel.Content}";
                         incomes.Font.Bold = true;
                         incomes.Font.Size = 16;
 
+                        // Добавление информации о периоде отчета
                         if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
                         {
                             Excel.Range period = worksheet.Cells[1][rowCount + 7];
@@ -652,6 +782,10 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Печать рейтинга сотрудников (менеджеров или мастеров)
+        /// </summary>
+        /// <param name="isManager">true - рейтинг менеджеров, false - рейтинг мастеров</param>
         private void PrintTopEmployees(bool isManager)
         {
             try
@@ -668,17 +802,21 @@ namespace WpfApp1
                 string roleName = "Мастер";
                 if (isManager)
                     roleName = "Менеджер";
+
                 var data = new List<object[]>();
                 var cols = new List<object>() { "ФИО", "Количество заявок" };
                 data.Add(cols.ToArray());
+
                 string filterParams = "";
                 if (additionalDateFilterParams != string.Empty)
                 {
                     filterParams = $" and {additionalDateFilterParams}";
                 }
+
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
+                    // Выбор поля для группировки: employees_id (менеджер) или master_id (мастер)
                     string id = isManager ? "employees_id" : "master_id";
                     string cmdText = $@"SELECT (select full_name from employees where idemployees = {id}) as fio, Count(*) as count
                                     FROM connection_claim where claim_status_id != (Select idclaim_status from claim_status where `status` = 'Отменена')
@@ -692,12 +830,12 @@ namespace WpfApp1
                         {
                             dr.GetValues(record);
                             if (cntr == 0)
-                                bestMaster = record[0].ToString();
+                                bestMaster = record[0].ToString();  // Лучший сотрудник (с максимальным количеством заявок)
                             data.Add(record);
                             record = new object[dr.FieldCount];
                             cntr++;
-
                         }
+
                         int rowCount = data.Count;
                         int colCount = cols.Count;
 
@@ -718,6 +856,7 @@ namespace WpfApp1
                         writeRange.Value2 = dataArray;
                         writeRange.Columns.AutoFit();
 
+                        // Создание таблицы Excel
                         Excel.ListObject table = worksheet.ListObjects.Add(
                             Excel.XlListObjectSourceType.xlSrcRange,
                             worksheet.Range[startCell, endCell],
@@ -726,11 +865,13 @@ namespace WpfApp1
                             Type.Missing);
                         table.Name = "Rating";
 
+                        // Информация о лучшем сотруднике
                         Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
                         recordCount.Value = $"Лучший {roleName}: {bestMaster}";
                         recordCount.Font.Bold = true;
                         recordCount.Font.Size = 16;
 
+                        // Информация о периоде
                         if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
                         {
                             Excel.Range period = worksheet.Cells[1][rowCount + 5];
@@ -762,20 +903,28 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Включение/выключение кнопки печати отчета в зависимости от выбора типа отчета
+        /// </summary>
         private void reportVariantsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(reportVariantsComboBox.SelectedItem != null)
+            if (reportVariantsComboBox.SelectedItem != null)
                 printAReport.IsEnabled = true;
             else
                 printAReport.IsEnabled = false;
         }
 
+        /// <summary>
+        /// Адаптация интерфейса при изменении размера окна
+        /// Изменяется размер шрифта кнопок и количество записей на странице
+        /// </summary>
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             double windowHeight = e.NewSize.Height;
             double baseFontSize = 14;
             int newPageSize = _pageSize;
 
+            // Изменение количества записей на странице в зависимости от высоты окна
             if (windowHeight > 800)
             {
                 newPageSize = 4;
@@ -812,11 +961,13 @@ namespace WpfApp1
                 }
 
                 UpdatePagination();
-
                 DisplayCurrentPage();
             }
         }
 
+        /// <summary>
+        /// Обновление размера шрифта для кнопок и ComboBox
+        /// </summary>
         private void UpdateButtonsFontSize(int fontSize)
         {
             var buttons = new[] { showClaimButton, orderButton, toMainButton, printAReport, clearFiltersButton, btnPrev, btnNext };
@@ -830,8 +981,12 @@ namespace WpfApp1
                 reportVariantsComboBox.FontSize = fontSize;
         }
 
+        /// <summary>
+        /// Открытие окна с диаграммой статистики заявок
+        /// </summary>
         private void diagram_Click(object sender, RoutedEventArgs e)
         {
+            // Формирование фильтра по датам для диаграммы
             if (fromDate.SelectedDate.HasValue && toDate.SelectedDate.HasValue)
             {
                 additionalDateFilterParams = $"connection_creationDate between '{fromDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}' and '{toDate.SelectedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")}'";

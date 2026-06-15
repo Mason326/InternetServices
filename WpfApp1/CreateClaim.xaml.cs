@@ -13,31 +13,52 @@ using System.Windows.Threading;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for Window16.xaml
+    /// Форма "Создание заявки" - основная форма для создания и редактирования заявок на подключение
+    /// Позволяет: создавать новую заявку, редактировать существующую, выбирать мастера,
+    /// выбирать тариф, дату и время выполнения, подключать дополнительные услуги
     /// </summary>
     public partial class CreateClaim : Window
     {
+        // Словарь тарифов (ID - название)
         Dictionary<int, string> tariffs = new Dictionary<int, string>();
+        // ID статуса "Входящая" (константа)
         const int INCOMING_CLAIM_STATUS_ID = 1;
+        // Количество заявок у мастера на выбранную дату
         int recordsCount = 0;
+        // Хранение даты редактируемой заявки (для восстановления)
         string[] currEditClaimDate;
+        // Условие фильтрации для SQL-запроса
         string filterOption = "";
+        // Флаг режима редактирования
         bool isEditing = false;
+        // Таймер автоматического обновления
         DispatcherTimer timerRef;
+        // Флаг просроченности заявки
         bool isExpired = false;
+        // DataTable для хранения дополнительных услуг
         DataTable dtAddServices = new DataTable();
+        // Таймер неактивности (автоматический выход)
         private DispatcherTimer inactivityTimer;
+
+        /// <summary>
+        /// Конструктор формы - инициализация компонентов, настройка таймеров
+        /// </summary>
         public CreateClaim()
         {
             InitializeComponent();
+
+            // Таймер неактивности: 2 минуты бездействия -> возврат на форму авторизации
             inactivityTimer = new DispatcherTimer();
             inactivityTimer.Interval = TimeSpan.FromMinutes(2);
             inactivityTimer.Tick += CheckInactivity;
 
+            // Таймер автоматического обновления DataGrid (каждые 5 минут)
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(300);
             timer.Tick += Timer_Tick;
             timer.Start();
+
+            // Инициализация DataTable для доп. услуг
             dtAddServices.Columns.Add("additional_service_name", typeof(string));
             dtAddServices.Columns.Add("cost", typeof(double));
             dtAddServices.Columns.Add("additional_service_id", typeof(int));
@@ -45,30 +66,45 @@ namespace WpfApp1
             timerRef = timer;
         }
 
+        /// <summary>
+        /// Проверка неактивности - выход из учетной записи
+        /// </summary>
         private void CheckInactivity(object sender, EventArgs e)
         {
             inactivityTimer.Stop();
             Auth.BackToAuth();
         }
 
+        /// <summary>
+        /// Сброс таймера неактивности при движении мыши
+        /// </summary>
         private void HandleActivity(object sender, MouseEventArgs e)
         {
             inactivityTimer.Stop();
             inactivityTimer.Start();
         }
 
+        /// <summary>
+        /// Сброс таймера неактивности при нажатии клавиш
+        /// </summary>
         private void HandleActivity(object sender, KeyEventArgs e)
         {
             inactivityTimer.Stop();
             inactivityTimer.Start();
         }
 
+        /// <summary>
+        /// Таймер обновления данных (если не в режиме редактирования)
+        /// </summary>
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if(!isEditing)
+            if (!isEditing)
                 RefreshData();
         }
 
+        /// <summary>
+        /// Кнопка "На главную" - очистка выбранных данных, остановка таймеров, закрытие формы
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ClearSelected();
@@ -79,12 +115,16 @@ namespace WpfApp1
             this.Close();
         }
 
+        /// <summary>
+        /// Кнопка выбора клиента - открытие формы создания/выбора клиента
+        /// </summary>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             inactivityTimer.Stop();
             var win = new CreateClient(true);
             win.ShowDialog();
             inactivityTimer.Start();
+
             if (ClientHolder.data != null)
             {
                 object[] client = ClientHolder.data;
@@ -94,6 +134,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Событие загрузки формы - инициализация UI, загрузка тарифов, настройка дат
+        /// </summary>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -104,16 +147,17 @@ namespace WpfApp1
             {
                 ;
             }
+
             RefreshData();
             dateOfExecution.IsEnabled = false;
             timeOfExecution.IsEnabled = false;
 
+            // Загрузка списка тарифов из БД
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-
                     MySqlCommand cmd = new MySqlCommand(@"SELECT idtariff, tariff_name FROM tariff;", conn);
                     MySqlDataReader dr = cmd.ExecuteReader();
                     while (dr.Read())
@@ -128,11 +172,15 @@ namespace WpfApp1
             {
                 MessageBox.Show($"Не удалось загрузить тарифы\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             UseStatusAsIncoming();
             editButton.IsEnabled = false;
-            dateOfExecution.DisplayDateStart = DateTime.Now.AddDays(1);
+            dateOfExecution.DisplayDateStart = DateTime.Now.AddDays(1);  // Минимум завтрашний день
         }
 
+        /// <summary>
+        /// Установка статуса заявки как "Входящая" (для новых заявок)
+        /// </summary>
         private void UseStatusAsIncoming()
         {
             try
@@ -155,6 +203,9 @@ namespace WpfApp1
             claimStatusComboBox.SelectedItem = "Входящая";
         }
 
+        /// <summary>
+        /// При изменении даты выполнения - обновление доступного времени для мастера
+        /// </summary>
         private void dateOfExecution_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             List<string> times = ShowAvailableTime();
@@ -162,6 +213,10 @@ namespace WpfApp1
                 timeOfExecution.ItemsSource = times;
         }
 
+        /// <summary>
+        /// Получение доступного времени для мастера на выбранную дату
+        /// Возвращает список свободных 30-минутных интервалов с 09:00 до 17:00
+        /// </summary>
         private List<string> ShowAvailableTime()
         {
             if (dateOfExecution.SelectedDate == null || MasterHolder.data == null)
@@ -170,12 +225,14 @@ namespace WpfApp1
                 return new List<string>();
             }
             timeOfExecution.IsEnabled = true;
+
             try
             {
                 recordsCount = 0;
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
+                    // Поиск уже занятых временных слотов у мастера
                     MySqlCommand cmd = new MySqlCommand($"SELECT mount_date FROM connection_claim where mount_date like '%{((DateTime)dateOfExecution.SelectedDate).ToString("yyyy-MM-dd")}%' and master_id = {MasterHolder.data[0]};", conn);
                     List<string> armoredTime = new List<string>();
                     using (MySqlDataReader dr = cmd.ExecuteReader())
@@ -186,8 +243,12 @@ namespace WpfApp1
                             recordsCount++;
                         }
                     }
+
+                    // Все возможные временные интервалы
                     List<string> timePeriodArr = new List<string>() { "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00" };
                     List<string> res = new List<string>();
+
+                    // Исключаем занятые слоты
                     if (armoredTime.Count > 0)
                         res = timePeriodArr.Where(el => !armoredTime.Contains(el)).ToList();
                     else
@@ -202,6 +263,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Валидация ввода адреса: разрешены цифры, русские буквы, дефис, точка, запятая, пробел, Backspace
+        /// </summary>
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             try
@@ -218,23 +282,32 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "Создать заявку" - добавление новой заявки в базу данных
+        /// </summary>
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
+            // Проверка заполнения всех обязательных полей
+            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 &&
+                dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null &&
+                tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
+                    // Проверка лимита заявок для мастера (не более 7 в день)
                     if (recordsCount > 6)
                     {
                         MessageBox.Show($"Не удалось добавить заявку. Указанный мастер превысил количество взятых заявок в сутки", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
+
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                     {
                         conn.Open();
                         MySqlTransaction transaction = conn.BeginTransaction();
                         try
                         {
+                            // Основной запрос на вставку заявки
                             MySqlCommand cmd = new MySqlCommand($@"Insert into connection_claim(id_claim, connection_address, mount_date, employees_id, client_id, claim_status_id, connection_creationDate, tariff_id, master_id)
                                                                value (
                                                                 {claimNumber.Content},
@@ -247,6 +320,8 @@ namespace WpfApp1
                                                                 {tariffs.Where(pair => pair.Value == tariffComboBox.SelectedItem.ToString()).Select(pair => pair.Key).Single()},
                                                                 {MasterHolder.data[0]}
                                                                  );", conn);
+
+                            // Добавление дополнительных услуг, если выбраны
                             if (AdditionalServicesHolder.additionalServices.Count > 0)
                             {
                                 cmd.CommandText += "Insert into additional_service_pack Values ";
@@ -257,9 +332,11 @@ namespace WpfApp1
                                 cmd.CommandText = cmd.CommandText.TrimEnd(new char[] { ',' });
                                 cmd.CommandText += ";";
                             }
+
                             cmd.Transaction = transaction;
                             cmd.ExecuteNonQuery();
                             transaction.Commit();
+
                             MessageBox.Show($"Заявка успешно создана", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             RefreshData(false);
                             ClearSelected();
@@ -283,8 +360,13 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обновление DataGrid со списком заявок
+        /// </summary>
+        /// <param name="initial">true - начальная загрузка (без сортировки), false - с сортировкой по убыванию ID</param>
         private void RefreshData(bool initial = true)
         {
+            // Формирование SQL-запроса в зависимости от параметра
             string cmdString = $@"Select `id_claim`, `connection_creationDate`, `mount_date`, `connection_address`, tariff.`tariff_name` as 'tariff', client.full_name as 'client_fio', employees.full_name as 'employee_fio', claim_status.status as 'claim_status', (Select full_name from employees where idemployees = connection_claim.master_id) as 'master_fio', concat('Дата заявки: ', connection_creationDate, '\nДата выполнения: ', mount_date,'\nАдрес монтирования: ', connection_address, '\nТариф: ', tariff.`tariff_name`) as claimDetails
                                                         from `connection_claim`
                                                         inner join `client` on client.idclient = connection_claim.client_id
@@ -300,6 +382,7 @@ namespace WpfApp1
                                                         inner join `tariff` on tariff.idtariff = connection_claim.tariff_id
                                                         inner join `claim_status` on `claim_status`.idclaim_status = connection_claim.claim_status_id {filterOption};";
             }
+
             try
             {
                 string cmdUpdateExpired = "";
@@ -308,26 +391,29 @@ namespace WpfApp1
                     conn.Open();
                     MySqlCommand cmd = new MySqlCommand(cmdString, conn);
                     DataTable dt = new DataTable();
+
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
+                        // Создание структуры таблицы
                         DataColumn[] columns = new DataColumn[dr.FieldCount];
                         for (int i = 0; i < columns.Length; i++)
                         {
                             columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
                         }
-
                         dt.Columns.AddRange(columns);
                         dt.Columns.Add("isExpired", Type.GetType("System.Boolean"));
+
                         object[] record = new object[dr.FieldCount + 1];
                         while (dr.Read())
                         {
                             dr.GetValues(record);
                             DateTime executionDate = (DateTime)record[2];
+
+                            // Логика определения просроченных и отмены заявок "В работе" с истекшим сроком
                             if (executionDate < DateTime.Now && record[7].ToString() == "Входящая")
                                 record[record.Length - 1] = true;
                             else if (executionDate < DateTime.Today.AddDays(1) && record[7].ToString() == "В работе")
                             {
-                                //record[record.Length - 1] = true;
                                 record[7] = "Отменена";
                                 cmdUpdateExpired += $"Update `connection_claim` set claim_status_id = (select idclaim_status from claim_status where `status` = 'Отменена') where id_claim = {record[0]};";
                             }
@@ -337,8 +423,9 @@ namespace WpfApp1
                         }
                     }
 
+                    // Автоматическая отмена просроченных заявок
                     if (cmdUpdateExpired != string.Empty)
-                    { 
+                    {
                         MySqlCommand cmd2 = new MySqlCommand(cmdUpdateExpired, conn);
                         cmd2.ExecuteNonQuery();
                     }
@@ -354,6 +441,9 @@ namespace WpfApp1
             UseNewClaimNumber();
         }
 
+        /// <summary>
+        /// Генерация нового номера заявки (максимальный ID + 1)
+        /// </summary>
         private void UseNewClaimNumber()
         {
             try
@@ -381,6 +471,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Очистка всех выбранных полей и данных
+        /// </summary>
         private void ClearSelected()
         {
             dateOfExecution.SelectedDate = null;
@@ -398,11 +491,17 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "Очистить поля" - сброс всех введенных данных
+        /// </summary>
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             ClearSelected();
         }
 
+        /// <summary>
+        /// Валидация ввода даты - разрешены только Backspace и пробел
+        /// </summary>
         private void dateOfExecution_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[\b\s]");
@@ -412,6 +511,9 @@ namespace WpfApp1
                 e.Handled = true;
         }
 
+        /// <summary>
+        /// Сокрытие части ФИО (остается фамилия и инициалы)
+        /// </summary>
         private string HideName(string fullName)
         {
             try
@@ -426,6 +528,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Сокрытие части номера телефона (маскирование)
+        /// </summary>
         private string HidePhoneNumber(string phoneNumber)
         {
             char[] phoneNumberByLetters = phoneNumber.ToCharArray().Where(c => c != ' ').ToArray();
@@ -444,6 +549,9 @@ namespace WpfApp1
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Просмотр выбранной заявки (открытие формы ClaimVerbose)
+        /// </summary>
         private void ShowClaimVerbose(object sender, RoutedEventArgs e)
         {
             if (claimsDG.SelectedItem != null)
@@ -459,11 +567,17 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Подготовка к редактированию заявки
+        /// </summary>
         private void PrepareToEditClaim(object sender, RoutedEventArgs e)
         {
             PrepateToEditClaimMethod(false);
         }
 
+        /// <summary>
+        /// Загрузка дополнительных услуг для заявки
+        /// </summary>
         private void FillAdditionalServicesHolder(int claimId)
         {
             try
@@ -471,7 +585,6 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
-
                     MySqlCommand cmd = new MySqlCommand($@"SELECT additional_services.additional_service_name,
                                                         additional_services.monthly_fee,
                                                         id_additional_service 
@@ -501,6 +614,10 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Основной метод подготовки к редактированию заявки
+        /// Заполняет поля формы данными выбранной заявки
+        /// </summary>
         private void PrepateToEditClaimMethod(bool isCanceled)
         {
             if (claimsDG.SelectedItem != null)
@@ -508,6 +625,8 @@ namespace WpfApp1
                 DataRowView drv = claimsDG.SelectedItem as DataRowView;
                 AdditionalServicesHolder.additionalServices.Clear();
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
+
+                // Проверка возможности редактирования по статусу
                 if (fieldValuesOfARecord[7].ToString() == "Закрыта" || fieldValuesOfARecord[7].ToString() == "В работе")
                 {
                     MessageBox.Show($"Заявки с такими статусами недоступны для редактирования", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -522,15 +641,19 @@ namespace WpfApp1
                     }
                     return;
                 }
+
+                // Переключение в режим редактирования
                 string[] dateByParts = fieldValuesOfARecord[2].ToString().Split(' ');
                 createClaimButton.Visibility = Visibility.Collapsed;
                 showClaimButton.Visibility = Visibility.Collapsed;
                 editButton.Visibility = Visibility.Collapsed;
                 toMainButton.Visibility = Visibility.Collapsed;
+
                 claimNumber.Content = fieldValuesOfARecord[0];
                 creationDate.Content = ((DateTime)fieldValuesOfARecord[1]).ToString("dd.MM.yyyy");
                 FillMasterObject(Convert.ToInt32(fieldValuesOfARecord[0]));
 
+                // Восстановление даты и времени выполнения
                 if (!((DateTime)fieldValuesOfARecord[2] < DateTime.Now))
                 {
                     dateOfExecution.SelectedDate = DateTime.Parse(dateByParts[0]);
@@ -542,6 +665,7 @@ namespace WpfApp1
                     timeOfExecution.SelectedItem = time;
                 }
 
+                // Настройка UI для режима редактирования
                 chooseAClientButton.IsEnabled = false;
                 claimStatusComboBox.IsEnabled = true;
                 currEditClaimDate = dateByParts;
@@ -551,10 +675,12 @@ namespace WpfApp1
                 mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 FillComboBoxStatusesManager();
                 FillAdditionalServicesHolder(Convert.ToInt32(claimNumber.Content));
+
                 if (isCanceled)
                     claimStatusComboBox.SelectedItem = "Отменена";
                 else
                     claimStatusComboBox.SelectedItem = fieldValuesOfARecord[7];
+
                 tariffComboBox.SelectedItem = fieldValuesOfARecord[4];
                 clientTextBox.Text = fieldValuesOfARecord[5].ToString();
                 masterTextBox.Text = MasterHolder.data[1].ToString();
@@ -563,16 +689,19 @@ namespace WpfApp1
                 endEditingButton.Visibility = Visibility.Visible;
                 cancelChangesButton.Visibility = Visibility.Visible;
             }
-
         }
 
-
-
+        /// <summary>
+        /// Отмена редактирования
+        /// </summary>
         private void CancelEdit(object sender, RoutedEventArgs e)
         {
             CloseEdition();
         }
 
+        /// <summary>
+        /// Выход из режима редактирования, возврат в режим создания
+        /// </summary>
         private void CloseEdition()
         {
             createClaimButton.Visibility = Visibility.Visible;
@@ -601,9 +730,15 @@ namespace WpfApp1
             claimStatusComboBox.IsEnabled = false;
         }
 
+        /// <summary>
+        /// Сохранение изменений при редактировании заявки
+        /// </summary>
         private void EditClaim(object sender, RoutedEventArgs e)
         {
-            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 && dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null && tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
+            // Проверка заполнения полей
+            if (mountAddressTextBox.Text.Length > 0 && clientTextBox.Text.Length > 0 &&
+                dateOfExecution.SelectedDate != null && timeOfExecution.SelectedItem != null &&
+                tariffComboBox.SelectedItem != null && masterTextBox.Text.Length > 0)
             {
                 try
                 {
@@ -613,6 +748,7 @@ namespace WpfApp1
                         MessageBox.Show($"Не удалось обновить заявку. Указанный мастер превысил количество взятых заявок в сутки", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
+
                     int contractId = CheckDuplicateUtil.HasNoDuplicate("contract", "connection_claim_id", $"{claimNumber.Content}", false);
 
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -622,18 +758,26 @@ namespace WpfApp1
                         try
                         {
                             string fullExectionDate = $"{((DateTime)dateOfExecution.SelectedDate).ToString("yyyy-MM-dd")} {timeOfExecution.SelectedItem.ToString()}:00";
+
+                            // Обновление данных заявки
                             MySqlCommand cmd = new MySqlCommand($@"Update `connection_claim` 
                                                                    set connection_address = '{mountAddressTextBox.Text}',
                                                                    mount_date = '{fullExectionDate}',
                                                                    claim_status_id = (SELECT idclaim_status FROM claim_status where `status` = '{claimStatusComboBox.SelectedItem}'),
                                                                    tariff_id = (SELECT idtariff FROM tariff where `tariff_name` = '{tariffComboBox.SelectedItem}'),
                                                                    master_id = {MasterHolder.data[0]}
-                                                                   where id_claim = {claimNumber.Content};", conn) ;
+                                                                   where id_claim = {claimNumber.Content};", conn);
+
+                            // Удаление старых дополнительных услуг
                             cmd.CommandText += $"Delete from `additional_service_pack` where `idclaim` = {claimNumber.Content};";
+
+                            // Если заявка отменяется - расторгаем договор
                             if (contractId != -1 && claimStatusComboBox.SelectedItem.ToString() == "Отменена")
                             {
                                 cmd.CommandText += $"update contract set contract_status_id = (Select idcontract_status from contract_status where `status` = 'Расторгнут') where idcontract = {contractId};";
                             }
+
+                            // Добавление новых дополнительных услуг
                             if (AdditionalServicesHolder.additionalServices.Count > 0)
                             {
                                 cmd.CommandText += "Insert into additional_service_pack Values ";
@@ -644,9 +788,11 @@ namespace WpfApp1
                                 cmd.CommandText = cmd.CommandText.TrimEnd(new char[] { ',' });
                                 cmd.CommandText += ";";
                             }
+
                             cmd.Transaction = transaction;
                             cmd.ExecuteNonQuery();
                             transaction.Commit();
+
                             MessageBox.Show($"Заявка успешно обновлена", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             CloseEdition();
                             RefreshData();
@@ -670,6 +816,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Заполнение ComboBox статусов для менеджера (исключая "В работе" и "Закрыта")
+        /// </summary>
         private void FillComboBoxStatusesManager()
         {
             try
@@ -691,6 +840,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Заполнение объекта мастера данными из БД
+        /// </summary>
         private void FillMasterObject(int claimId)
         {
             try
@@ -700,7 +852,7 @@ namespace WpfApp1
                     conn.Open();
                     MySqlCommand cmd = new MySqlCommand($"Select * from employees where idemployees = (SELECT master_id FROM connection_claim where id_claim = {claimId});", conn);
                     using (MySqlDataReader dr = cmd.ExecuteReader())
-                    { 
+                    {
                         object[] fieldValues = new object[dr.FieldCount];
                         while (dr.Read())
                             dr.GetValues(fieldValues);
@@ -714,20 +866,24 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Активация кнопок при выборе заявки в DataGrid
+        /// </summary>
         private void claimsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             showClaimButton.IsEnabled = true;
             editButton.IsEnabled = true;
         }
 
+        /// <summary>
+        /// Выбор мастера (открытие формы выбора сотрудника)
+        /// </summary>
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             inactivityTimer.Stop();
-            //this.Hide();
             var win = new EmployeesViewWindow();
             win.ShowDialog();
             inactivityTimer.Start();
-            //this.ShowDialog();
 
             if (MasterHolder.data != null)
             {
@@ -737,12 +893,15 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// При изменении текста в поле мастера - включение выбора даты
+        /// </summary>
         private void masterTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (masterTextBox.Text.Length > 0)
             {
                 dateOfExecution.IsEnabled = true;
-                if(isEditing)
+                if (isEditing)
                 {
                     dateOfExecution.SelectedDate = null;
                     timeOfExecution.IsEnabled = false;
@@ -753,6 +912,9 @@ namespace WpfApp1
                 dateOfExecution.IsEnabled = false;
         }
 
+        /// <summary>
+        /// Поиск по номеру заявки или ФИО клиента
+        /// </summary>
         private void searchByClaimNumAndFio_TextChanged(object sender, TextChangedEventArgs e)
         {
             int claimNum;
@@ -766,6 +928,9 @@ namespace WpfApp1
             RefreshData();
         }
 
+        /// <summary>
+        /// Перевыпуск заявки (создание копии с новым номером)
+        /// </summary>
         private void RereleaseClaim(object[] fieldValuesOfARecord)
         {
             ClearSelected();
@@ -774,6 +939,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
+                    // Копирование данных клиента
                     MySqlCommand cmd = new MySqlCommand($@"SELECT `client`.* FROM connection_claim inner join `client` on `client`.idclient = connection_claim.client_id where id_claim = {fieldValuesOfARecord[0]};", conn);
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
@@ -785,7 +951,7 @@ namespace WpfApp1
                         ClientHolder.data = clientData;
                         clientTextBox.Text = HideName(clientData[1].ToString());
                     }
-                    mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries)); ;
+                    mountAddressTextBox.Text = string.Join(" ", fieldValuesOfARecord[3].ToString().Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
                 }
             }
             catch (Exception exc)
@@ -794,13 +960,12 @@ namespace WpfApp1
             }
         }
 
-        private void claimsDG_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
+        /// <summary>
+        /// Обработчик изменения статуса заявки (для режима редактирования)
+        /// </summary>
         private void claimStatusComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // Логика изменения UI в зависимости от выбранного статуса при редактировании
             if (currEditClaimDate != null && claimStatusComboBox.SelectedItem.ToString() == "Отменена")
             {
                 PrepateToEditClaimMethod(true);
@@ -840,8 +1005,7 @@ namespace WpfApp1
                 additServiceButton.IsEnabled = true;
             }
             else
-            { 
-                //dateOfExecution.IsEnabled = true;
+            {
                 chooseAMasterButton.IsEnabled = true;
                 tariffComboBox.IsEnabled = true;
                 clearFieldsButton.IsEnabled = true;
@@ -849,6 +1013,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка выбора дополнительных услуг
+        /// </summary>
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
             inactivityTimer.Stop();

@@ -18,35 +18,54 @@ using MySql.Data.MySqlClient;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for Diagram.xaml
+    /// Структура данных о сотруднике: ФИО и сумма выручки
     /// </summary>
-
     struct EmployeesData
     {
-        public string FullName;
-        public double Revenue;
+        public string FullName;   // Полное ФИО сотрудника
+        public double Revenue;    // Сумма выручки (доход от заявок)
     }
 
+    /// <summary>
+    /// Структура данных о помесячной выручке
+    /// </summary>
     struct MonthlyRevenue
     {
-        public string Year;
-        public string MonthName;
-        public double Revenue;
+        public string Year;       // Год
+        public string MonthName;  // Название месяца (Январь, Февраль и т.д.)
+        public double Revenue;    // Сумма выручки за месяц
     }
+
+    /// <summary>
+    /// Форма "Диаграмма" - визуализация статистических данных
+    /// Отображает три типа диаграмм:
+    /// 1. Круговая диаграмма - распределение заявок по статусам
+    /// 2. Столбчатая диаграмма - выручка по сотрудникам (мастерам)
+    /// 3. Столбчатая диаграмма - помесячная выручка за текущий год
+    /// </summary>
     public partial class Diagram : Window
     {
+        // Условие фильтрации по дате для SQL-запросов
         string dateLimit = "";
 
+        /// <summary>
+        /// Конструктор формы - принимает фильтр по дате из родительской формы
+        /// </summary>
+        /// <param name="dateFilter">Условие фильтрации для SQL (например: "date between ... and ...")</param>
         public Diagram(string dateFilter)
         {
             InitializeComponent();
             dateLimit = dateFilter;
         }
 
+        /// <summary>
+        /// Событие загрузки формы - построение всех трех диаграмм
+        /// </summary>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
+                // Отображение роли и сокращенного ФИО в заголовке окна
                 this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
             }
             catch
@@ -54,73 +73,86 @@ namespace WpfApp1
                 ;
             }
 
-            DrawACircleDiagram();
-            List<EmployeesData> revenueHist = GetEmployeesRating();
-            DrawRevenueChart(revenueHist);
-            List<MonthlyRevenue> monthlyRevenueHist = GetMonhtlyRevenueReport();
-            BuildMonthlyRevenueChart(monthlyRevenueHist);
+            DrawACircleDiagram();                    // Круговая диаграмма статусов
+            List<EmployeesData> revenueHist = GetEmployeesRating();  // Данные по сотрудникам
+            DrawRevenueChart(revenueHist);           // Столбчатая диаграмма выручки сотрудников
+            List<MonthlyRevenue> monthlyRevenueHist = GetMonhtlyRevenueReport();  // Данные по месяцам
+            BuildMonthlyRevenueChart(monthlyRevenueHist);  // Столбчатая диаграмма помесячной выручки
         }
 
+        /// <summary>
+        /// Построение круговой диаграммы распределения заявок по статусам
+        /// </summary>
         private void DrawACircleDiagram()
         {
-            double incoming = 0;
-            double canceled = 0;
-            double inProgress = 0;
-            double closed = 0;
+            double incoming = 0;    // Количество входящих заявок
+            double canceled = 0;    // Количество отмененных заявок
+            double inProgress = 0;  // Количество заявок в работе
+            double closed = 0;      // Количество закрытых заявок
+
             GetStatusCount(ref incoming, ref canceled, ref inProgress, ref closed);
 
+            // Данные для диаграммы
             double[] values = new double[] { incoming, canceled, inProgress, closed };
             string[] names = new string[] { "Входящие", "Отмененные", "В работе", "Закрытые" };
+
+            // Цвета секторов
             System.Drawing.Color[] colors = new System.Drawing.Color[]
             {
-    System.Drawing.Color.FromArgb(76, 175, 80),
-    System.Drawing.Color.FromArgb(244, 67, 54),
-    System.Drawing.Color.FromArgb(255, 152, 0),
-    System.Drawing.Color.FromArgb(156, 39, 176)
+                System.Drawing.Color.FromArgb(76, 175, 80),   // Зеленый - входящие
+                System.Drawing.Color.FromArgb(244, 67, 54),   // Красный - отмененные
+                System.Drawing.Color.FromArgb(255, 152, 0),   // Оранжевый - в работе
+                System.Drawing.Color.FromArgb(156, 39, 176)   // Фиолетовый - закрытые
             };
 
             chart.Series.Clear();
 
+            // Создание серии для круговой диаграммы
             Series series = new Series("Статусы заявок");
             series.Points.DataBindXY(names, values);
             series.ChartType = SeriesChartType.Pie;
             series.Color = System.Drawing.Color.Transparent;
 
-            series["PieLabelStyle"] = "Outside";
-            series["PieLineColor"] = "DarkGray";
-            series.IsValueShownAsLabel = true;
+            // Настройка отображения меток
+            series["PieLabelStyle"] = "Outside";      // Метки снаружи
+            series["PieLineColor"] = "DarkGray";      // Цвет линий от секторов к меткам
+            series.IsValueShownAsLabel = true;        // Показывать значения на метках
             series.LabelForeColor = System.Drawing.Color.DarkSlateGray;
             series.Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
-            series.LabelFormat = "N0";
-            series.ToolTip = "#VALX: #VAL{0} задач (#PERCENT{P0})";
+            series.LabelFormat = "N0";                // Формат чисел (без десятичных)
+            series.ToolTip = "#VALX: #VAL{0} задач (#PERCENT{P0})";  // Всплывающая подсказка
 
+            // Применение цветов к секторам
             for (int i = 0; i < series.Points.Count; i++)
             {
                 series.Points[i].Color = colors[i];
-
-                if (i == 0) series.Points[i]["Exploded"] = "true";
+                if (i == 0) series.Points[i]["Exploded"] = "true";  // Первый сектор слегка отделен
             }
 
             chart.Series.Add(series);
 
+            // Настройка области диаграммы
             if (chart.ChartAreas.Count == 0)
                 chart.ChartAreas.Add(new ChartArea());
 
             var area = chart.ChartAreas[0];
 
+            // Отключение осей (для круговой диаграммы они не нужны)
             area.AxisX.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
             area.AxisY.Enabled = System.Windows.Forms.DataVisualization.Charting.AxisEnabled.False;
-            area.Area3DStyle.Enable3D = false;
+            area.Area3DStyle.Enable3D = false;  // Плоский вид
 
             area.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
             area.BackSecondaryColor = System.Drawing.Color.White;
 
+            // Заголовок диаграммы
             chart.Titles.Clear();
             Title title = new Title("Статистика заявок", Docking.Top,
                 new System.Drawing.Font("Segoe UI", 14, System.Drawing.FontStyle.Bold),
                 System.Drawing.Color.DarkSlateGray);
             chart.Titles.Add(title);
 
+            // Легенда (справочник цветов)
             chart.Legends.Clear();
             Legend legend = new Legend();
             legend.Docking = Docking.Bottom;
@@ -132,13 +164,17 @@ namespace WpfApp1
             chart.Legends.Add(legend);
         }
 
-        private void GetStatusCount(ref double incoming, ref double canceled, ref double inProgress, ref double closed) 
+        /// <summary>
+        /// Получение количества заявок по каждому статусу из базы данных
+        /// </summary>
+        private void GetStatusCount(ref double incoming, ref double canceled, ref double inProgress, ref double closed)
         {
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
+                    // Группировка заявок по статусу с учетом фильтра по дате
                     MySqlCommand cmd = new MySqlCommand($@"SELECT 
                                                             (SELECT 
                                                                     status
@@ -153,7 +189,7 @@ namespace WpfApp1
                                                             GROUP BY claim_status_id;", conn);
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
-                        while(dr.Read())
+                        while (dr.Read())
                         {
                             switch (dr.GetValue(0))
                             {
@@ -180,6 +216,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Построение столбчатой диаграммы выручки по сотрудникам (мастерам)
+        /// </summary>
         private void DrawRevenueChart(List<EmployeesData> data)
         {
             if (data == null || data.Count == 0)
@@ -192,24 +231,27 @@ namespace WpfApp1
             chart2.Series.Clear();
             chart2.ChartAreas.Clear();
 
+            // Создание серии для столбчатой диаграммы
             Series series = new Series("Выручка");
             series.ChartType = SeriesChartType.Column;
-            series.Color = System.Drawing.Color.FromArgb(54, 162, 235);
+            series.Color = System.Drawing.Color.FromArgb(54, 162, 235);  // Голубой цвет
 
-            series["PointWidth"] = "0.7";
+            series["PointWidth"] = "0.7";  // Ширина столбцов
 
+            // Настройка отображения значений на столбцах
             series.IsValueShownAsLabel = true;
             series.LabelForeColor = System.Drawing.Color.DarkSlateGray;
             series.Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
-            series.LabelFormat = "C0";
+            series.LabelFormat = "C0";  // Формат валюты
             series.ToolTip = "#VALX: #VAL{0:C}";
 
+            // Добавление данных
             foreach (var employee in data)
             {
                 string shortName = employee.FullName;
                 try
                 {
-                    shortName = FullNameSplitter.MakeShortName(employee.FullName);
+                    shortName = FullNameSplitter.MakeShortName(employee.FullName);  // Сокращение ФИО
                 }
                 catch
                 {
@@ -223,44 +265,49 @@ namespace WpfApp1
 
             chart2.Series.Add(series);
 
+            // Настройка области диаграммы
             ChartArea area = new ChartArea();
             chart2.ChartAreas.Add(area);
 
+            // Настройка оси X (Сотрудники)
             area.AxisX.Title = "Сотрудники";
             area.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
             area.AxisX.MajorGrid.Enabled = false;
             area.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 7);
-            area.AxisX.LabelStyle.Angle = -30;
+            area.AxisX.LabelStyle.Angle = -30;  // Наклон подписей для читаемости
             area.AxisX.LabelStyle.Interval = 1;
             area.AxisX.Interval = 1;
 
             if (data.Count > 5)
             {
                 area.AxisX.LabelStyle.Interval = 1;
-                area.AxisX.LabelStyle.Angle = -45;
+                area.AxisX.LabelStyle.Angle = -45;  // Больший наклон при большом количестве сотрудников
             }
 
+            // Настройка оси Y (Выручка)
             area.AxisY.Title = "Выручка (руб.)";
             area.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
             area.AxisY.MajorGrid.LineColor = System.Drawing.Color.FromArgb(224, 224, 224);
             area.AxisY.MajorGrid.LineDashStyle = ChartDashStyle.Dash;
             area.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9);
             area.AxisY.LabelStyle.Format = "C0";
-
             area.AxisY.Minimum = 0;
 
+            // Фоновое оформление
             area.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
             area.BackSecondaryColor = System.Drawing.Color.White;
             area.BorderColor = System.Drawing.Color.Gray;
             area.BorderDashStyle = ChartDashStyle.Solid;
             area.BorderWidth = 1;
 
+            // Заголовок
             chart2.Titles.Clear();
             Title title = new Title("Выручка по сотрудникам", Docking.Top,
                 new System.Drawing.Font("Segoe UI", 14, System.Drawing.FontStyle.Bold),
                 System.Drawing.Color.DarkSlateGray);
             chart2.Titles.Add(title);
 
+            // Легенда
             chart2.Legends.Clear();
             Legend legend = new Legend();
             legend.Docking = Docking.Top;
@@ -268,9 +315,11 @@ namespace WpfApp1
             legend.Font = new System.Drawing.Font("Segoe UI", 9);
             legend.BackColor = System.Drawing.Color.Transparent;
             chart2.Legends.Add(legend);
-
         }
 
+        /// <summary>
+        /// Построение столбчатой диаграммы помесячной выручки за текущий год
+        /// </summary>
         private void BuildMonthlyRevenueChart(List<MonthlyRevenue> data)
         {
             if (data == null || data.Count == 0)
@@ -280,21 +329,21 @@ namespace WpfApp1
                 return;
             }
 
-            // Создаем словарь с данными по месяцам
+            // Словарь для быстрого доступа к данным по месяцам
             Dictionary<string, MonthlyRevenue> monthDataDict = new Dictionary<string, MonthlyRevenue>();
             foreach (var item in data)
             {
                 monthDataDict[item.MonthName] = item;
             }
 
-            // Список всех месяцев в правильном порядке
+            // Все месяцы в правильном порядке (с января по декабрь)
             List<string> allMonths = new List<string>
             {
                 "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
                 "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
             };
 
-            // Создаем полный список данных за все месяцы
+            // Создание полного списка данных за все месяцы (с нулями для отсутствующих)
             List<MonthlyRevenue> fullYearData = new List<MonthlyRevenue>();
             foreach (string month in allMonths)
             {
@@ -304,7 +353,6 @@ namespace WpfApp1
                 }
                 else
                 {
-                    // Добавляем месяц с нулевой выручкой
                     fullYearData.Add(new MonthlyRevenue
                     {
                         MonthName = month,
@@ -314,32 +362,30 @@ namespace WpfApp1
                 }
             }
 
-            // Очищаем диаграмму
+            // Очистка диаграммы
             chart3.Series.Clear();
             chart3.ChartAreas.Clear();
 
-            // Создаем серию для гистограммы
+            // Создание серии для столбчатой диаграммы
             Series series = new Series("Выручка");
             series.ChartType = SeriesChartType.Column;
-            series.Color = System.Drawing.Color.FromArgb(76, 175, 80);
+            series.Color = System.Drawing.Color.FromArgb(76, 175, 80);  // Зеленый цвет
 
-            // Настройка ширины столбцов
             series["PointWidth"] = "0.7";
 
-            // Показывать значения на столбцах
+            // Настройка отображения значений
             series.IsValueShownAsLabel = true;
             series.LabelForeColor = System.Drawing.Color.DarkSlateGray;
             series.Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Bold);
             series.LabelFormat = "C0";
             series.ToolTip = "#VALX: #VAL{0:C}";
 
-            // Добавляем данные за все месяцы
+            // Добавление данных за все месяцы
             for (int i = 0; i < fullYearData.Count; i++)
             {
                 var monthData = fullYearData[i];
                 DataPoint point = series.Points.Add(Convert.ToDouble(monthData.Revenue));
 
-                // ВАЖНО: Устанавливаем подпись для оси X
                 point.AxisLabel = monthData.MonthName;
                 point.Label = monthData.Revenue > 0 ? monthData.Revenue.ToString("C0") : "";
 
@@ -352,22 +398,21 @@ namespace WpfApp1
                     point.ToolTip = $"{monthData.MonthName}\nНет данных";
                 }
 
-                // Цвета по сезонам
+                // Цветовая схема по сезонам
                 if (monthData.MonthName == "Декабрь" || monthData.MonthName == "Январь" || monthData.MonthName == "Февраль")
-                    point.Color = System.Drawing.Color.FromArgb(100, 181, 246);
+                    point.Color = System.Drawing.Color.FromArgb(100, 181, 246);  // Зима - голубой
                 else if (monthData.MonthName == "Март" || monthData.MonthName == "Апрель" || monthData.MonthName == "Май")
-                    point.Color = System.Drawing.Color.FromArgb(129, 199, 132);
+                    point.Color = System.Drawing.Color.FromArgb(129, 199, 132);  // Весна - зеленый
                 else if (monthData.MonthName == "Июнь" || monthData.MonthName == "Июль" || monthData.MonthName == "Август")
-                    point.Color = System.Drawing.Color.FromArgb(255, 152, 0);
+                    point.Color = System.Drawing.Color.FromArgb(255, 152, 0);    // Лето - оранжевый
                 else
-                    point.Color = System.Drawing.Color.FromArgb(156, 39, 176);
+                    point.Color = System.Drawing.Color.FromArgb(156, 39, 176);   // Осень - фиолетовый
 
                 if (monthData.Revenue == 0)
                 {
-                    point.Color = System.Drawing.Color.FromArgb(200, 200, 200);
+                    point.Color = System.Drawing.Color.FromArgb(200, 200, 200);  // Серый для нулевых значений
                 }
             }
-
 
             chart3.Series.Add(series);
 
@@ -375,19 +420,16 @@ namespace WpfApp1
             ChartArea area = new ChartArea();
             chart3.ChartAreas.Add(area);
 
-            // ============ КЛЮЧЕВЫЕ НАСТРОЙКИ ДЛЯ ОТОБРАЖЕНИЯ ПОДПИСЕЙ МЕСЯЦЕВ ============
-
             // Настройка оси X (Месяцы)
             area.AxisX.Title = "Месяцы";
             area.AxisX.TitleFont = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
             area.AxisX.MajorGrid.Enabled = false;
-
-            // ВАЖНО: Принудительно включаем отображение подписей
             area.AxisX.LabelStyle.Enabled = true;
             area.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9, System.Drawing.FontStyle.Regular);
-            area.AxisX.LabelStyle.Angle = -45; // Наклон для читаемости
-            area.AxisX.LabelStyle.Interval = 1; // Каждая метка
-            
+            area.AxisX.LabelStyle.Angle = -45;        // Наклон для читаемости
+            area.AxisX.LabelStyle.Interval = 1;       // Каждая метка
+
+            // Настройка оси Y (Выручка)
             area.AxisY.Title = "Выручка (руб.)";
             area.AxisY.TitleFont = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
             area.AxisY.MajorGrid.LineColor = System.Drawing.Color.FromArgb(224, 224, 224);
@@ -399,17 +441,17 @@ namespace WpfApp1
             if (fullYearData.Any(x => x.Revenue > 0))
             {
                 double maxRevenue = fullYearData.Max(x => x.Revenue);
-                area.AxisY.Maximum = maxRevenue * 1.1;
+                area.AxisY.Maximum = maxRevenue * 1.1;  // Запас сверху 10%
             }
 
-            // Настройка фона
+            // Фоновое оформление
             area.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
             area.BackSecondaryColor = System.Drawing.Color.White;
             area.BorderColor = System.Drawing.Color.Gray;
             area.BorderDashStyle = ChartDashStyle.Solid;
             area.BorderWidth = 1;
 
-            // ============ ЗАГОЛОВОК ============
+            // Заголовок с итоговой суммой за год
             chart3.Titles.Clear();
             int currentYear = DateTime.Now.Year;
             double totalRevenue = fullYearData.Sum(x => x.Revenue);
@@ -420,23 +462,24 @@ namespace WpfApp1
                                    System.Drawing.Color.DarkSlateGray);
             chart3.Titles.Add(title);
 
-            // ============ ЛЕГЕНДА ============
+            // Легенда (очищаем, так как информация передается через заголовок)
             chart3.Legends.Clear();
 
-
-            // Дополнительный трюк: принудительно обновляем диаграмму
+            // Принудительное обновление диаграммы
             chart3.Invalidate();
             chart3.Update();
         }
 
-
+        /// <summary>
+        /// Преобразование номера месяца в название месяца на русском языке
+        /// </summary>
         private string ConvertMonthNumberToName(int monthNumber)
         {
             string[] monthNames =
             {
-        "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
-        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
-    };
+                "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+            };
 
             if (monthNumber >= 1 && monthNumber <= 12)
                 return monthNames[monthNumber - 1];
@@ -444,7 +487,9 @@ namespace WpfApp1
             return "Неизвестно";
         }
 
-
+        /// <summary>
+        /// Получение отчета о помесячной выручке за текущий год
+        /// </summary>
         private List<MonthlyRevenue> GetMonhtlyRevenueReport()
         {
             List<MonthlyRevenue> monthlyRevenue = new List<MonthlyRevenue>();
@@ -453,6 +498,7 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
+                    // Группировка по годам и месяцам с суммированием выручки из заказов
                     MySqlCommand cmd = new MySqlCommand($@"SELECT 
                                                             YEAR(connection_creationDate) AS currentYear,
                                                             MONTH(connection_creationDate) AS monthNumber,
@@ -473,7 +519,6 @@ namespace WpfApp1
                             item.MonthName = ConvertMonthNumberToName(Convert.ToInt32(dr["monthNumber"]));
                             item.Year = dr["currentYear"].ToString();
                             item.Revenue = Convert.ToDouble(dr["monthlyRevenue"]);
-
                             monthlyRevenue.Add(item);
                         }
                     }
@@ -486,6 +531,10 @@ namespace WpfApp1
             return monthlyRevenue;
         }
 
+        /// <summary>
+        /// Получение рейтинга сотрудников (мастеров) по выручке
+        /// Группировка по мастерам, исключая отмененные заявки
+        /// </summary>
         private List<EmployeesData> GetEmployeesRating()
         {
             List<EmployeesData> data = new List<EmployeesData>();
@@ -494,17 +543,17 @@ namespace WpfApp1
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
                 {
                     conn.Open();
+                    // Запрос: количество заявок и сумма выручки по каждому мастеру
                     MySqlCommand cmd = new MySqlCommand($@"SELECT (select full_name from employees where idemployees = master_id) as fio, Count(*) as count, sum(totalcost) as revenue
                                     FROM connection_claim inner join `order` on idorder = order_id where claim_status_id != (Select idclaim_status from claim_status where `status` = 'Отменена') AND {dateLimit}
                                     group by master_id order by count desc;", conn);
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
-                        while(dr.Read())
+                        while (dr.Read())
                         {
                             var item = new EmployeesData();
                             item.FullName = dr["fio"].ToString();
                             item.Revenue = Convert.ToDouble(dr["revenue"]);
-
                             data.Add(item);
                         }
                     }
@@ -517,6 +566,9 @@ namespace WpfApp1
             return data;
         }
 
+        /// <summary>
+        /// Кнопка "На главную" - закрытие формы
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

@@ -10,22 +10,36 @@ using Excel = Microsoft.Office.Interop.Excel;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for Window21.xaml
+    /// Форма "Учет договоров" - окно для просмотра и управления договорами на подключение
     /// </summary>
     public partial class AccountingContract : Window
     {
+        // Дополнительные условия для SQL-запроса (фильтрация по статусу договора)
         private string additionalFilterParams = "";
+        // Дополнительные условия для фильтрации по дате договора
         private string additionalDateFilterParams = "";
+        // Дополнительные условия для сортировки (по номеру договора)
         private string additionalSortParams = "";
+        // Дополнительные условия для поиска (по номеру договора или ФИО клиента)
         private string additionalSearchParams = "";
+        // Хранилище всех строк данных (для пагинации)
         private List<DataRow> _allRows = new List<DataRow>();
+        // Текущая страница пагинации
         private int _currentPage = 1;
+        // Количество записей на одной странице
         private int _pageSize = 3;
+        
+        /// <summary>
+        /// Конструктор формы - инициализация компонентов
+        /// </summary>
         public AccountingContract()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Кнопка "Просмотр договора" - открывает детальную информацию о выбранном договоре
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (contractsDG.SelectedItem != null)
@@ -39,71 +53,94 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "На главную" - закрытие текущей формы
+        /// </summary>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// Событие загрузки формы - настройка UI, отображение роли пользователя,
+        /// установка ограничений на даты, загрузка данных
+        /// </summary>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
+                // Отображение роли и сокращенного ФИО в заголовке окна
                 this.Title += $" ({AccountHolder.UserRole}: {FullNameSplitter.MakeShortName(AccountHolder.FIO)})";
             }
             catch
             {
                 ;
             }
+            
             RefreshDataGrid();
-            noSort.IsChecked = true;
-            allContracts.IsChecked = true;
-            fromDate.DisplayDateStart = DateTime.Today.AddYears(-10);
-            fromDate.DisplayDateEnd = DateTime.Today.AddDays(-1);
-            toDate.DisplayDateEnd = DateTime.Today;
-            showContractVerbose.IsEnabled = false;
+            
+            // Настройка начальных состояний элементов управления
+            noSort.IsChecked = true;           // Сортировка по умолчанию отключена
+            allContracts.IsChecked = true;      // Показаны все договоры
+            fromDate.DisplayDateStart = DateTime.Today.AddYears(-10);  // От -10 лет от сегодня
+            fromDate.DisplayDateEnd = DateTime.Today.AddDays(-1);      // До вчерашнего дня
+            toDate.DisplayDateEnd = DateTime.Today;                    // До сегодня
+            showContractVerbose.IsEnabled = false;  // Кнопка просмотра неактивна до выбора договора
             printAReportButton.Visibility = Visibility.Collapsed;
+            
+            // Только директор может печатать отчеты
             if (AccountHolder.UserRole == "Директор")
             {
                 printAReportButton.Visibility = Visibility.Visible;
             }
         }
 
+        /// <summary>
+        /// Фильтрация договоров по статусу (RadioButton)
+        /// </summary>
         private void FilterByStatus_Checked(object sender, RoutedEventArgs e)
         {
             RadioButton rb = (RadioButton)sender;
             switch (rb.Name)
             {
                 case "allContracts":
-                    additionalFilterParams = "";
+                    additionalFilterParams = "";                    // Все договоры
                     break;
                 case "currentContracts":
-                    additionalFilterParams = "`status` = 'Заключен'";
+                    additionalFilterParams = "`status` = 'Заключен'"; // Только действующие
                     break;
                 case "terminatedContracts":
-                    additionalFilterParams = "`status` = 'Расторгнут'";
+                    additionalFilterParams = "`status` = 'Расторгнут'"; // Расторгнутые
                     break;
             }
             RefreshDataGrid();
         }
 
+        /// <summary>
+        /// Сортировка по номеру договора (возрастание/убывание/без сортировки)
+        /// </summary>
         private void SortByContractNumber_Checked(object sender, RoutedEventArgs e)
         {
             RadioButton rb = (RadioButton)sender;
             switch (rb.Name)
             {
                 case "noSort":
-                    additionalSortParams = "";
+                    additionalSortParams = "";                      // Без сортировки
                     break;
                 case "asc":
-                    additionalSortParams = " order by `idcontract`";
+                    additionalSortParams = " order by `idcontract`"; // По возрастанию
                     break;
                 case "desc":
-                    additionalSortParams = " order by `idcontract` desc";
+                    additionalSortParams = " order by `idcontract` desc"; // По убыванию
                     break;
             }
             RefreshDataGrid();
         }
 
+        /// <summary>
+        /// Основной метод обновления DataGrid - загрузка данных о договорах из БД
+        /// Асинхронный для предотвращения блокировки UI
+        /// </summary>
         private async void RefreshDataGrid()
         {
             try
@@ -112,6 +149,8 @@ namespace WpfApp1
                 {
                     conn.Open();
                     string filterParams = "";
+                    
+                    // Формирование WHERE-условия из активных фильтров
                     if (additionalFilterParams != string.Empty || additionalSearchParams != string.Empty || additionalDateFilterParams != string.Empty)
                     {
                         string betweenExpressions1 = additionalDateFilterParams != string.Empty && additionalFilterParams != string.Empty ? " And " : "";
@@ -119,6 +158,7 @@ namespace WpfApp1
                         filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
                     }
 
+                    // SQL-запрос для получения данных о договорах с информацией о связанной заявке
                     MySqlCommand cmd = new MySqlCommand($@"SELECT idcontract, contract_date, (Select full_name from `client`
                                                     where idclient = connection_claim.client_id) as 'client',
                                                     connection_claim_id, `contract_status`.`status` as 'status',
@@ -137,14 +177,17 @@ namespace WpfApp1
                     await cmd.ExecuteNonQueryAsync();
                     da.Fill(dt);
 
+                    // Сохранение всех строк для пагинации
                     _allRows.Clear();
                     foreach (DataRow row in dt.Rows)
                     {
                         _allRows.Add(row);
                     }
 
+                    // Отображение количества записей
                     ShowRecordsCount(cmd.CommandText);
 
+                    // Обновление элементов пагинации
                     UpdatePagination();
                 }
             }
@@ -154,11 +197,15 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обновление элементов управления пагинации (кнопки "Вперед/Назад", номер страницы)
+        /// </summary>
         private void UpdatePagination()
         {
             int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
             lblTotalPages.Text = totalPages.ToString();
 
+            // Корректировка текущей страницы, если она выходит за допустимые границы
             if (_currentPage > totalPages && totalPages > 0)
                 _currentPage = totalPages;
             if (_currentPage < 1)
@@ -172,6 +219,9 @@ namespace WpfApp1
             DisplayCurrentPage();
         }
 
+        /// <summary>
+        /// Отображение данных текущей страницы в DataGrid
+        /// </summary>
         private void DisplayCurrentPage()
         {
             if (_allRows.Count == 0)
@@ -187,11 +237,13 @@ namespace WpfApp1
 
             if (_allRows.Count > 0)
             {
+                // Копирование структуры таблицы
                 foreach (DataColumn col in _allRows[0].Table.Columns)
                 {
                     pageTable.Columns.Add(col.ColumnName, col.DataType);
                 }
 
+                // Добавление строк только для текущей страницы
                 for (int i = startIndex; i < endIndex; i++)
                 {
                     pageTable.ImportRow(_allRows[i]);
@@ -201,6 +253,9 @@ namespace WpfApp1
             contractsDG.ItemsSource = pageTable.AsDataView();
         }
 
+        /// <summary>
+        /// Обработчик кнопки "Предыдущая страница"
+        /// </summary>
         private void PrevPage_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPage > 1)
@@ -210,6 +265,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обработчик кнопки "Следующая страница"
+        /// </summary>
         private void NextPage_Click(object sender, RoutedEventArgs e)
         {
             int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
@@ -220,6 +278,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обработчик ручного ввода номера страницы в текстовое поле
+        /// </summary>
         private void txtPageNum_LostFocus(object sender, RoutedEventArgs e)
         {
             int totalPages = (int)Math.Ceiling((double)_allRows.Count / _pageSize);
@@ -241,12 +302,19 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Валидация ввода - разрешены только цифры для поля номера страницы
+        /// </summary>
         private void OnlyNumbers_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]");
             e.Handled = regex.IsMatch(e.Text);
         }
 
+        /// <summary>
+        /// Поиск по номеру договора или ФИО клиента
+        /// Активируется при длине запроса более 3 символов или при вводе цифр
+        /// </summary>
         private void searchByContractNumAndFio_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchPrompt = searchByContractNumAndFio.Text;
@@ -261,7 +329,9 @@ namespace WpfApp1
             RefreshDataGrid();
         }
 
-
+        /// <summary>
+        /// Фильтрация договоров по диапазону дат заключения
+        /// </summary>
         private void dates_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             if (fromDate.SelectedDate.HasValue && toDate.SelectedDate.HasValue)
@@ -281,11 +351,15 @@ namespace WpfApp1
                 additionalDateFilterParams = "";
             }
 
+            // Ограничение выбора дат (начало не может быть позже конца и наоборот)
             fromDate.DisplayDateEnd = toDate.SelectedDate == null || toDate?.SelectedDate.Value > DateTime.Now ? DateTime.Now : toDate.SelectedDate.Value.AddDays(-1);
             toDate.DisplayDateStart = fromDate.SelectedDate == null ? fromDate.DisplayDateStart : fromDate.SelectedDate.Value.AddDays(1);
             RefreshDataGrid();
         }
 
+        /// <summary>
+        /// Валидация ввода дат - разрешены только управляющие символы (Backspace, пробел)
+        /// </summary>
         private void Dates_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[\b\s]");
@@ -295,6 +369,9 @@ namespace WpfApp1
                 e.Handled = true;
         }
 
+        /// <summary>
+        /// Кнопка сброса всех фильтров и настроек
+        /// </summary>
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             fromDate.Text = "";
@@ -307,6 +384,9 @@ namespace WpfApp1
             _pageSize = 3;
         }
 
+        /// <summary>
+        /// Валидация ввода поискового запроса - разрешены буквы, цифры, дефис, пробел, Backspace
+        /// </summary>
         private void searchByContractNumAndFio_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[0-9A-Za-zА-Яа-я-\b\s]");
@@ -314,14 +394,19 @@ namespace WpfApp1
                 e.Handled = false;
             else
                 e.Handled = true;
-
         }
 
+        /// <summary>
+        /// Активация кнопки просмотра договора при выборе строки в DataGrid
+        /// </summary>
         private void contractsDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             showContractVerbose.IsEnabled = true;
         }
 
+        /// <summary>
+        /// Отображение общего количества записей, соответствующих текущим фильтрам
+        /// </summary>
         private void ShowRecordsCount(string strCmd)
         {
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -333,6 +418,10 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка печати отчета - формирование и экспорт отчета о договорах в Excel
+        /// Доступна только для роли "Директор"
+        /// </summary>
         private void printAReportButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -342,31 +431,27 @@ namespace WpfApp1
                     MessageBox.Show($"В отчете отсутствуют записи", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+                
+                // Создание Excel-приложения и книги
                 var application = new Excel.Application();
                 var workbook = application.Workbooks.Add();
                 var worksheet = workbook.Worksheets[1] as Excel.Worksheet;
 
                 int rowCount = contractsDG.Items.Count;
-                int colCount = contractsDG.Columns.Count - 1;
+                int colCount = contractsDG.Columns.Count - 1;  // Исключаем колонку "Описание"
 
                 var data = new List<object[]>();
                 var cols = new List<object>();
+                
+                // Сбор заголовков колонок (исключая колонку "Описание")
                 foreach (var col in contractsDG.Columns)
                 {
                     if(col.Header != null && col.Header.ToString() != "Описание")
                         cols.Add(col.Header);
                 }
                 data.Add(cols.ToArray());
-                //foreach (DataRowView row in contractsDG.Items)
-                //{
-                //    object[] values = row.Row.ItemArray;
-
-
-                //    values[1] = ((DateTime)values[1]).ToString("dd.MM.yyyy");
-                //    values[6] = ((DateTime)values[6]).ToString("dd.MM.yyyy");
-                //    object[] valuesRightOrder = new object[] { values[0], values[3], values[2], values[5], values[7], values[6], values[1], values[4] };
-                //    data.Add(valuesRightOrder);
-                //}
+                
+                // Загрузка актуальных данных из БД для отчета
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -380,6 +465,8 @@ namespace WpfApp1
                             string betweenExpressions2 = (additionalDateFilterParams != string.Empty || additionalFilterParams != string.Empty) && additionalSearchParams != string.Empty ? " And " : "";
                             filterParams = $" where {additionalDateFilterParams}{betweenExpressions1}{additionalFilterParams}{betweenExpressions2}{additionalSearchParams}";
                         }
+                        
+                        // SQL-запрос для получения данных об отфильтрованных договорах
                         MySqlCommand cmd = new MySqlCommand($@"SELECT idcontract, contract_date, (Select full_name from `client`
                                                         where idclient = connection_claim.client_id) as 'client',
                                                         connection_claim_id, `contract_status`.`status` as 'status',
@@ -390,10 +477,12 @@ namespace WpfApp1
                                                         inner join `connection_claim` on contract.connection_claim_id = connection_claim.id_claim
                                                         inner join contract_status on contract_status.idcontract_status = contract.contract_status_id {filterParams}{additionalSortParams};", conn);
                         cmd.ExecuteNonQuery();
+                        
                         using (MySqlDataReader dr = cmd.ExecuteReader())
                         {
                             while (dr.Read())
                             {
+                                // Формирование строки данных с форматированием дат
                                 data.Add(new object[] {
                                     dr["idcontract"],
                                     dr["connection_claim_id"],
@@ -413,12 +502,15 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось загрузить данные для отчета\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
+                
+                // Определение диапазона для записи данных
                 Excel.Range startCell = worksheet.Range["A1"];
                 Excel.Range endCell = worksheet.Cells[rowCount + 2, colCount];
 
                 Excel.Range writeRange = worksheet.Range[startCell, endCell];
                 object[,] dataArray = new object[rowCount + 2, colCount];
 
+                // Заполнение массива данными
                 for (int i = 0; i <= rowCount + 1; i++)
                 {
                     for (int j = 0; j < colCount; j++)
@@ -430,17 +522,19 @@ namespace WpfApp1
                 writeRange.Value2 = dataArray;
                 writeRange.Columns.AutoFit();
 
+                // Цветовое выделение строк в зависимости от статуса договора
                 for (int i = 2; i <= rowCount + 2; i++)
                 {
                     Excel.Range cell = writeRange.Cells[colCount][i];
                     cell.Font.Bold = true;
                     cell.Font.Color = Excel.XlRgbColor.rgbWhite;
                     if (cell.Text == "Заключен")
-                        cell.Interior.Color = Excel.XlRgbColor.rgbDarkGreen;
+                        cell.Interior.Color = Excel.XlRgbColor.rgbDarkGreen;  // Действующий - зеленый
                     else
-                        cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;
+                        cell.Interior.Color = Excel.XlRgbColor.rgbDarkRed;    // Расторгнутый - красный
                 }
 
+                // Создание форматированной таблицы Excel
                 Excel.ListObject table = worksheet.ListObjects.Add(
                     Excel.XlListObjectSourceType.xlSrcRange,
                     worksheet.Range[startCell, endCell],
@@ -449,11 +543,13 @@ namespace WpfApp1
                     Type.Missing);
                 table.Name = "Contracts";
 
+                // Добавление информации о количестве договоров
                 Excel.Range recordCount = worksheet.Cells[1][rowCount + 3];
                 recordCount.Value = $"Количество договоров: {recordsCountLabel.Content}";
                 recordCount.Font.Bold = true;
                 recordCount.Font.Size = 16;
 
+                // Добавление информации о периоде отчета
                 if (fromDate.SelectedDate != null && toDate.SelectedDate != null)
                 {
                     Excel.Range period = worksheet.Cells[1][rowCount + 5];
@@ -475,6 +571,8 @@ namespace WpfApp1
                     period.Font.Bold = true;
                     period.Font.Size = 12;
                 }
+                
+                // Отображение Excel с отчетом
                 application.Visible = true;
             }
             catch(Exception exc)
@@ -483,12 +581,17 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Адаптация интерфейса при изменении размера окна
+        /// Изменяется размер шрифта кнопок (количество записей на странице фиксировано - 3)
+        /// </summary>
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             double windowHeight = e.NewSize.Height;
             double baseFontSize = 14;
             int newPageSize = _pageSize;
 
+            // Изменение размера шрифта в зависимости от высоты окна
             if (windowHeight > 800)
             {
                 newPageSize = 3;
@@ -509,6 +612,7 @@ namespace WpfApp1
                 UpdateButtonsFontSize((int)baseFontSize);
             }
 
+            // Если размер страницы изменился, обновляем пагинацию
             if (newPageSize != _pageSize)
             {
                 _pageSize = newPageSize;
@@ -525,11 +629,13 @@ namespace WpfApp1
                 }
 
                 UpdatePagination();
-
                 DisplayCurrentPage();
             }
         }
 
+        /// <summary>
+        /// Обновление размера шрифта для кнопок управления
+        /// </summary>
         private void UpdateButtonsFontSize(int fontSize)
         {
             var buttons = new[] { clearFilters, showContractVerbose, toMain, printAReportButton };

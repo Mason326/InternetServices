@@ -20,30 +20,48 @@ using System.Reflection;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for Window19.xaml
+    /// Форма "Заказ-наряд" - создание и закрытие заказ-наряда на выполненные работы
+    /// Позволяет:
+    /// - Выбирать услуги и материалы для заказ-наряда
+    /// - Управлять количеством услуг/материалов
+    /// - Рассчитывать общую стоимость с учетом скидки
+    /// - Сохранять заказ-наряд в БД
+    /// - Печатать акт выполненных работ в Word
     /// </summary>
     public partial class Order : Window
     {
-        int claimId;
-        DataTable dtServices = new DataTable();
-        Dictionary<string, DataRowView> servicesDictionary = new Dictionary<string, DataRowView>();
-        DataTable dtMaterials = new DataTable();
-        Dictionary<string, DataRowView> materialsDictionary = new Dictionary<string, DataRowView>();
-        Action<bool> RefreshDG;
+        int claimId;                                           // ID заявки, для которой создается заказ-наряд
+        DataTable dtServices = new DataTable();                // Таблица для хранения выбранных услуг
+        Dictionary<string, DataRowView> servicesDictionary = new Dictionary<string, DataRowView>();  // Словарь услуг для быстрого доступа
+        DataTable dtMaterials = new DataTable();               // Таблица для хранения выбранных материалов
+        Dictionary<string, DataRowView> materialsDictionary = new Dictionary<string, DataRowView>(); // Словарь материалов для быстрого доступа
+        Action<bool> RefreshDG;                               // Делегат для обновления родительского DataGrid
+
+        /// <summary>
+        /// Конструктор формы - инициализация таблиц и словарей
+        /// </summary>
+        /// <param name="claimIdentifier">ID заявки</param>
+        /// <param name="refreshDG">Метод обновления DataGrid</param>
         public Order(int claimIdentifier, Action<bool> refreshDG)
         {
             InitializeComponent();
             claimId = claimIdentifier;
+
+            // Структура таблицы услуг: название, количество, стоимость, ID, единицы измерения
             dtServices.Columns.Add("service_name", typeof(string));
             dtServices.Columns.Add("count", typeof(int));
             dtServices.Columns.Add("cost", typeof(double));
             dtServices.Columns.Add("service_id", typeof(int));
             dtServices.Columns.Add("units", typeof(string));
+
+            // Структура таблицы материалов: название, количество, стоимость, ID, единицы измерения
             dtMaterials.Columns.Add("material_name", typeof(string));
             dtMaterials.Columns.Add("count", typeof(int));
             dtMaterials.Columns.Add("cost", typeof(double));
             dtMaterials.Columns.Add("material_id", typeof(int));
             dtMaterials.Columns.Add("units", typeof(string));
+
+            // Инициализация сумм
             materialsTotalCostLabel.Content = 0;
             servicesTotalCostLabel.Content = 0;
             orderTotalCostLabel.Content = 0;
@@ -51,13 +69,17 @@ namespace WpfApp1
             RefreshDG += refreshDG;
         }
 
-
-
+        /// <summary>
+        /// Кнопка "На главную" - закрытие формы
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// Событие загрузки формы - загрузка данных заявки, услуг и материалов
+        /// </summary>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -68,7 +90,10 @@ namespace WpfApp1
             {
                 ;
             }
-            numberOrderLabel.Content = GetOrderNumber();
+
+            numberOrderLabel.Content = GetOrderNumber();  // Получение номера заказ-наряда
+
+            // Загрузка данных заявки из БД
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -88,6 +113,8 @@ namespace WpfApp1
                         numberClaimLabel.Content = values[0];
                         creationDateLabel.Content = ((DateTime)values[1]).ToString("dd.MM.yyyy");
                         executionDateLabel.Content = ((DateTime)values[2]).ToString("dd.MM.yyyy HH:mm");
+
+                        // Очистка адреса от лишних символов
                         string address = string.Join(", ", values[3].ToString().Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
                         address = address.Replace(",,", ",");
                         mountAddressTextBox.Text = address;
@@ -97,16 +124,19 @@ namespace WpfApp1
                         statusLabel.Content = values[7];
                     }
                 }
-
             }
             catch (Exception exc)
             {
                 MessageBox.Show($"Не удалось загрузить заказ-наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            FillServicesDG("");
-            FillMaterialsDG("");
+            FillServicesDG("");      // Загрузка списка услуг
+            FillMaterialsDG("");     // Загрузка списка материалов
         }
+
+        /// <summary>
+        /// Получение номера нового заказ-наряда (максимальный ID + 1)
+        /// </summary>
         private int GetOrderNumber()
         {
             try
@@ -118,14 +148,16 @@ namespace WpfApp1
                     int orderNumber = Convert.ToInt32(cmd.ExecuteScalar()) + 1;
                     return orderNumber;
                 }
-
             }
             catch
             {
-                return 1;
+                return 1;  // Если таблица пуста, начинаем с 1
             }
         }
 
+        /// <summary>
+        /// Заполнение DataGrid списком услуг (с фильтрацией по поисковому запросу)
+        /// </summary>
         private void FillServicesDG(string searchWord)
         {
             try
@@ -140,7 +172,6 @@ namespace WpfApp1
                     da.Fill(dt);
                     servicesDG.ItemsSource = dt.AsDataView();
                 }
-
             }
             catch (Exception exc)
             {
@@ -148,6 +179,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Заполнение DataGrid списком материалов (с фильтрацией по поисковому запросу)
+        /// </summary>
         private void FillMaterialsDG(string searchWord)
         {
             try
@@ -162,7 +196,6 @@ namespace WpfApp1
                     da.Fill(dt);
                     materialsDG.ItemsSource = dt.AsDataView();
                 }
-
             }
             catch (Exception exc)
             {
@@ -170,10 +203,15 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Поиск услуг/материалов при вводе текста в поле поиска
+        /// Выполняется при длине запроса более 3 символов
+        /// </summary>
         private void searchTextBox_KeyUp(object sender, KeyEventArgs e)
         {
             var textBox = sender as TextBox;
             Action<string> targetName;
+
             switch (textBox.Name)
             {
                 case "searchServiceTextBox":
@@ -186,18 +224,24 @@ namespace WpfApp1
                     targetName = (string str) => { };
                     break;
             }
+
             if (textBox.Text.Length > 3)
                 targetName(textBox.Text);
             else if (textBox.Text.Length == 0)
                 targetName("");
         }
 
+        /// <summary>
+        /// Кнопка "Добавить услугу" - добавление услуги в заказ-наряд
+        /// </summary>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if (servicesDG.SelectedItem != null)
             {
                 var drv = servicesDG.SelectedItem as DataRowView;
                 var items = drv.Row.ItemArray;
+
+                // Если услуга уже есть в наряде - увеличиваем количество
                 if (servicesDictionary.ContainsKey(items[1].ToString()))
                 {
                     DataRowView values;
@@ -213,7 +257,7 @@ namespace WpfApp1
                     orderServiceDG.Items.Add(addedToOrderDg);
                     dtServices.Rows.Remove(values.Row);
                 }
-                else
+                else  // Новая услуга
                 {
                     DataRow dr = dtServices.NewRow();
                     dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0], items[2].ToString() };
@@ -223,23 +267,28 @@ namespace WpfApp1
                     orderServiceDG.Items.Add(addedToOrderDg);
                 }
 
+                // Пересчет общей стоимости услуг
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
                 servicesCost += Convert.ToDouble(items[3]);
                 servicesTotalCostLabel.Content = Math.Round(servicesCost, 2);
 
                 double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
-
                 orderTotalCostLabel.Content = Math.Round(servicesCost + materialsCost, 2);
-                RefreshDiscountLabel();
+                RefreshDiscountLabel();  // Пересчет скидки
             }
         }
 
+        /// <summary>
+        /// Кнопка "Добавить материал" - добавление материала в заказ-наряд
+        /// </summary>
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             if (materialsDG.SelectedItem != null)
             {
                 var drv = materialsDG.SelectedItem as DataRowView;
                 var items = drv.Row.ItemArray;
+
+                // Если материал уже есть в наряде - увеличиваем количество
                 if (materialsDictionary.ContainsKey(items[1].ToString()))
                 {
                     DataRowView values;
@@ -255,7 +304,7 @@ namespace WpfApp1
                     orderMaterials.Items.Add(addedToOrderDg);
                     dtMaterials.Rows.Remove(values.Row);
                 }
-                else
+                else  // Новый материал
                 {
                     DataRow dr = dtMaterials.NewRow();
                     dr.ItemArray = new object[] { items[1].ToString(), 1, items[3], items[0], items[2].ToString() };
@@ -264,79 +313,93 @@ namespace WpfApp1
                     materialsDictionary.Add(items[1].ToString(), addedToOrderDg);
                     orderMaterials.Items.Add(addedToOrderDg);
                 }
+
+                // Пересчет общей стоимости материалов
                 double materialCost = Convert.ToDouble(materialsTotalCostLabel.Content);
                 materialCost += Convert.ToDouble(items[3]);
                 materialsTotalCostLabel.Content = Math.Round(materialCost, 2);
 
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
-
                 orderTotalCostLabel.Content = Math.Round(servicesCost + materialCost, 2);
-                RefreshDiscountLabel();
+                RefreshDiscountLabel();  // Пересчет скидки
             }
         }
 
+        /// <summary>
+        /// Кнопка "Удалить услугу" - уменьшение количества или удаление услуги из наряда
+        /// </summary>
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             if (orderServiceDG.SelectedItem != null)
             {
                 var drv = orderServiceDG.SelectedItem as DataRowView;
                 var items = drv.Row.ItemArray;
+
                 if (servicesDictionary.ContainsKey(items[0].ToString()))
                 {
                     DataRowView values;
                     servicesDictionary.TryGetValue(items[0].ToString(), out values);
                     int newCount = Convert.ToInt32(values[1]);
-                    if (--newCount >= 1)
+
+                    if (--newCount >= 1)  // Уменьшаем количество, если осталось >= 1
                     {
                         drv.Row.SetField<int>(1, newCount);
                         drv.Row.AcceptChanges();
                         servicesDictionary.Remove(items[0].ToString());
                         servicesDictionary.Add(items[0].ToString(), drv);
                     }
-                    else
+                    else  // Удаляем услугу полностью
                     {
                         orderServiceDG.Items.Remove(drv);
                         servicesDictionary.Remove(items[0].ToString());
                     }
                 }
-                double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
 
+                // Пересчет стоимости
+                double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
                 if (servicesCost != 0)
                 {
                     servicesCost -= Convert.ToDouble(items[2]);
                     servicesTotalCostLabel.Content = Math.Round(servicesCost, 2);
                 }
-                double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
 
+                double materialsCost = Convert.ToDouble(materialsTotalCostLabel.Content);
                 orderTotalCostLabel.Content = Math.Round(servicesCost + materialsCost, 2);
-                RefreshDiscountLabel();
+                RefreshDiscountLabel();  // Пересчет скидки
             }
         }
 
+        /// <summary>
+        /// Кнопка "Удалить материал" - уменьшение количества или удаление материала из наряда
+        /// </summary>
         private void Button_Click_6(object sender, RoutedEventArgs e)
         {
             if (orderMaterials.SelectedItem != null)
             {
                 var drv = orderMaterials.SelectedItem as DataRowView;
                 var items = drv.Row.ItemArray;
+
                 if (materialsDictionary.ContainsKey(items[0].ToString()))
                 {
                     DataRowView values;
                     materialsDictionary.TryGetValue(items[0].ToString(), out values);
                     int newCount = Convert.ToInt32(values.Row.ItemArray[1]);
-                    if (--newCount >= 1)
+
+                    if (--newCount >= 1)  // Уменьшаем количество, если осталось >= 1
                     {
                         drv.Row.SetField<int>(1, newCount);
                         drv.Row.AcceptChanges();
                         materialsDictionary.Remove(items[0].ToString());
                         materialsDictionary.Add(items[0].ToString(), drv);
                     }
-                    else
+                    else  // Удаляем материал полностью
                     {
                         orderMaterials.Items.Remove(drv);
                         materialsDictionary.Remove(items[0].ToString());
                     }
                 }
+
+                // Пересчет стоимости
                 double materialCost = Convert.ToDouble(materialsTotalCostLabel.Content);
                 if (materialCost != 0)
                 {
@@ -345,30 +408,38 @@ namespace WpfApp1
                 }
 
                 double servicesCost = Convert.ToDouble(servicesTotalCostLabel.Content);
-
                 orderTotalCostLabel.Content = Math.Round(servicesCost + materialCost, 2);
-                RefreshDiscountLabel();
+                RefreshDiscountLabel();  // Пересчет скидки
             }
         }
 
+        /// <summary>
+        /// Кнопка "Закрыть наряд" - сохранение заказ-наряда в БД и закрытие заявки
+        /// </summary>
         private void Button_Click_7(object sender, RoutedEventArgs e)
         {
+            // Проверка: должны быть указаны выполненные услуги
             if (servicesDictionary.Count < 1)
             {
                 MessageBox.Show($"В заказ-наряде должны быть оказаны указаны выполненные услуги", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
             MessageBoxResult res = MessageBox.Show("Вы уверены, что хотите закрыть наряд?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
             if (res != MessageBoxResult.Yes)
                 return;
+
             using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
             {
                 conn.Open();
-                MySqlTransaction transaction = conn.BeginTransaction();
+                MySqlTransaction transaction = conn.BeginTransaction();  // Транзакция для согласованного сохранения
+
+                // Основной запрос на вставку заказ-наряда
                 string cmdText = $"INSERT INTO `order`(`idorder`, `orderDate`, `totalCost`, `connection_claim_id`) VALUE ({numberOrderLabel.Content}, '{DateTime.Now.Date.ToString("yyyy-MM-dd")}', {orderTotalCostLabel.Content.ToString().Replace(',', '.')}, {claimId});";
-                
-                if (servicesDictionary.Count > 0) 
-                { 
+
+                // Добавление услуг в пакет услуг
+                if (servicesDictionary.Count > 0)
+                {
                     cmdText += "INSERT INTO `services_pack` VALUES ";
                 }
                 foreach (var el in servicesDictionary)
@@ -377,6 +448,8 @@ namespace WpfApp1
                     int serviceId = Convert.ToInt32(drv.Row.ItemArray[3]);
                     cmdText += $"({serviceId}, {numberOrderLabel.Content}, {el.Value[1]}),";
                 }
+
+                // Добавление материалов в пакет материалов
                 if (materialsDictionary.Count > 0)
                 {
                     cmdText = cmdText.Trim(new char[] { ',' });
@@ -389,17 +462,23 @@ namespace WpfApp1
                     int materialId = Convert.ToInt32(drv.Row.ItemArray[3]);
                     cmdText += $"({materialId}, {numberOrderLabel.Content}, {el.Value[1]}),";
                 }
+
                 try
                 {
                     cmdText = cmdText.TrimEnd(new char[] { ',' });
                     cmdText += ";";
+                    // Обновление статуса заявки на "Закрыта" и связь с заказ-нарядом
                     cmdText += $"Update `connection_claim` SET `claim_status_id` = (Select `idclaim_status` from `claim_status` where `status` = 'Закрыта'), `order_id` = {numberOrderLabel.Content} where `id_claim` = {claimId}";
+
                     MySqlCommand cmd = new MySqlCommand($"{cmdText};", conn);
                     cmd.Transaction = transaction;
                     cmd.ExecuteNonQuery();
                     transaction.Commit();
+
                     MessageBox.Show($"Наряд успешно закрыт", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    RefreshDG(true);
+                    RefreshDG(true);  // Обновление родительского DataGrid
+
+                    // Предложение распечатать акт
                     MessageBoxResult printRes = MessageBox.Show("Хотите распечатать акт выполненных работ?", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
                     if (printRes == MessageBoxResult.Yes)
                         PrintADocument();
@@ -407,17 +486,24 @@ namespace WpfApp1
                 }
                 catch (Exception exc)
                 {
-                    transaction.Rollback();
+                    transaction.Rollback();  // Откат транзакции при ошибке
                     MessageBox.Show($"Не удалось закрыть наряд\nОшибка: {exc.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
+        /// <summary>
+        /// Обработчик чекбокса скидки - применение 15% скидки к общей сумме
+        /// </summary>
         private void discountCheckBox_Click(object sender, RoutedEventArgs e)
         {
             RefreshDiscountLabel();
         }
 
+        /// <summary>
+        /// Обновление суммы скидки и итоговой стоимости
+        /// Скидка составляет 15% от общей суммы
+        /// </summary>
         private void RefreshDiscountLabel()
         {
             double currentOrderCost = Convert.ToDouble(orderTotalCostLabel.Content);
@@ -427,6 +513,10 @@ namespace WpfApp1
             orderTotalCostLabel.Content = checkedFlag ? Math.Round(currentOrderCost - discount, 3) : Math.Round(Convert.ToDouble(servicesTotalCostLabel.Content) + Convert.ToDouble(materialsTotalCostLabel.Content), 3);
         }
 
+        /// <summary>
+        /// Печать акта выполненных работ в формате Word
+        /// Формирует документ на основе шаблона с подстановкой данных
+        /// </summary>
         private void PrintADocument()
         {
             if (servicesDictionary.Count < 1)
@@ -434,14 +524,17 @@ namespace WpfApp1
                 MessageBox.Show("В наряде должны быть выбраны выполненные услуги", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            // Путь к шаблону акта
             string fileName = Directory.GetCurrentDirectory();
             if (fileName.Contains("bin\\"))
             {
                 fileName = string.Join("\\", fileName.Split('\\').TakeWhile(el => el != "bin"));
             }
             fileName += "\\Resources\\Templates\\ActTemplate.doc";
+
             Word.Application wordApp = new Word.Application();
-            wordApp.Visible = false;
+            wordApp.Visible = false;  // Работаем в фоновом режиме
 
             try
             {
@@ -449,6 +542,7 @@ namespace WpfApp1
                 Word.Range range = doc.Content;
                 Word.PageSetup pageSetup = doc.PageSetup;
 
+                // Настройка полей страницы
                 pageSetup.LeftMargin = wordApp.CentimetersToPoints(0.75f);
                 pageSetup.RightMargin = wordApp.CentimetersToPoints(0.75f);
                 pageSetup.TopMargin = wordApp.CentimetersToPoints(1.5f);
@@ -462,7 +556,7 @@ namespace WpfApp1
                 if (range.End > 1)
                     range.MoveEnd(Word.WdUnits.wdCharacter, -1);
 
-
+                // Вставка содержимого шаблона
                 range.InsertFile(
                     FileName: fileName,
                     Link: false,
@@ -470,8 +564,9 @@ namespace WpfApp1
                     ConfirmConversions: false
                 );
 
-                doc.Fields.Update();
+                doc.Fields.Update();  // Обновление полей документа
 
+                // Замена плейсхолдеров в документе
                 ReplaceWord("{orderNumber}", numberOrderLabel.Content.ToString(), doc);
                 ReplaceWord("{orderDate}", (DateTime.Now).ToString("dd.MM.yyyy"), doc);
                 ReplaceWord("{companyName}", Properties.Settings.Default.companyName, doc);
@@ -480,21 +575,25 @@ namespace WpfApp1
                 string address = string.Join(", ", mountAddressTextBox.Text.Split(new string[] { ", ", "\t,", "\t" }, StringSplitOptions.RemoveEmptyEntries).Select(el => el.Trim()));
                 ReplaceWord("{mountAddress}", address, doc);
                 ReplaceWord("{totalServicesCost}", Convert.ToDouble(servicesTotalCostLabel.Content).ToString("f2"), doc);
-                ReplaceWord("{companyName}", Properties.Settings.Default.companyName, doc);
+
                 if (discountCheckBox.IsChecked.HasValue && discountCheckBox.IsChecked.Value)
                     ReplaceWord("{discountAmount}", $"Размер скидки: {discountAmountLabel.Content} руб.", doc);
                 else
                     ReplaceWord("{discountAmount}", "", doc);
                 ReplaceWord("{totalOrderCost}", orderTotalCostLabel.Content.ToString(), doc);
 
+                // Формирование таблицы услуг
                 if (range.Find.Execute("{tableServices}"))
                 {
                     range.Text = "";
                     int rowCount = servicesDictionary.Count;
                     Word.Table tbl = doc.Tables.Add(range, rowCount + 1, 4);
 
+                    // Настройка границ и внешнего вида таблицы
                     tbl.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
                     tbl.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+
+                    // Заголовки таблицы
                     for (int i = 1; i < 5; i++)
                     {
                         tbl.Rows[1].Cells[i].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
@@ -508,6 +607,8 @@ namespace WpfApp1
                     tbl.Rows[1].Cells[2].Range.Text = "Единица измерения";
                     tbl.Rows[1].Cells[3].Range.Text = "Количество";
                     tbl.Rows[1].Cells[4].Range.Text = "Сумма (руб.)";
+
+                    // Заполнение таблицы услугами
                     int contentCounter = 2;
                     foreach (var el in servicesDictionary)
                     {
@@ -517,6 +618,7 @@ namespace WpfApp1
                         tbl.Rows[contentCounter].Cells[2].Range.Text = el.Value.Row.ItemArray[4].ToString();
                         tbl.Rows[contentCounter].Cells[3].Range.Text = el.Value.Row.ItemArray[1].ToString();
                         tbl.Rows[contentCounter].Cells[4].Range.Text = Math.Round(serviceCost * serviceQuantity, 2).ToString("f2");
+
                         for (int i = 1; i < 5; i++)
                         {
                             tbl.Rows[contentCounter].Cells[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
@@ -532,6 +634,8 @@ namespace WpfApp1
                         }
                         contentCounter++;
                     }
+
+                    // Итоговая строка таблицы услуг
                     var tblOverallRow = tbl.Rows.Add();
                     tblOverallRow.Range.Shading.BackgroundPatternColor = Word.WdColor.wdColorGray10;
                     tblOverallRow.Cells[1].Range.Text = "Итого оказано услуг";
@@ -549,6 +653,7 @@ namespace WpfApp1
                     tblOverallRow.Cells[4].Range.ParagraphFormat.RightIndent = 0;
                 }
 
+                // Формирование таблицы материалов (если есть)
                 if (range.Find.Execute("{tableMaterials}") && materialsDictionary.Count > 0)
                 {
                     range.Text = "";
@@ -557,6 +662,8 @@ namespace WpfApp1
 
                     tbl.Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
                     tbl.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+
+                    // Заголовки таблицы материалов
                     for (int i = 1; i < 5; i++)
                     {
                         tbl.Rows[1].Cells[i].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
@@ -570,6 +677,8 @@ namespace WpfApp1
                     tbl.Rows[1].Cells[2].Range.Text = "Единица измерения";
                     tbl.Rows[1].Cells[3].Range.Text = "Количество";
                     tbl.Rows[1].Cells[4].Range.Text = "Сумма (руб.)";
+
+                    // Заполнение таблицы материалами
                     int contentCounter = 2;
                     foreach (var el in materialsDictionary)
                     {
@@ -579,6 +688,7 @@ namespace WpfApp1
                         tbl.Rows[contentCounter].Cells[2].Range.Text = el.Value.Row.ItemArray[4].ToString();
                         tbl.Rows[contentCounter].Cells[3].Range.Text = el.Value.Row.ItemArray[1].ToString();
                         tbl.Rows[contentCounter].Cells[4].Range.Text = Math.Round(materialCost * materialQuantity, 2).ToString("f2");
+
                         for (int i = 1; i < 5; i++)
                         {
                             tbl.Rows[contentCounter].Cells[1].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
@@ -594,6 +704,8 @@ namespace WpfApp1
                         }
                         contentCounter++;
                     }
+
+                    // Итоговая строка таблицы материалов
                     var tblOverallRow = tbl.Rows.Add();
                     tblOverallRow.Range.Shading.BackgroundPatternColor = Word.WdColor.wdColorGray10;
                     tblOverallRow.Cells[1].Range.Text = "Итого материалов";
@@ -624,10 +736,13 @@ namespace WpfApp1
             }
             finally
             {
-                wordApp.Visible = true;
+                wordApp.Visible = true;  // Показать Word с готовым документом
             }
         }
 
+        /// <summary>
+        /// Замена текста в документе Word
+        /// </summary>
         private void ReplaceWord(string src, string dest, Word.Document doc)
         {
             Word.Range range = doc.Content;

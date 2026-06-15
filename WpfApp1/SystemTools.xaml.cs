@@ -18,25 +18,40 @@ using WpfApp1.Utils;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for SystemTools.xaml
+    /// Форма "Системные инструменты" - утилиты для администрирования базы данных
+    /// Предоставляет доступ к следующим функциям:
+    /// - Создание резервной копии базы данных (Backup)
+    /// - Восстановление базы данных из резервной копии (Restore)
+    /// - Импорт данных из CSV-файла в таблицы
+    /// - Экспорт данных из таблиц в CSV-файл
+    /// Доступна только для служебной учетной записи (serviceLogin/servicePassword)
     /// </summary>
     public partial class SystemTools : Window
     {
+        /// <summary>
+        /// Конструктор формы - инициализация компонентов
+        /// </summary>
         public SystemTools()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Кнопка "На главную" - закрытие формы
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// Кнопка "Создать резервную копию БД" - экспорт всей базы данных в SQL-файл
+        /// </summary>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             try
             {
-                string pathToFile = Backup.MakeABackup();
+                string pathToFile = Backup.MakeABackup();  // Создание резервной копии
                 MessageBox.Show($"Резервная копия создана по пути: {pathToFile}", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception exc)
@@ -45,18 +60,25 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "Восстановить БД из копии" - импорт SQL-файла для восстановления базы данных
+        /// </summary>
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             try
             {
+                // Диалог выбора SQL-файла для восстановления
                 OpenFileDialog dialog = new OpenFileDialog();
                 dialog.Title = "Выберите файл восстановления базы данных";
                 dialog.Filter = "SQL-скрипты (*.sql)|*.sql";
                 dialog.ShowDialog();
+
                 if (dialog.FileName != string.Empty)
                 {
                     string filePath = dialog.FileName;
+                    // Подтверждение операции (действие необратимо)
                     MessageBoxResult res = MessageBox.Show($"Вы уверены что хотите восстановить базу данных из файла: \"{filePath}\"? Действие не может быть отменено", "Внимание", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
                     if (res == MessageBoxResult.Yes)
                     {
                         using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -66,7 +88,7 @@ namespace WpfApp1
                                 using (MySqlBackup mb = new MySqlBackup(cmd))
                                 {
                                     conn.Open();
-                                    mb.ImportFromFile(filePath);
+                                    mb.ImportFromFile(filePath);  // Восстановление БД из файла
                                 }
                             }
                         }
@@ -80,6 +102,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "Импорт данных" - открытие формы импорта данных из CSV-файла
+        /// </summary>
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             this.Hide();
@@ -88,6 +113,9 @@ namespace WpfApp1
             this.ShowDialog();
         }
 
+        /// <summary>
+        /// Кнопка "Экспорт данных" - открытие формы экспорта данных в CSV-файл
+        /// </summary>
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
             this.Hide();

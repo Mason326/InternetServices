@@ -26,36 +26,59 @@ using WpfApp1.Utils;
 namespace WpfApp1
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Форма "Создание пользователя" - управление учетными записями сотрудников
+    /// Позволяет: создавать новых пользователей, редактировать существующих,
+    /// удалять пользователей, назначать роли, загружать фото профиля,
+    /// генерировать пароли, изменять учетные данные
     /// </summary>
     public partial class CreateUser : Window
     {
+        // Флаг для отслеживания нажатия Backspace при форматировании ФИО
         bool prevBack = false;
+        // Флаг режима редактирования
         bool isEdit = false;
+        // Максимальный размер изображения (2 МБ)
         int IMAGE_MAX_BYTE_SIZE = 2097152;
+        // Флаг генерации новых учетных данных
         bool isGenerateNewCredentials;
+        // ID редактируемого пользователя
         int userId = -1;
+        // Путь к файлу изображения
         string filePath;
+        // Регулярное выражение для проверки номера телефона
         Regex regexForPhoneNumber = new Regex(@"^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$");
 
+        // WinAPI для управления раскладкой клавиатуры
         [DllImport("user32.dll")]
         static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, uint flags);
 
         [DllImport("user32.dll")]
         static extern IntPtr GetKeyboardLayout(uint idThread);
 
+        // Коды раскладок: русская и английская
         private static readonly IntPtr RussianLayout = new IntPtr(0x04190419);
         private static readonly IntPtr EnglishLayout = new IntPtr(0x04090409);
+
+        /// <summary>
+        /// Конструктор формы - инициализация компонентов
+        /// </summary>
         public CreateUser()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Кнопка "На главную" - закрытие формы
+        /// </summary>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
+        /// <summary>
+        /// Событие загрузки формы - отображение роли пользователя,
+        /// загрузка списка ролей, загрузка данных пользователей
+        /// </summary>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -66,8 +89,11 @@ namespace WpfApp1
             {
                 ;
             }
+
             RefreshDataGrid(true);
             editUserButton.IsEnabled = false;
+
+            // Загрузка ролей из БД
             try
             {
                 using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -90,8 +116,10 @@ namespace WpfApp1
             deleteUserButton.IsEnabled = false;
         }
 
-
-
+        /// <summary>
+        /// Валидация ввода ФИО - русские буквы, дефис, пробел, Backspace
+        /// Автоматическое форматирование: первая буква заглавная
+        /// </summary>
         private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[А-Яа-я-\b\s]");
@@ -101,6 +129,8 @@ namespace WpfApp1
                     e.Handled = false;
                 else
                     e.Handled = true;
+
+                // Автоматическое преобразование к верхнему регистру первой буквы
                 string[] arr = fioTextBox.Text.Split(' ');
                 if (arr.Length > 0)
                     fioTextBox.Text = string.Join(" ", arr.Select(s => $"{s[0].ToString().ToUpper()}{s.Substring(1)}"));
@@ -112,6 +142,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// При получении фокуса полем телефона - установка курсора на первый символ маски "_"
+        /// </summary>
         private void phoneTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             var phoneTextBox = sender as TextBox;
@@ -120,6 +153,9 @@ namespace WpfApp1
                 phoneTextBox.CaretIndex = targetIndex;
         }
 
+        /// <summary>
+        /// При захвате мыши полем телефона - установка курсора на первый символ маски "_"
+        /// </summary>
         private void phoneTextBox_GotMouseCapture(object sender, MouseEventArgs e)
         {
             var phoneTextBox = sender as TextBox;
@@ -128,20 +164,27 @@ namespace WpfApp1
                 phoneTextBox.CaretIndex = targetIndex;
         }
 
+        /// <summary>
+        /// Автоматическое форматирование номера телефона при вводе
+        /// </summary>
         private void phoneTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             var phoneTextBox = sender as TextBox;
             int currentPos = phoneTextBox.CaretIndex;
             try
             {
-                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                // Пропуск служебных клавиш
+                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift ||
+                    e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
                     return;
+
                 if (e.Key == Key.Back)
                 {
                     phoneTextBox.Text = "+7 (___) ___-__-__";
                     phoneTextBox.CaretIndex = 4;
                     return;
                 }
+
                 int fioLength = phoneTextBox.Text.Length;
                 if (fioLength > 0)
                 {
@@ -158,39 +201,27 @@ namespace WpfApp1
                                 phoneByParts[i] = $"({part.Substring(1, 3)})";
                                 break;
                             case 2:
-                                string fpart;
-                                string spart;
-                                string tpart;
+                                string fpart, spart, tpart;
                                 fpart = part.Substring(0, 3);
                                 spart = part.Substring(4, 2);
                                 tpart = part.Substring(7, 2);
-                                if (currentPos > 13 && currentPos <= 16)
-                                    tpart = part.Substring(8, 2);
-                                else if (currentPos > 9 && currentPos <= 13)
-                                {
-                                    spart = part.Substring(5, 2);
-                                    tpart = part.Substring(8, 2);
-                                }
                                 phoneByParts[i] = $"{fpart}-{spart}-{tpart}";
                                 break;
                         }
                     }
+
                     string[] lastNumsOfThirdPart = phoneByParts[2].Split('-');
                     phoneTextBox.Text = string.Join(" ", phoneByParts);
+
+                    // Корректировка позиции курсора после форматирования
                     if (!phoneByParts[1].Contains("_") && currentPos < 9)
                         phoneTextBox.CaretIndex = currentPos + 2;
                     else if (!lastNumsOfThirdPart[0].Contains("_") && currentPos < 13)
-                    {
                         phoneTextBox.CaretIndex = currentPos + 1;
-                    }
                     else if (!lastNumsOfThirdPart[1].Contains("_") && currentPos < 17)
-                    {
                         phoneTextBox.CaretIndex = currentPos + 1;
-                    }
                     else if (!lastNumsOfThirdPart[2].Contains("_") && currentPos < 21)
-                    {
                         phoneTextBox.CaretIndex = currentPos + 1;
-                    }
                     else
                         phoneTextBox.CaretIndex = currentPos;
                 }
@@ -201,6 +232,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "Сгенерировать пароль" - создание случайного пароля
+        /// </summary>
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if (isEdit)
@@ -211,13 +245,17 @@ namespace WpfApp1
                 else
                     isGenerateNewCredentials = true;
             }
+
+            // Генерация пароля из перемешанных символов
             char[] targetCharsPassword = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789".ToCharArray();
             char[] mixedCharsPassword = CredentialsGenerator.MixChars(targetCharsPassword);
             string generatePassword = CredentialsGenerator.GenerateCredential(mixedCharsPassword);
-
             passwordTextBox.Text = generatePassword;
         }
 
+        /// <summary>
+        /// Валидация ввода телефона - только цифры, пробел, Backspace
+        /// </summary>
         private void phoneTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[0-9\b\s]");
@@ -234,17 +272,23 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Автоматическое форматирование ФИО: первая буква каждого слова заглавная
+        /// </summary>
         private void fioTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             try
             {
-                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift || e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
+                if (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.LeftAlt || e.Key == Key.LeftShift ||
+                    e.Key == Key.LeftCtrl || e.Key == Key.CapsLock || e.Key == Key.System)
                     return;
+
                 if (e.Key == Key.Back)
                 {
                     prevBack = true;
                     return;
                 }
+
                 int fioLength = fioTextBox.Text.Length;
                 if (fioLength > 0)
                 {
@@ -252,7 +296,6 @@ namespace WpfApp1
                     for (int i = 0; i < fioByParts.Length; i++)
                     {
                         string part = fioByParts[i];
-
                         if (part.Length > 0)
                             fioByParts[i] = ToTitle(part);
                         if (part.Contains("-"))
@@ -265,8 +308,10 @@ namespace WpfApp1
                             }
                         }
                     }
+
                     int currentPos = fioTextBox.CaretIndex;
                     fioTextBox.Text = string.Join(" ", fioByParts);
+
                     if (prevBack)
                     {
                         fioTextBox.CaretIndex = currentPos;
@@ -287,15 +332,16 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Валидация ввода ФИО - русские буквы, дефис, пробел, Backspace
+        /// </summary>
         private void fioTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex(@"[А-Яа-я- \b\s]");
             try
             {
                 if (regex.IsMatch(e.Text[e.Text.Length - 1].ToString()))
-                {
                     e.Handled = false;
-                }
                 else
                     e.Handled = true;
             }
@@ -305,6 +351,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Ограничение ввода: не более 2 пробелов в ФИО
+        /// </summary>
         private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
@@ -319,17 +368,22 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Преобразование строки в формат "Заглавная + строчные"
+        /// </summary>
         private string ToTitle(string text)
         {
             return $"{text[0].ToString().ToUpper()}{text.Substring(1, text.Length - 1)}";
         }
 
+        /// <summary>
+        /// Кнопка "Создать пользователя" - добавление нового пользователя в БД
+        /// </summary>
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             bool requiredFieldsIsFilled;
             try
             {
-
                 requiredFieldsIsFilled = fioTextBox.Text.Split(' ').Length >= 1
                    && regexForPhoneNumber.IsMatch(phoneTextBox.Text)
                    && rolesComboBox.SelectedItem != null
@@ -353,9 +407,9 @@ namespace WpfApp1
                 return;
             }
 
-
             if (requiredFieldsIsFilled)
             {
+                // Проверка на дубликаты логина и телефона
                 if (!CheckDuplicateUtil.HasNoDuplicate("employees", "login", loginTextBox.Text))
                 {
                     MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина пользователя", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -367,11 +421,13 @@ namespace WpfApp1
                     return;
                 }
 
+                // Проверка: может быть только один директор
                 if (HasDirectorAccount() && rolesComboBox.SelectedItem.ToString() == "Директор")
                 {
                     MessageBox.Show("В системе уже существует учетная запись директора", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -388,6 +444,8 @@ namespace WpfApp1
                                                                  (Select idroles from `roles` where `role_name` = '{rolesComboBox.SelectedItem}')
                                                             );";
                         cmd.CommandText = cmdText;
+
+                        // Обработка загрузки фото (с проверкой размера и возможным сжатием)
                         if (filePath != null)
                         {
                             byte[] imageBytes = File.ReadAllBytes(filePath);
@@ -395,24 +453,22 @@ namespace WpfApp1
                             bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
                             if (imageSizeIsInvalid)
                             {
-                                if (imageSizeIsInvalid)
+                                MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                if (res == MessageBoxResult.Yes)
                                 {
-                                    MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                                    if (res == MessageBoxResult.Yes)
+                                    var win = new ImageCompressionWindow();
+                                    win.ShowDialog();
+                                    if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
                                     {
-                                        var win = new ImageCompressionWindow();
-                                        win.ShowDialog();
-                                        if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
-                                        {
-                                            ImageHolder.isCanceled = false;
-                                            return;
-                                        }
-                                        imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
-                                        goto compressionLabel;
+                                        ImageHolder.isCanceled = false;
+                                        return;
                                     }
-                                    return;
+                                    imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
+                                    goto compressionLabel;
                                 }
+                                return;
                             }
+
                             cmdText = $@"Insert into `employees`(full_name, `login`, `password`, phoneNumber, roles_id, photo) 
                                                             value(
                                                                 '{fioTextBox.Text}',
@@ -430,7 +486,6 @@ namespace WpfApp1
                         ClearInputData();
                         userImage.Source = ImageUtils.LoadImage(null);
                     }
-
                 }
                 catch (Exception exc)
                 {
@@ -443,6 +498,9 @@ namespace WpfApp1
                 MessageBox.Show("Все поля помеченные \"*\" обязательны для заполнения", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
+        /// <summary>
+        /// Очистка всех полей ввода
+        /// </summary>
         private void ClearInputData()
         {
             fioTextBox.Text = "";
@@ -452,6 +510,10 @@ namespace WpfApp1
             passwordTextBox.Text = "";
         }
 
+        /// <summary>
+        /// Обновление DataGrid со списком пользователей
+        /// </summary>
+        /// <param name="isInitial">true - начальная загрузка, false - обновление с сортировкой по убыванию ID</param>
         private void RefreshDataGrid(bool isInitial)
         {
             try
@@ -468,26 +530,30 @@ namespace WpfApp1
                                                           FROM employees
                                                           inner join `roles` on employees.roles_id = roles.idroles order by idemployees;";
                     }
+
                     MySqlCommand cmd = new MySqlCommand(cmdText, conn);
                     DataTable dt = new DataTable();
                     using (MySqlDataReader dr = cmd.ExecuteReader())
                     {
+                        // Создание структуры таблицы
                         DataColumn[] columns = new DataColumn[dr.FieldCount];
                         for (int i = 0; i < columns.Length; i++)
                         {
                             columns[i] = new DataColumn(dr.GetName(i), dr.GetFieldType(i));
                         }
-
                         dt.Columns.AddRange(columns);
+
+                        // Добавление колонки для фото
                         BitmapImage image = new BitmapImage();
                         Type type = image.GetType();
                         dt.Columns.Add("UserPhoto", type);
+
                         object[] record = new object[dr.FieldCount + 1];
                         while (dr.Read())
                         {
                             dr.GetValues(record);
                             byte[] imageBytes = record[6] as byte[];
-                            record[8] = ImageUtils.LoadImage(imageBytes);
+                            record[8] = ImageUtils.LoadImage(imageBytes);  // Загрузка фото из БД
                             dt.LoadDataRow(record, true);
                         }
                     }
@@ -503,6 +569,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Создание SHA256 хеша пароля
+        /// </summary>
         public string CreateChecksum(string password)
         {
             StringBuilder Sb = new StringBuilder();
@@ -513,10 +582,12 @@ namespace WpfApp1
                 foreach (Byte b in result)
                     Sb.Append(b.ToString("x2"));
             }
-            string hashedPassword = Sb.ToString();
-            return hashedPassword;
+            return Sb.ToString();
         }
 
+        /// <summary>
+        /// Кнопка "Удалить пользователя" - удаление выбранного пользователя из БД
+        /// </summary>
         private void deleteUserButton_Click(object sender, RoutedEventArgs e)
         {
             if (userDG.SelectedItem == null)
@@ -529,6 +600,7 @@ namespace WpfApp1
             if (result == MessageBoxResult.No || result == MessageBoxResult.Cancel)
                 return;
 
+            // Запрет удаления текущего пользователя
             int currentUserId = AccountHolder.userId;
             if (currentUserId == Convert.ToInt32(recordValues[0]))
             {
@@ -554,12 +626,18 @@ namespace WpfApp1
             RefreshDataGrid(false);
         }
 
+        /// <summary>
+        /// Активация кнопок при выборе пользователя в DataGrid
+        /// </summary>
         private void userDG_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             deleteUserButton.IsEnabled = true;
             editUserButton.IsEnabled = true;
         }
 
+        /// <summary>
+        /// Проверка наличия учетной записи директора в системе
+        /// </summary>
         private bool HasDirectorAccount()
         {
             try
@@ -580,11 +658,17 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Кнопка "Редактировать пользователя" - переход в режим редактирования
+        /// </summary>
         private void editUserButton_Click(object sender, RoutedEventArgs e)
         {
             PrepareToEdit();
         }
 
+        /// <summary>
+        /// Подготовка к редактированию - заполнение полей данными выбранного пользователя
+        /// </summary>
         private void PrepareToEdit()
         {
             if (userDG.SelectedItem != null)
@@ -592,6 +676,7 @@ namespace WpfApp1
                 DataRowView drv = userDG.SelectedItem as DataRowView;
                 object[] fieldValuesOfARecord = drv.Row.ItemArray;
 
+                // Переключение UI в режим редактирования
                 createUserButton.Visibility = Visibility.Collapsed;
                 editUserButton.Visibility = Visibility.Collapsed;
                 deleteUserButton.Visibility = Visibility.Collapsed;
@@ -602,10 +687,13 @@ namespace WpfApp1
 
                 userId = Convert.ToInt32(fieldValuesOfARecord[0]);
                 int currentUserId = AccountHolder.userId;
+
+                // Запрет изменения роли текущего пользователя
                 if (currentUserId == userId)
                     rolesComboBox.IsEnabled = false;
                 else
                     rolesComboBox.IsEnabled = true;
+
                 fioTextBox.Text = fieldValuesOfARecord[1].ToString().Trim();
                 loginTextBox.Text = fieldValuesOfARecord[2].ToString().Trim();
                 phoneTextBox.Text = fieldValuesOfARecord[5].ToString().Trim();
@@ -620,6 +708,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Выход из режима редактирования, возврат в режим просмотра/создания
+        /// </summary>
         private void CloseEdition()
         {
             createUserButton.Visibility = Visibility.Visible;
@@ -642,11 +733,17 @@ namespace WpfApp1
             isEdit = false;
         }
 
+        /// <summary>
+        /// Кнопка "Отмена редактирования"
+        /// </summary>
         private void cancelChangesButton_Click(object sender, RoutedEventArgs e)
         {
             CloseEdition();
         }
 
+        /// <summary>
+        /// Кнопка "Завершить редактирование" - сохранение изменений пользователя
+        /// </summary>
         private void endEditingButton_Click(object sender, RoutedEventArgs e)
         {
             bool requiredFieldsIsFilled;
@@ -665,6 +762,7 @@ namespace WpfApp1
 
             if (requiredFieldsIsFilled)
             {
+                // Проверка на дубликаты при редактировании (исключая текущего пользователя)
                 int duplicatePhoneUserId = CheckDuplicateUtil.HasNoDuplicate("employees", "phoneNumber", phoneTextBox.Text, false);
                 int duplicateLoginUserId = CheckDuplicateUtil.HasNoDuplicate("employees", "login", loginTextBox.Text, true);
 
@@ -678,6 +776,7 @@ namespace WpfApp1
                     MessageBox.Show($"Не удалось добавить клиента. Обнаружен дубликат логина пользователя", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
+
                 try
                 {
                     using (MySqlConnection conn = new MySqlConnection(Connection.ConnectionString))
@@ -692,8 +791,12 @@ namespace WpfApp1
                                                 `login` = '{loginTextBox.Text}',
                                                 phoneNumber = '{phoneTextBox.Text}',
                                                 roles_id = (SELECT idroles FROM `roles` where `role_name` = '{rolesComboBox.SelectedItem}')";
+
+                            // Обновление пароля, если были сгенерированы новые учетные данные
                             if (isGenerateNewCredentials && passwordTextBox.Text.Length > 0)
                                 cmd.CommandText += $", `password` = '{CreateChecksum(passwordTextBox.Text)}'";
+
+                            // Обновление фото, если был выбран новый файл
                             if (filePath != null)
                             {
                                 cmd.CommandText += ", photo = @File";
@@ -702,23 +805,20 @@ namespace WpfApp1
                                 bool imageSizeIsInvalid = ImageIsTooLarge(imageBytes);
                                 if (imageSizeIsInvalid)
                                 {
-                                    if (imageSizeIsInvalid)
+                                    MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                    if (res == MessageBoxResult.Yes)
                                     {
-                                        MessageBoxResult res = MessageBox.Show($"Размер картинки превышает допустимые значения. Выберите другую картинку или используйте сжатие. \nИспользовать сжатие картинки?", "Внимание", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                                        if (res == MessageBoxResult.Yes)
+                                        var win = new ImageCompressionWindow();
+                                        win.ShowDialog();
+                                        if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
                                         {
-                                            var win = new ImageCompressionWindow();
-                                            win.ShowDialog();
-                                            if (ImageHolder.isCanceled || ImageHolder.destinationImage == null)
-                                            {
-                                                ImageHolder.isCanceled = false;
-                                                return;
-                                            }
-                                            imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
-                                            goto compressionLabel2;
+                                            ImageHolder.isCanceled = false;
+                                            return;
                                         }
-                                        return;
+                                        imageBytes = ImageHolder.GetBitmapImageBytes(ImageHolder.destinationImage);
+                                        goto compressionLabel2;
                                     }
+                                    return;
                                 }
                                 cmd.Parameters.AddWithValue("@File", imageBytes);
                             }
@@ -746,11 +846,17 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// При изменении текста в поле пароля - установка флага генерации новых учетных данных
+        /// </summary>
         private void passwordTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             isGenerateNewCredentials = true;
         }
 
+        /// <summary>
+        /// Кнопка "Загрузить фото" - выбор изображения для профиля пользователя
+        /// </summary>
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog();
@@ -760,7 +866,6 @@ namespace WpfApp1
             if (dialog.ShowDialog() == true)
             {
                 ImageHolder.BackToDefaultValues();
-
                 filePath = dialog.FileName;
                 ImageHolder.sourcePath = filePath;
                 ImageHolder.sourceImage = new BitmapImage(new Uri(filePath));
@@ -768,11 +873,17 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Проверка, превышает ли размер изображения допустимый лимит
+        /// </summary>
         private bool ImageIsTooLarge(byte[] imageBytes)
         {
             return imageBytes.Length > IMAGE_MAX_BYTE_SIZE;
         }
 
+        /// <summary>
+        /// Адаптация интерфейса при изменении размера окна
+        /// </summary>
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             double windowHeight = e.NewSize.Height;
@@ -796,6 +907,9 @@ namespace WpfApp1
             }
         }
 
+        /// <summary>
+        /// Обновление размера шрифта для кнопок и DataGrid
+        /// </summary>
         private void UpdateButtonsFontSize(int fontSize)
         {
             var buttons = new[] { createUserButton, editUserButton, deleteUserButton,
@@ -811,6 +925,9 @@ namespace WpfApp1
                 userDG.FontSize = fontSize;
         }
 
+        /// <summary>
+        /// При получении фокуса полем ФИО - переключение на русскую раскладку клавиатуры
+        /// </summary>
         private void fioTextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             ActivateKeyboardLayout(RussianLayout, 0);
