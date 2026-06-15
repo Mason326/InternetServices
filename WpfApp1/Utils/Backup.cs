@@ -8,11 +8,16 @@ using MySql.Data.MySqlClient;
 
 namespace WpfApp1.Utils
 {
+    /// <summary>
+    /// Класс для резервного копирования (бэкапов)
+    /// </summary>
     public class Backup
     {
         public static string MakeABackup()
         {
+            // Дампы сохраняются в Resources\Backups
             string pathToProject = string.Join("\\", Directory.GetCurrentDirectory().Split('\\').TakeWhile(item => item != "bin"));
+            // Если директории не существует, то создаем ее
             if (!Directory.Exists($@"{pathToProject}\Resources\Backups\"))
                 Directory.CreateDirectory($@"{pathToProject}\Resources\Backups\");
             string fileName = $@"{pathToProject}\Resources\Backups\backup_{DateTime.Now.Ticks}.sql";
@@ -20,6 +25,7 @@ namespace WpfApp1.Utils
             {
                 using (MySqlCommand cmd = conn.CreateCommand())
                 {
+                    // Использование библиотеки-расширения MySqlBackup
                     using (MySqlBackup backup = new MySqlBackup(cmd))
                     {
                         conn.Open();
@@ -27,7 +33,7 @@ namespace WpfApp1.Utils
                     }
                 }
             }
-
+            // Путь до файла-дампа возвращаем
             return fileName;
         }
     }

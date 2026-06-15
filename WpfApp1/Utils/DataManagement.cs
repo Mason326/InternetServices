@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace WpfApp1.Utils
 {
+    /// <summary>
+    /// Класс-деражатель перечисления
+    /// </summary>
     public class DataManagement
     {
+        /// <summary>
+        /// Перечисление для служебных действий по Импорту / Экспорты
+        /// </summary>
         public enum DataOperationType
         {
             Import,

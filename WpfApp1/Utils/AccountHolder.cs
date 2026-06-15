@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace WpfApp1
 {
+    /// <summary>
+    /// Класс держатель данных текущего пользователя
+    /// </summary>
     public class AccountHolder
     {
         public static int userId { get; set; }
